@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { getConflictingBookings, nextFreeDate } from '@/lib/availability'
+import { enqueueEmail, flushEmailQueueInBackground } from '@/lib/email/send'
 
 export async function POST(request: NextRequest) {
   try {
@@ -120,15 +121,55 @@ export async function POST(request: NextRequest) {
       await supabase.from('booking_addons').insert(addonRows)
     }
 
-    // Queue notification (for future use)
-    await supabase.from('notifications_queue').insert({
-      booking_id: booking.id,
-      type: 'email',
-      recipient: guestEmail,
-      template_key: 'booking_confirmation',
-      payload: { reference: booking.reference, name: guestName },
-      status: 'pending',
-    })
+    // Queue the customer receipt and the internal alert. Both are sent by the
+    // email worker, so a mail outage delays the notification instead of
+    // failing the booking. Carries enough detail for the templates to render
+    // the vehicle, dates and total.
+    const { data: carRow } = await supabase
+      .from('cars')
+      .select('make, model')
+      .eq('id', carId)
+      .single()
+
+    const emailPayload = {
+      reference: booking.reference,
+      name: guestName,
+      carName: carRow ? `${carRow.make} ${carRow.model}` : undefined,
+      pickupDate,
+      dropoffDate,
+      totalAmount: pricing?.total ?? null,
+    }
+
+    const { data: notifySettings } = await supabase
+      .from('settings')
+      .select('key, value')
+      .in('key', ['notify_new_booking', 'notify_admin_email', 'notify_booking_confirm'])
+
+    const notify = Object.fromEntries(
+      (notifySettings || []).map(s => [s.key, (s.value || '').trim()])
+    )
+
+    if (notify.notify_booking_confirm !== 'false') {
+      await enqueueEmail({
+        bookingId: booking.id,
+        recipient: guestEmail,
+        templateKey: 'booking_confirmation',
+        payload: emailPayload,
+      })
+    }
+
+    if (notify.notify_new_booking !== 'false' && notify.notify_admin_email) {
+      await enqueueEmail({
+        bookingId: booking.id,
+        recipient: notify.notify_admin_email,
+        templateKey: 'admin_new_booking',
+        payload: emailPayload,
+      })
+    }
+
+    // Send now rather than waiting for the nightly cron; does not block the
+    // response the customer is waiting on.
+    flushEmailQueueInBackground()
 
     return NextResponse.json({ reference: booking.reference, id: booking.id })
   } catch (e) {

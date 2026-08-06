@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth-guard'
+import { enqueueEmail, flushEmailQueueInBackground } from '@/lib/email/send'
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const denied = await requireAdmin()
@@ -36,5 +37,37 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+
+  // Tell the customer when their booking is confirmed or cancelled. Queued,
+  // so a mail problem never blocks the status change staff just made.
+  const template =
+    update.status === 'confirmed'
+      ? 'booking_confirmed'
+      : update.status === 'cancelled'
+        ? 'booking_cancelled'
+        : null
+
+  if (template && data?.guest_email) {
+    const { data: car } = data.car_id
+      ? await supabase.from('cars').select('make, model').eq('id', data.car_id).single()
+      : { data: null }
+
+    await enqueueEmail({
+      bookingId: data.id,
+      recipient: data.guest_email,
+      templateKey: template,
+      payload: {
+        reference: data.reference,
+        name: data.guest_name || 'there',
+        carName: car ? `${car.make} ${car.model}` : undefined,
+        pickupDate: data.pickup_date,
+        dropoffDate: data.dropoff_date,
+        totalAmount: data.total_amount ? Number(data.total_amount) : null,
+      },
+    })
+  }
+
+  flushEmailQueueInBackground()
+
   return NextResponse.json({ booking: data })
 }

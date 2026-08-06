@@ -7,6 +7,7 @@ const settingsNav = [
   { href: '/admin/settings/booking-policy', label: 'Booking Policy', iconName: 'BookOpen',  desc: 'Cancellation & advance limits' },
   { href: '/admin/settings/notifications',  label: 'Notifications',  iconName: 'Bell',      desc: 'Emails & WhatsApp alerts' },
   { href: '/admin/settings/social-media',   label: 'Social Media',   iconName: 'Share2',    desc: 'Facebook, Instagram, TikTok' },
+  { href: '/admin/settings/integrations',   label: 'Integrations',   iconName: 'Plug',      desc: 'Email & payment keys' },
 ]
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {

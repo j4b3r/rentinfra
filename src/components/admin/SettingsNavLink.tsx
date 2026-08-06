@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Building2, Scale, Clock, Share2, Bell, BookOpen } from 'lucide-react'
+import { Building2, Scale, Clock, Share2, Bell, BookOpen, Plug } from 'lucide-react'
 
 const ICONS: Record<string, React.ElementType> = {
-  Building2, Scale, Clock, Share2, Bell, BookOpen,
+  Building2, Scale, Clock, Share2, Bell, BookOpen, Plug,
 }
 
 interface Props {

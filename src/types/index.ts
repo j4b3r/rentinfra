@@ -185,6 +185,8 @@ export interface Setting {
   value: string
   type: 'string' | 'number' | 'boolean' | 'json'
   description: string | null
+  /** Credentials — withheld from non-admins by RLS, never sent to the client */
+  is_secret?: boolean
   updated_at: string
 }
 
