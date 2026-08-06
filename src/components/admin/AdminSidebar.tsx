@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Car, Calendar, Users, MapPin,
-  Settings, Languages, Package, ExternalLink, LogOut
+  Settings, Languages, Package, ExternalLink, LogOut, Star
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -16,6 +16,7 @@ const navItems = [
   { href: '/admin/addons', label: 'Addons', icon: Package },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/locations', label: 'Locations', icon: MapPin },
+  { href: '/admin/testimonials', label: 'Testimonials', icon: Star },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
   { href: '/admin/translations', label: 'Translations', icon: Languages },
 ]

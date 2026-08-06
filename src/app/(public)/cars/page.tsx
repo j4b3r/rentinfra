@@ -21,10 +21,29 @@ const categories = [
 export default async function CarsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>
+  searchParams: Promise<{ category?: string; pickup?: string; dropoff?: string; location?: string }>
 }) {
-  const { category } = await searchParams
+  const { category, pickup, dropoff, location } = await searchParams
   const supabase = await createClient()
+
+  // Dates chosen on the homepage travel with every link so the booking
+  // wizard opens on the range the visitor already picked.
+  const dateParams = new URLSearchParams()
+  if (pickup) dateParams.set('pickup', pickup)
+  if (dropoff) dateParams.set('dropoff', dropoff)
+  if (location) dateParams.set('location', location)
+  const bookingQuery = dateParams.toString()
+
+  const rentalDays =
+    pickup && dropoff
+      ? Math.max(
+          1,
+          Math.round(
+            (new Date(`${dropoff}T00:00:00`).getTime() - new Date(`${pickup}T00:00:00`).getTime()) /
+              86400000
+          )
+        )
+      : null
 
   let query = supabase
     .from('cars')
@@ -68,7 +87,12 @@ export default async function CarsPage({
             </div>
             {categories.map(cat => (
               <a key={cat.value}
-                href={cat.value !== 'all' ? `/cars?category=${cat.value}` : '/cars'}
+                href={(() => {
+                  const p = new URLSearchParams(dateParams)
+                  if (cat.value !== 'all') p.set('category', cat.value)
+                  const qs = p.toString()
+                  return qs ? `/cars?${qs}` : '/cars'
+                })()}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                   current === cat.value
                     ? 'bg-[#0A1F44] text-white shadow-sm'
@@ -89,7 +113,7 @@ export default async function CarsPage({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {cars.map((car, i) => (
               <div key={car.id} className="animate-fade-up" style={{ animationDelay: `${i * 0.08}s` }}>
-                <CarCard car={car as Car} />
+                <CarCard car={car as Car} bookingQuery={bookingQuery} rentalDays={rentalDays} />
               </div>
             ))}
           </div>

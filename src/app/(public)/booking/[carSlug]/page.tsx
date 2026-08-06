@@ -3,8 +3,15 @@ import { notFound } from 'next/navigation'
 import BookingWizard from '@/components/booking/BookingWizard'
 import { Car, Addon, Location, Setting } from '@/types'
 
-export default async function BookingPage({ params }: { params: Promise<{ carSlug: string }> }) {
+export default async function BookingPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ carSlug: string }>
+  searchParams: Promise<{ pickup?: string; dropoff?: string; location?: string }>
+}) {
   const { carSlug } = await params
+  const { pickup, dropoff, location } = await searchParams
   const supabase = await createClient()
 
   const [carRes, addonsRes, locationsRes, settingsRes, userRes] = await Promise.all([
@@ -46,6 +53,9 @@ export default async function BookingPage({ params }: { params: Promise<{ carSlu
           settings={settings}
           userId={user?.id}
           userEmail={user?.email}
+          initialPickupDate={pickup}
+          initialDropoffDate={dropoff}
+          initialLocationId={location && locations.some(l => l.id === location) ? location : undefined}
         />
       </div>
     </div>

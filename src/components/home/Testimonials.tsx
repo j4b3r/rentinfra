@@ -1,86 +1,79 @@
-import { Star, Quote } from 'lucide-react'
+import { Star } from 'lucide-react'
 
-const testimonials = [
-  {
-    name: 'James & Sarah T.',
-    country: '🇬🇧 United Kingdom',
-    rating: 5,
-    text: 'Absolutely brilliant service. The car was delivered to our hotel — spotless and exactly as described. Best car rental experience we\'ve had. Will definitely book again next summer.',
-    car: 'Toyota RAV4',
-  },
-  {
-    name: 'Klaus M.',
-    country: '🇩🇪 Germany',
-    rating: 5,
-    text: 'Sehr professionell und zuverlässig. The team was responsive on WhatsApp and the airport pickup was smooth. Great price for a luxury car — the Mercedes was perfect for our week-long trip.',
-    car: 'Mercedes C-Class',
-  },
-  {
-    name: 'María G.',
-    country: '🇪🇸 Spain',
-    rating: 5,
-    text: 'Llevamos usando este servicio tres años consecutivos para nuestras vacaciones. Siempre puntuales, los coches en perfecto estado y el precio muy competitivo. El servicio de entrega en el hotel es comodísimo.',
-    car: 'Renault Clio',
-  },
-  {
-    name: 'David L.',
-    country: '🇮🇪 Ireland',
-    rating: 5,
-    text: 'Rented for 10 days. The booking process was simple, the car was immaculate, and when we had a minor query, the WhatsApp response was within minutes. Highly recommend to anyone visiting the area.',
-    car: 'Toyota RAV4',
-  },
-  {
-    name: 'Sophie & Marc B.',
-    country: '🇫🇷 France',
-    rating: 5,
-    text: 'Service impeccable. Le véhicule était livré à notre villa à temps. Prix très compétitif par rapport aux grandes agences. Nous reviendrons certainement l\'année prochaine.',
-    car: 'Mercedes C-Class',
-  },
-  {
-    name: 'Anna K.',
-    country: '🇵🇱 Poland',
-    rating: 5,
-    text: 'Fantastic experience from start to finish. The online booking was easy, the car was ready, and the staff were so friendly. The GPS addon was well worth it for exploring the local mountain roads.',
-    car: 'Renault Clio',
-  },
-]
+export interface Testimonial {
+  id: string
+  author_name: string
+  author_country: string | null
+  author_country_emoji: string | null
+  rating: number
+  quote: string
+  car_label: string | null
+}
 
-export default function Testimonials() {
+interface TestimonialsProps {
+  testimonials: Testimonial[]
+  /** Aggregate figures from settings — both must be set to show the strip. */
+  rating?: string
+  reviewCount?: string
+}
+
+/**
+ * Renders only when there are published reviews. A fresh install shows
+ * nothing here rather than inventing social proof — add real reviews in
+ * the admin panel under Testimonials.
+ */
+export default function Testimonials({ testimonials, rating, reviewCount }: TestimonialsProps) {
+  if (!testimonials.length) return null
+
+  const showAggregate = Boolean(rating && reviewCount)
+
   return (
-    <section className="py-20 bg-[#0A1F44] relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-[#C9A84C]/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#C9A84C]/5 rounded-full blur-3xl" />
-      <div className="absolute inset-0 opacity-[0.03]"
-        style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+    <section className="bg-[#0A1F44] py-16 sm:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <h2 className="font-display text-3xl text-white sm:text-4xl">What drivers say</h2>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <span className="text-[#C9A84C] text-sm font-semibold uppercase tracking-widest">What Our Customers Say</span>
-          <h2 className="text-4xl font-extrabold text-white mt-2">Trusted by Travellers</h2>
-          <div className="flex items-center justify-center gap-1 mt-3">
-            {[...Array(5)].map((_, i) => <Star key={i} size={18} className="text-[#C9A84C] fill-[#C9A84C]" />)}
-            <span className="text-gray-400 text-sm ml-2">5.0 · 500+ happy customers</span>
-          </div>
+          {showAggregate && (
+            <p className="flex items-center gap-2 text-sm text-gray-300">
+              <span className="flex" aria-hidden="true">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={15} className="fill-[#C9A84C] text-[#C9A84C]" />
+                ))}
+              </span>
+              <span className="font-display text-lg text-[#C9A84C] tabular-nums">{rating}</span>
+              from {reviewCount} reviews
+            </p>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {testimonials.map((t, i) => (
-            <div key={i} className="glass rounded-2xl p-6 card-lift">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <div className="flex gap-0.5 mb-1">
-                    {[...Array(t.rating)].map((_, j) => (
-                      <Star key={j} size={14} className="text-[#C9A84C] fill-[#C9A84C]" />
-                    ))}
-                  </div>
-                  <p className="font-bold text-white text-sm">{t.name}</p>
-                  <p className="text-gray-400 text-xs">{t.country} · {t.car}</p>
-                </div>
-                <Quote size={20} className="text-[#C9A84C]/40 shrink-0" />
+        <div className="mt-9 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {testimonials.map((t) => (
+            <figure
+              key={t.id}
+              className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.06] p-6"
+            >
+              <div className="flex gap-0.5" aria-label={`${t.rating} out of 5`}>
+                {[...Array(t.rating)].map((_, i) => (
+                  <Star key={i} size={13} className="fill-[#C9A84C] text-[#C9A84C]" />
+                ))}
               </div>
-              <p className="text-gray-300 text-sm leading-relaxed">&ldquo;{t.text}&rdquo;</p>
-            </div>
+
+              <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-gray-200">
+                &ldquo;{t.quote}&rdquo;
+              </blockquote>
+
+              <figcaption className="mt-4 border-t border-white/10 pt-3 text-xs text-gray-400">
+                <span className="font-semibold text-white">{t.author_name}</span>
+                {t.author_country && (
+                  <>
+                    {' · '}
+                    {t.author_country_emoji && <span aria-hidden="true">{t.author_country_emoji} </span>}
+                    {t.author_country}
+                  </>
+                )}
+                {t.car_label && <> · {t.car_label}</>}
+              </figcaption>
+            </figure>
           ))}
         </div>
       </div>

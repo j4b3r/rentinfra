@@ -12,9 +12,23 @@ const CAR_PLACEHOLDER: Record<string, string> = {
   luxury: 'https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=800&q=80',
 }
 
-export default async function CarDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function CarDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ pickup?: string; dropoff?: string; location?: string }>
+}) {
   const { slug } = await params
+  const { pickup, dropoff, location } = await searchParams
   const supabase = await createClient()
+
+  // Keep the searched dates attached so the wizard opens prefilled.
+  const bookingParams = new URLSearchParams()
+  if (pickup) bookingParams.set('pickup', pickup)
+  if (dropoff) bookingParams.set('dropoff', dropoff)
+  if (location) bookingParams.set('location', location)
+  const bookingQuery = bookingParams.toString()
 
   const { data: car } = await supabase
     .from('cars')
@@ -94,7 +108,7 @@ export default async function CarDetailPage({ params }: { params: Promise<{ slug
             )}
 
             <Link
-              href={`/booking/${typedCar.slug}`}
+              href={bookingQuery ? `/booking/${typedCar.slug}?${bookingQuery}` : `/booking/${typedCar.slug}`}
               className="w-full block text-center bg-[#C9A84C] text-[#0A1F44] py-3 rounded-lg font-bold text-lg hover:bg-yellow-400 transition-colors"
             >
               Book This Car

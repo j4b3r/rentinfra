@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { Car } from '@/types'
 import { Users, DoorOpen, Fuel, Settings, Luggage, Zap } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
+import { getDiscountForDays } from '@/lib/pricing'
 
 const CAR_PLACEHOLDER: Record<string, string> = {
   economy: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=600&q=80',
@@ -18,9 +19,13 @@ const categoryConfig: Record<string, { label: string; color: string; bg: string 
 
 interface CarCardProps {
   car: Car
+  /** Serialized ?pickup=&dropoff=&location= carried over from the search */
+  bookingQuery?: string
+  /** Length of the searched rental, when the visitor picked dates */
+  rentalDays?: number | null
 }
 
-export default function CarCard({ car }: CarCardProps) {
+export default function CarCard({ car, bookingQuery, rentalDays }: CarCardProps) {
   const primaryImage = car.car_images?.find(img => img.is_primary)?.url
     || car.car_images?.[0]?.url
     || CAR_PLACEHOLDER[car.category]
@@ -30,6 +35,15 @@ export default function CarCard({ car }: CarCardProps) {
 
   const cat = categoryConfig[car.category] || categoryConfig.economy
   const isElectricOrHybrid = car.fuel_type === 'electric' || car.fuel_type === 'hybrid'
+
+  // When the visitor searched dates, show what the rental actually costs for
+  // that range — using the same discount tiers the booking wizard applies.
+  const stayDiscount =
+    rentalDays && activePriceList ? getDiscountForDays(activePriceList, rentalDays).pct : 0
+  const stayTotal =
+    rentalDays && activePriceList
+      ? activePriceList.daily_rate * rentalDays * (1 - stayDiscount / 100)
+      : null
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden card-lift group">
@@ -113,19 +127,29 @@ export default function CarCard({ car }: CarCardProps) {
         {/* Price & CTA */}
         <div className="flex items-center justify-between pt-3 border-t border-gray-100">
           <div>
-            <span className="text-xs text-gray-400">From</span>
+            <span className="text-xs text-gray-400">{stayTotal ? `Total, ${rentalDays} days` : 'From'}</span>
             <div className="flex items-baseline gap-1">
-              <span className="text-[#0A1F44] font-extrabold text-2xl">
-                {activePriceList ? formatCurrency(activePriceList.daily_rate) : '—'}
+              <span className="text-[#0A1F44] font-extrabold text-2xl tabular-nums">
+                {stayTotal
+                  ? formatCurrency(stayTotal)
+                  : activePriceList ? formatCurrency(activePriceList.daily_rate) : '—'}
               </span>
-              <span className="text-sm text-gray-400">/day</span>
+              <span className="text-sm text-gray-400">{stayTotal ? '' : '/day'}</span>
             </div>
+            {stayTotal && activePriceList && (
+              <p className="text-xs text-gray-400">
+                {formatCurrency(activePriceList.daily_rate)}/day
+                {stayDiscount > 0 && (
+                  <span className="text-green-600 font-medium"> · {stayDiscount}% off</span>
+                )}
+              </p>
+            )}
           </div>
           <Link
-            href={`/cars/${car.slug}`}
+            href={bookingQuery ? `/cars/${car.slug}?${bookingQuery}` : `/cars/${car.slug}`}
             className="btn-gold text-[#0A1F44] px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm"
           >
-            Book Now
+            View details
           </Link>
         </div>
       </div>

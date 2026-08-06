@@ -45,7 +45,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-Run the SQL migrations in `supabase/migrations/` against your Supabase project (in order, `001` → `005`) via the Supabase SQL editor or CLI. Skip `006_demo_seed.sql` — it only contains fake data for the public demo.
+Run the SQL migrations in `supabase/migrations/` against your Supabase project (in order, `001` → `005`, then `007`) via the Supabase SQL editor or CLI. Skip `006_demo_seed.sql` — it only contains fake data for the public demo.
 
 After registering an account, promote yourself to admin so `/admin` is reachable:
 

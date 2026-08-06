@@ -16,6 +16,10 @@ interface BookingWizardProps {
   settings: Record<string, string>
   userId?: string
   userEmail?: string
+  /** Prefilled from the homepage search panel via ?pickup=&dropoff=&location= */
+  initialPickupDate?: string
+  initialDropoffDate?: string
+  initialLocationId?: string
 }
 
 export type WizardData = {
@@ -67,9 +71,21 @@ const initialData: WizardData = {
   driverAge: '',
 }
 
-export default function BookingWizard({ car, addons, locations, settings, userId, userEmail }: BookingWizardProps) {
+export default function BookingWizard({
+  car, addons, locations, settings, userId, userEmail,
+  initialPickupDate, initialDropoffDate, initialLocationId,
+}: BookingWizardProps) {
   const [step, setStep] = useState(0)
-  const [data, setData] = useState<WizardData>({ ...initialData, guestEmail: userEmail || '' })
+  const [data, setData] = useState<WizardData>({
+    ...initialData,
+    guestEmail: userEmail || '',
+    // Carry over whatever the visitor already chose on the homepage search
+    ...(initialPickupDate ? { pickupDate: initialPickupDate } : {}),
+    ...(initialDropoffDate ? { dropoffDate: initialDropoffDate } : {}),
+    ...(initialLocationId
+      ? { pickupLocationId: initialLocationId, dropoffLocationId: initialLocationId }
+      : {}),
+  })
   const [bookingRef, setBookingRef] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

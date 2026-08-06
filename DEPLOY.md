@@ -69,7 +69,7 @@ The SQL files in `supabase/migrations/` create every table, row-level security p
 
 ### Option A — Supabase SQL Editor (simplest)
 
-For each file `001` → `005`, in order:
+For each file `001` → `005` and then `007`, in order:
 
 1. Open your project → **SQL Editor** → **New query**.
 2. Paste the entire contents of the file.
@@ -82,6 +82,9 @@ For each file `001` → `005`, in order:
 | `003_settings_expansion.sql` | Additional settings keys |
 | `004_car_images_storage.sql` | The public `car-images` storage bucket + its RLS policies |
 | `005_booking_contract_fields.sql` | Rental-contract fields (license plate, NIE/passport, KM and fuel readings, deposit method) |
+| `007_testimonials.sql` | `testimonials` table + RLS, and the homepage social-proof settings keys |
+
+Run `007` as well — it is part of the base schema, not demo data. It ships with **no rows**, and the homepage hides the reviews section entirely until you publish one from `/admin/testimonials`.
 
 `006_demo_seed.sql` is **optional and for the public demo only** — it inserts fake cars, photos and bookings. **Skip it** if you are setting up a real business. It is safe to re-run and safe to ignore.
 
