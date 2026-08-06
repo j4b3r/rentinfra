@@ -1,10 +1,14 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/auth-guard'
 
 export async function PATCH(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string; imageId: string }> }
 ) {
+  const denied = await requireAdmin()
+  if (denied) return denied
+
   const { id: carId, imageId } = await params
   const supabase = await createAdminClient()
 
@@ -21,6 +25,9 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string; imageId: string }> }
 ) {
+  const denied = await requireAdmin()
+  if (denied) return denied
+
   const { imageId } = await params
   const supabase = await createAdminClient()
 

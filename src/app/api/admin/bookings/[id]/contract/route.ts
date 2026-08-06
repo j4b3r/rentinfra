@@ -7,8 +7,12 @@ import { RentalContract } from '@/lib/pdf/RentalContract'
 import QRCode from 'qrcode'
 import fs from 'fs'
 import path from 'path'
+import { requireAdmin } from '@/lib/auth-guard'
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
+
   const { id } = await params
   const lang = (req.nextUrl.searchParams.get('lang') || 'es') as 'es' | 'en'
 
