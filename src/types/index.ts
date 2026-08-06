@@ -1,6 +1,13 @@
+export type VehicleType = 'car' | 'motorbike' | 'bicycle'
+
+/** Categories are validated per vehicle type by a DB constraint. */
 export type CarCategory = 'economy' | 'suv' | 'luxury'
+export type MotorbikeCategory = 'scooter' | 'motorcycle' | 'touring'
+export type BicycleCategory = 'city' | 'mountain' | 'electric' | 'road'
+export type VehicleCategory = CarCategory | MotorbikeCategory | BicycleCategory
+
 export type Transmission = 'auto' | 'manual'
-export type FuelType = 'petrol' | 'diesel' | 'electric' | 'hybrid'
+export type FuelType = 'petrol' | 'diesel' | 'electric' | 'hybrid' | 'none'
 export type BookingStatus = 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled'
 export type PaymentStatus = 'unpaid' | 'deposit_paid' | 'paid' | 'refunded' | 'partial_refund'
 export type PaymentMethod = 'stripe' | 'paypal' | 'cash' | 'bank_transfer'
@@ -28,13 +35,26 @@ export interface Car {
   make: string
   model: string
   year: number | null
-  category: CarCategory
-  transmission: Transmission
-  fuel_type: FuelType
+  vehicle_type: VehicleType
+  category: VehicleCategory
+  /** Null on bicycles */
+  transmission: Transmission | null
+  fuel_type: FuelType | null
   seats: number
   doors: number
   luggage_small: number
   luggage_large: number
+  /** Motorbikes: engine displacement in cc */
+  engine_cc: number | null
+  /** Bicycles: frame size, e.g. "M" or "54cm" */
+  frame_size: string | null
+  /** Bicycles: number of gears */
+  gears: number | null
+  helmet_included: boolean
+  /** False for bicycles — no licence, age limit or young-driver fee */
+  requires_license: boolean
+  /** Overrides the global min_driver_age when set */
+  min_rider_age: number | null
   ac: boolean
   bluetooth: boolean
   gps_builtin: boolean
@@ -59,11 +79,17 @@ export interface CarImage {
   created_at: string
 }
 
+export type RateUnit = 'day' | 'hour'
+
 export interface PriceList {
   id: string
   car_id: string
   name: string
   daily_rate: number
+  /** What daily_rate buys. 'hour' lists also set hourly_rate/min_hours. */
+  rate_unit?: RateUnit
+  hourly_rate?: number | null
+  min_hours?: number | null
   season_start: string | null
   season_end: string | null
   is_active: boolean
@@ -86,6 +112,8 @@ export interface PriceListDiscount {
 
 export interface Addon {
   id: string
+  /** Limits the addon to one vehicle type; null applies to all */
+  vehicle_type?: VehicleType | null
   name_en: string
   name_es: string
   description_en: string | null

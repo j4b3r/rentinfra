@@ -37,11 +37,15 @@ export default async function BookingPage({
   )
   const user = userRes.data.user
 
-  // Filter addons: global ones + car-specific ones
+  // Filter addons: global ones + vehicle-specific ones, then drop anything
+  // meant for a different vehicle type (a child seat on a bicycle, a helmet
+  // in a car). A null vehicle_type means the addon applies to everything.
   const carAddonIds = car.car_addons?.map((ca: { addon_id: string }) => ca.addon_id) || []
-  const availableAddons = allAddons.filter(
-    a => a.is_global || carAddonIds.includes(a.id)
-  )
+  const availableAddons = allAddons.filter(a => {
+    const offered = a.is_global || carAddonIds.includes(a.id)
+    const typeMatches = !a.vehicle_type || a.vehicle_type === car.vehicle_type
+    return offered && typeMatches
+  })
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] py-8">

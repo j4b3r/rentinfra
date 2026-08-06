@@ -1,20 +1,22 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Car } from '@/types'
-import { Users, DoorOpen, Fuel, Settings, Luggage, Zap } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { getDiscountForDays } from '@/lib/pricing'
+import { specsFor, categoryLabel, placeholderFor } from '@/lib/vehicles'
+import { Users, DoorOpen, Fuel, Settings, Luggage, Zap, Bike, Gauge } from 'lucide-react'
 
-const CAR_PLACEHOLDER: Record<string, string> = {
-  economy: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=600&q=80',
-  suv: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=600&q=80',
-  luxury: 'https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=600&q=80',
-}
+const SPEC_ICONS = {
+  users: Users, door: DoorOpen, gauge: Gauge, fuel: Fuel,
+  luggage: Luggage, settings: Settings, bike: Bike, zap: Zap,
+} as const
 
-const categoryConfig: Record<string, { label: string; color: string; bg: string }> = {
-  economy: { label: 'Economy', color: 'text-blue-700', bg: 'bg-blue-50' },
-  suv:     { label: 'SUV',     color: 'text-emerald-700', bg: 'bg-emerald-50' },
-  luxury:  { label: 'Luxury',  color: 'text-amber-700', bg: 'bg-amber-50' },
+
+
+const TYPE_STYLE: Record<string, { color: string; bg: string }> = {
+  car:       { color: 'text-blue-700',    bg: 'bg-blue-50' },
+  motorbike: { color: 'text-orange-700',  bg: 'bg-orange-50' },
+  bicycle:   { color: 'text-emerald-700', bg: 'bg-emerald-50' },
 }
 
 interface CarCardProps {
@@ -38,12 +40,13 @@ export default function CarCard({
 }: CarCardProps) {
   const primaryImage = car.car_images?.find(img => img.is_primary)?.url
     || car.car_images?.[0]?.url
-    || CAR_PLACEHOLDER[car.category]
+    || placeholderFor(car)
 
   const activePriceList = car.price_lists?.find(pl => pl.is_active && !pl.season_start)
     || car.price_lists?.[0]
 
-  const cat = categoryConfig[car.category] || categoryConfig.economy
+  const cat = TYPE_STYLE[car.vehicle_type] || TYPE_STYLE.car
+  const catLabel = categoryLabel(car.vehicle_type, car.category)
   const isElectricOrHybrid = car.fuel_type === 'electric' || car.fuel_type === 'hybrid'
 
   // When the visitor searched dates, show what the rental actually costs for
@@ -86,7 +89,7 @@ export default function CarCard({
         {/* Category badge */}
         <div className="absolute top-3 left-3">
           <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${cat.bg} ${cat.color}`}>
-            {cat.label}
+            {catLabel}
           </span>
         </div>
 
@@ -114,28 +117,17 @@ export default function CarCard({
           {car.year && <p className="text-gray-400 text-xs mt-0.5">{car.year}</p>}
         </div>
 
-        {/* Specs grid */}
+        {/* Specs grid — only what applies to this vehicle type */}
         <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-gray-500 mb-4 p-3 bg-gray-50 rounded-xl">
-          <div className="flex items-center gap-1.5">
-            <Users size={12} className="text-[#C9A84C] shrink-0" />
-            <span>{car.seats} seats</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <DoorOpen size={12} className="text-[#C9A84C] shrink-0" />
-            <span>{car.doors} doors</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Settings size={12} className="text-[#C9A84C] shrink-0" />
-            <span>{car.transmission === 'auto' ? 'Automatic' : 'Manual'}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Fuel size={12} className="text-[#C9A84C] shrink-0" />
-            <span className="capitalize">{car.fuel_type}</span>
-          </div>
-          <div className="flex items-center gap-1.5 col-span-2">
-            <Luggage size={12} className="text-[#C9A84C] shrink-0" />
-            <span>{car.luggage_small} small + {car.luggage_large} large bag{car.luggage_large !== 1 ? 's' : ''}</span>
-          </div>
+          {specsFor(car).map(sp => {
+            const Icon = SPEC_ICONS[sp.icon]
+            return (
+              <div key={sp.label} className="flex items-center gap-1.5">
+                <Icon size={12} className="text-[#C9A84C] shrink-0" />
+                <span>{sp.label}</span>
+              </div>
+            )
+          })}
         </div>
 
         {/* Discount badges */}

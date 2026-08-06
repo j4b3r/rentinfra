@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { Car, PriceList, PriceListDiscount } from '@/types'
 import { Plus, Trash2, Save, ArrowLeft, AlertCircle } from 'lucide-react'
 import CarImageUploader from './CarImageUploader'
+import { CATEGORIES_BY_TYPE } from '@/lib/vehicles'
+import type { VehicleType } from '@/types'
 
 interface Discount {
   id?: string
@@ -34,9 +36,35 @@ export default function CarForm({ car }: CarFormProps) {
   const [make, setMake] = useState(car?.make || '')
   const [model, setModel] = useState(car?.model || '')
   const [year, setYear] = useState(car?.year?.toString() || '')
-  const [category, setCategory] = useState<'economy' | 'suv' | 'luxury'>(car?.category || 'economy')
+  const [vehicleType, setVehicleType] = useState<VehicleType>(car?.vehicle_type || 'car')
+  const [category, setCategory] = useState<string>(car?.category || 'economy')
   const [transmission, setTransmission] = useState<'auto' | 'manual'>(car?.transmission || 'auto')
-  const [fuelType, setFuelType] = useState<'petrol' | 'diesel' | 'electric' | 'hybrid'>(car?.fuel_type || 'petrol')
+  const [fuelType, setFuelType] = useState<string>(car?.fuel_type || 'petrol')
+  // Two-wheeler specs
+  const [engineCc, setEngineCc] = useState(car?.engine_cc?.toString() || '')
+  const [frameSize, setFrameSize] = useState(car?.frame_size || '')
+  const [gears, setGears] = useState(car?.gears?.toString() || '')
+  const [helmetIncluded, setHelmetIncluded] = useState(car?.helmet_included ?? false)
+  const [requiresLicense, setRequiresLicense] = useState(car?.requires_license ?? true)
+  const [minRiderAge, setMinRiderAge] = useState(car?.min_rider_age?.toString() || '')
+
+  const isCar = vehicleType === 'car'
+  const isBike = vehicleType === 'bicycle'
+  const isMoto = vehicleType === 'motorbike'
+
+  // Switching type invalidates the category (a DB constraint enforces the pairing)
+  // and resets the rules that differ per type.
+  function changeVehicleType(next: VehicleType) {
+    setVehicleType(next)
+    setCategory(CATEGORIES_BY_TYPE[next][0].value)
+    if (next === 'bicycle') {
+      setRequiresLicense(false)
+      setFuelType('none')
+    } else {
+      setRequiresLicense(true)
+      if (fuelType === 'none') setFuelType('petrol')
+    }
+  }
   const [seats, setSeats] = useState(car?.seats?.toString() || '5')
   const [doors, setDoors] = useState(car?.doors?.toString() || '4')
   const [luggageSmall, setLuggageSmall] = useState(car?.luggage_small?.toString() || '2')
@@ -95,13 +123,21 @@ export default function CarForm({ car }: CarFormProps) {
       make: make.trim(),
       model: model.trim(),
       year: year ? parseInt(year) : null,
+      vehicle_type: vehicleType,
       category,
-      transmission,
-      fuel_type: fuelType,
-      seats: parseInt(seats),
-      doors: parseInt(doors),
-      luggage_small: parseInt(luggageSmall),
-      luggage_large: parseInt(luggageLarge),
+      // Bicycles have no transmission; the column is nullable for them.
+      transmission: isBike ? null : transmission,
+      fuel_type: isBike && fuelType === 'none' ? 'none' : fuelType,
+      seats: parseInt(seats) || (isBike ? 1 : 2),
+      doors: isCar ? parseInt(doors) : 0,
+      luggage_small: isCar ? parseInt(luggageSmall) : 0,
+      luggage_large: isCar ? parseInt(luggageLarge) : 0,
+      engine_cc: isMoto && engineCc ? parseInt(engineCc) : null,
+      frame_size: isBike ? frameSize.trim() || null : null,
+      gears: isBike && gears ? parseInt(gears) : null,
+      helmet_included: isCar ? false : helmetIncluded,
+      requires_license: requiresLicense,
+      min_rider_age: minRiderAge ? parseInt(minRiderAge) : null,
       ac,
       bluetooth,
       gps_builtin: gpsBuiltin,
@@ -185,29 +221,65 @@ export default function CarForm({ car }: CarFormProps) {
             <input className={inputCls} type="number" value={year} onChange={e => setYear(e.target.value)} placeholder="e.g. 2023" min="2000" max="2030" />
           </div>
           <div>
+            <label className={labelCls}>Vehicle Type *</label>
+            <select className={selectCls} value={vehicleType} onChange={e => changeVehicleType(e.target.value as VehicleType)}>
+              <option value="car">Car</option>
+              <option value="motorbike">Motorbike</option>
+              <option value="bicycle">Bicycle</option>
+            </select>
+          </div>
+          <div>
             <label className={labelCls}>Category *</label>
-            <select className={selectCls} value={category} onChange={e => setCategory(e.target.value as 'economy' | 'suv' | 'luxury')}>
-              <option value="economy">Economy</option>
-              <option value="suv">SUV</option>
-              <option value="luxury">Luxury</option>
+            <select className={selectCls} value={category} onChange={e => setCategory(e.target.value)}>
+              {CATEGORIES_BY_TYPE[vehicleType].map(c => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
             </select>
           </div>
-          <div>
-            <label className={labelCls}>Transmission *</label>
-            <select className={selectCls} value={transmission} onChange={e => setTransmission(e.target.value as 'auto' | 'manual')}>
-              <option value="auto">Automatic</option>
-              <option value="manual">Manual</option>
-            </select>
-          </div>
-          <div>
-            <label className={labelCls}>Fuel Type *</label>
-            <select className={selectCls} value={fuelType} onChange={e => setFuelType(e.target.value as 'petrol' | 'diesel' | 'electric' | 'hybrid')}>
-              <option value="petrol">Petrol</option>
-              <option value="diesel">Diesel</option>
-              <option value="electric">Electric</option>
-              <option value="hybrid">Hybrid</option>
-            </select>
-          </div>
+          {!isBike && (
+            <div>
+              <label className={labelCls}>Transmission *</label>
+              <select className={selectCls} value={transmission} onChange={e => setTransmission(e.target.value as 'auto' | 'manual')}>
+                <option value="auto">{isMoto ? 'Twist-and-go' : 'Automatic'}</option>
+                <option value="manual">Manual</option>
+              </select>
+            </div>
+          )}
+          {!isBike && (
+            <div>
+              <label className={labelCls}>Fuel Type *</label>
+              <select className={selectCls} value={fuelType} onChange={e => setFuelType(e.target.value)}>
+                <option value="petrol">Petrol</option>
+                <option value="diesel">Diesel</option>
+                <option value="electric">Electric</option>
+                <option value="hybrid">Hybrid</option>
+              </select>
+            </div>
+          )}
+          {isMoto && (
+            <div>
+              <label className={labelCls}>Engine (cc)</label>
+              <input className={inputCls} type="number" value={engineCc} onChange={e => setEngineCc(e.target.value)} placeholder="e.g. 125" />
+            </div>
+          )}
+          {isBike && (
+            <div>
+              <label className={labelCls}>Frame Size</label>
+              <input className={inputCls} value={frameSize} onChange={e => setFrameSize(e.target.value)} placeholder="S / M / L or 54cm" />
+            </div>
+          )}
+          {isBike && (
+            <div>
+              <label className={labelCls}>Gears</label>
+              <input className={inputCls} type="number" value={gears} onChange={e => setGears(e.target.value)} placeholder="e.g. 21" />
+            </div>
+          )}
+          {!isCar && (
+            <div>
+              <label className={labelCls}>Minimum Rider Age</label>
+              <input className={inputCls} type="number" value={minRiderAge} onChange={e => setMinRiderAge(e.target.value)} placeholder="Leave blank to use the global setting" />
+            </div>
+          )}
           <div>
             <label className={labelCls}>License Plate</label>
             <input className={inputCls} value={licensePlate} onChange={e => setLicensePlate(e.target.value)} placeholder="e.g. 1234 ABC" />
@@ -230,12 +302,18 @@ export default function CarForm({ car }: CarFormProps) {
           </div>
         </div>
 
-        {/* Features */}
-        <div className="mt-4 flex gap-6">
+        {/* Features — only the ones that apply to this vehicle type */}
+        <div className="mt-4 flex flex-wrap gap-6">
           {[
-            { label: 'Air Conditioning', val: ac, set: setAc },
-            { label: 'Bluetooth', val: bluetooth, set: setBluetooth },
-            { label: 'Built-in GPS', val: gpsBuiltin, set: setGpsBuiltin },
+            ...(isCar ? [
+              { label: 'Air Conditioning', val: ac, set: setAc },
+              { label: 'Bluetooth', val: bluetooth, set: setBluetooth },
+              { label: 'Built-in GPS', val: gpsBuiltin, set: setGpsBuiltin },
+            ] : []),
+            ...(!isCar ? [
+              { label: 'Helmet included', val: helmetIncluded, set: setHelmetIncluded },
+            ] : []),
+            { label: 'Requires a driving licence', val: requiresLicense, set: setRequiresLicense },
           ].map(({ label, val, set }) => (
             <label key={label} className="flex items-center gap-2 cursor-pointer select-none">
               <input type="checkbox" checked={val} onChange={e => set(e.target.checked)}

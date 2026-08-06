@@ -174,3 +174,82 @@ WHERE NOT EXISTS (
 -- ------------------------------------------------------------
 UPDATE public.settings SET value = 'RentInfra Demo'          WHERE key = 'company_name';
 UPDATE public.settings SET value = 'demo@rentinfra.example'  WHERE key = 'company_email';
+
+-- ------------------------------------------------------------
+-- Demo motorbikes and bicycles (added with migration 012).
+-- Same rule as above: skip this file entirely for a real deployment.
+-- ------------------------------------------------------------
+INSERT INTO public.cars
+  (slug, make, model, year, vehicle_type, category, transmission, fuel_type,
+   seats, engine_cc, frame_size, gears, helmet_included, requires_license, min_rider_age,
+   ac, bluetooth, gps_builtin, description_en, description_es,
+   is_available, is_active, license_plate)
+VALUES
+  ('vespa-primavera-125', 'Vespa', 'Primavera 125', 2024, 'motorbike', 'scooter', 'auto', 'petrol',
+   2, 125, NULL, NULL, TRUE, TRUE, 18, FALSE, FALSE, FALSE,
+   'The classic scooter. Twist-and-go, easy to park, and ideal for short hops around town.',
+   'El scooter clasico. Automatico, facil de aparcar e ideal para trayectos cortos por la ciudad.',
+   TRUE, TRUE, 'DEMO-201'),
+
+  ('honda-cb500x-2024', 'Honda', 'CB500X', 2024, 'motorbike', 'touring', 'manual', 'petrol',
+   2, 471, NULL, NULL, TRUE, TRUE, 21, FALSE, FALSE, FALSE,
+   'A light adventure bike that is comfortable for a full day in the saddle. A2 licence friendly.',
+   'Una trail ligera y comoda para todo un dia de ruta. Apta para carnet A2.',
+   TRUE, TRUE, 'DEMO-202'),
+
+  ('yamaha-mt-07-2023', 'Yamaha', 'MT-07', 2023, 'motorbike', 'motorcycle', 'manual', 'petrol',
+   2, 689, NULL, NULL, TRUE, TRUE, 21, FALSE, FALSE, FALSE,
+   'A punchy naked twin with plenty of character for coastal roads.',
+   'Una naked bicilindrica con mucho caracter para carreteras de costa.',
+   TRUE, TRUE, 'DEMO-203'),
+
+  ('city-cruiser-bike', 'Urban', 'City Cruiser', 2024, 'bicycle', 'city', NULL, 'none',
+   1, NULL, 'M', 7, TRUE, FALSE, NULL, FALSE, FALSE, FALSE,
+   'Upright, comfortable and fitted with a basket. Perfect for the seafront and the old town.',
+   'Comoda y con cesta. Perfecta para el paseo maritimo y el casco antiguo.',
+   TRUE, TRUE, NULL),
+
+  ('trek-marlin-mtb', 'Trek', 'Marlin 6', 2024, 'bicycle', 'mountain', NULL, 'none',
+   1, NULL, 'L', 21, TRUE, FALSE, NULL, FALSE, FALSE, FALSE,
+   'Hardtail mountain bike with hydraulic disc brakes for the hill trails.',
+   'Bicicleta de montana rigida con frenos de disco hidraulicos para rutas de montana.',
+   TRUE, TRUE, NULL),
+
+  ('e-bike-cityglide', 'Cityglide', 'E-Bike Pro', 2024, 'bicycle', 'electric', NULL, 'electric',
+   1, NULL, 'M', 8, TRUE, FALSE, NULL, FALSE, FALSE, FALSE,
+   'Pedal-assist e-bike with a 70km range. Hills stop being a problem.',
+   'Bicicleta electrica con asistencia al pedaleo y 70km de autonomia. Las cuestas dejan de importar.',
+   TRUE, TRUE, NULL)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Rates. Bikes are priced hourly with a daily equivalent; motorbikes daily.
+INSERT INTO public.price_lists (car_id, name, daily_rate, rate_unit, hourly_rate, min_hours, is_active)
+SELECT c.id, 'Standard', v.daily, v.unit, v.hourly, v.min_h, TRUE
+FROM (VALUES
+  ('vespa-primavera-125',  35.00, 'day',  NULL::numeric, NULL::integer),
+  ('honda-cb500x-2024',    65.00, 'day',  NULL,          NULL),
+  ('yamaha-mt-07-2023',    80.00, 'day',  NULL,          NULL),
+  ('city-cruiser-bike',    14.00, 'hour', 4.00,          2),
+  ('trek-marlin-mtb',      22.00, 'hour', 6.00,          2),
+  ('e-bike-cityglide',     30.00, 'hour', 9.00,          2)
+) AS v(slug, daily, unit, hourly, min_h)
+JOIN public.cars c ON c.slug = v.slug
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.price_lists p WHERE p.car_id = c.id AND p.name = 'Standard'
+);
+
+-- Photos for the two-wheelers.
+INSERT INTO public.car_images (car_id, url, position, is_primary)
+SELECT c.id, v.url, 0, TRUE
+FROM (VALUES
+  ('vespa-primavera-125', 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=1200&q=80'),
+  ('honda-cb500x-2024',   'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1200&q=80'),
+  ('yamaha-mt-07-2023',   'https://images.unsplash.com/photo-1558981285-6f0c94958bb6?w=1200&q=80'),
+  ('city-cruiser-bike',   'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=1200&q=80'),
+  ('trek-marlin-mtb',     'https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?w=1200&q=80'),
+  ('e-bike-cityglide',    'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=1200&q=80')
+) AS v(slug, url)
+JOIN public.cars c ON c.slug = v.slug
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.car_images ci WHERE ci.car_id = c.id AND ci.url = v.url
+);

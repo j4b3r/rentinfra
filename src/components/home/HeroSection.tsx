@@ -64,7 +64,7 @@ export default function HeroSection({
           <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
             <span className="flex items-center gap-2 text-white">
               <span className="h-1.5 w-1.5 rounded-full bg-[#C9A84C]" />
-              {fleetCount} {fleetCount === 1 ? 'car' : 'cars'} available now
+              {fleetCount} {fleetCount === 1 ? 'vehicle' : 'vehicles'} available now
             </span>
             {fromRate !== null && (
               <span className="text-gray-300">

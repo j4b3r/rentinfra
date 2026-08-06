@@ -6,27 +6,29 @@ import { Car } from '@/types'
 import { Metadata } from 'next'
 import { Car as CarIcon, SlidersHorizontal } from 'lucide-react'
 import { absoluteUrl } from '@/lib/site'
+import { CATEGORIES_BY_TYPE } from '@/lib/vehicles'
+import type { VehicleType } from '@/types'
 
 export const metadata: Metadata = {
-  title: 'Our Fleet — Car Rental | RentInfra',
-  description: 'Browse our full fleet of rental cars. Economy from €45/day, SUV from €85/day, Luxury from €150/day. Airport pickup and hotel delivery.',
+  title: 'Our Fleet — Cars, Motorbikes & Bicycles | RentInfra',
+  description: 'Browse our full fleet — cars, motorbikes and bicycles. Airport pickup and hotel delivery available.',
   keywords: 'car rental fleet, economy car hire, suv rental, luxury car rental',
   alternates: { canonical: absoluteUrl('/cars') },
 }
 
-const categories = [
-  { value: 'all', label: 'All Cars', emoji: '🚗' },
-  { value: 'economy', label: 'Economy', emoji: '⚡' },
-  { value: 'suv', label: 'SUV', emoji: '🚙' },
-  { value: 'luxury', label: 'Luxury', emoji: '✨' },
+const VEHICLE_TABS: { value: string; label: string; emoji: string }[] = [
+  { value: 'all', label: 'All vehicles', emoji: '🚗' },
+  { value: 'car', label: 'Cars', emoji: '🚙' },
+  { value: 'motorbike', label: 'Motorbikes', emoji: '🏍️' },
+  { value: 'bicycle', label: 'Bicycles', emoji: '🚲' },
 ]
 
 export default async function CarsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; pickup?: string; dropoff?: string; location?: string }>
+  searchParams: Promise<{ type?: string; category?: string; pickup?: string; dropoff?: string; location?: string }>
 }) {
-  const { category, pickup, dropoff, location } = await searchParams
+  const { type, category, pickup, dropoff, location } = await searchParams
   const supabase = await createClient()
 
   // Dates chosen on the homepage travel with every link so the booking
@@ -53,12 +55,17 @@ export default async function CarsPage({
     .select('*, car_images(*), price_lists(*, price_list_discounts(*))')
     .eq('is_active', true)
 
+  // Filter by vehicle type first, then by the categories that belong to it.
+  if (type && type !== 'all') {
+    query = query.eq('vehicle_type', type)
+  }
   if (category && category !== 'all') {
     query = query.eq('category', category)
   }
 
   const { data: cars } = await query.order('created_at')
-  const current = category || 'all'
+  const currentType = type || 'all'
+  const currentCategory = category || 'all'
 
   // When dates were searched, mark which cars are already taken so the customer
   // sees it here rather than after filling in the whole booking wizard.
@@ -83,8 +90,8 @@ export default async function CarsPage({
             </div>
             <span className="text-[#C9A84C] text-sm font-semibold uppercase tracking-widest">Our Fleet</span>
           </div>
-          <h1 className="text-4xl font-extrabold text-white">Find Your Perfect Car</h1>
-          <p className="text-gray-400 mt-2">Choose from our handpicked fleet — all serviced, insured and ready to go</p>
+          <h1 className="text-4xl font-extrabold text-white">Find your ride</h1>
+          <p className="text-gray-400 mt-2">Cars, motorbikes and bicycles — all serviced, insured and ready to go</p>
         </div>
       </div>
 
@@ -96,21 +103,21 @@ export default async function CarsPage({
               <SlidersHorizontal size={14} />
               <span className="text-sm font-medium">Filter:</span>
             </div>
-            {categories.map(cat => (
-              <a key={cat.value}
+            {VEHICLE_TABS.map(tab => (
+              <a key={tab.value}
                 href={(() => {
                   const p = new URLSearchParams(dateParams)
-                  if (cat.value !== 'all') p.set('category', cat.value)
+                  if (tab.value !== 'all') p.set('type', tab.value)
                   const qs = p.toString()
                   return qs ? `/cars?${qs}` : '/cars'
                 })()}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-                  current === cat.value
+                  currentType === tab.value
                     ? 'bg-[#0A1F44] text-white shadow-sm'
                     : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
                 }`}>
-                <span>{cat.emoji}</span>
-                {cat.label}
+                <span>{tab.emoji}</span>
+                {tab.label}
               </a>
             ))}
             <span className="ml-auto text-xs text-gray-400">
@@ -119,6 +126,27 @@ export default async function CarsPage({
                 : `${cars?.length || 0} car${cars?.length !== 1 ? 's' : ''} available`}
             </span>
           </div>
+
+          {/* Sub-filter: categories only make sense within one vehicle type */}
+          {currentType !== 'all' && (
+            <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3">
+              {[{ value: 'all', label: 'All' }, ...CATEGORIES_BY_TYPE[currentType as VehicleType]].map(cat => {
+                const p = new URLSearchParams(dateParams)
+                p.set('type', currentType)
+                if (cat.value !== 'all') p.set('category', cat.value)
+                return (
+                  <a key={cat.value} href={`/cars?${p.toString()}`}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                      currentCategory === cat.value
+                        ? 'bg-[#C9A84C] text-[#0A1F44]'
+                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                    }`}>
+                    {cat.label}
+                  </a>
+                )
+              })}
+            </div>
+          )}
 
           {/* Say which dates these results are for, and how to widen them. */}
           {availability && (
@@ -134,7 +162,7 @@ export default async function CarsPage({
                 </>
               )}
               {' · '}
-              <a href={current === 'all' ? '/cars' : `/cars?category=${current}`} className="text-[#C9A84C] hover:underline">
+              <a href={currentType === 'all' ? '/cars' : `/cars?type=${currentType}`} className="text-[#C9A84C] hover:underline">
                 Clear dates
               </a>
             </p>
@@ -159,8 +187,8 @@ export default async function CarsPage({
         ) : (
           <div className="text-center py-20">
             <div className="text-5xl mb-4">🚗</div>
-            <p className="text-gray-500 text-lg">No cars available in this category right now.</p>
-            <a href="/cars" className="mt-4 inline-block text-[#C9A84C] hover:underline font-medium">View all cars →</a>
+            <p className="text-gray-500 text-lg">Nothing available in this category right now.</p>
+            <a href="/cars" className="mt-4 inline-block text-[#C9A84C] hover:underline font-medium">View the whole fleet →</a>
           </div>
         )}
       </div>

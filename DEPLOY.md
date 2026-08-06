@@ -70,7 +70,7 @@ The SQL files in `supabase/migrations/` create every table, row-level security p
 
 ### Option A — Supabase SQL Editor (simplest)
 
-For each file `001` → `005` and then `007` → `011`, in order:
+For each file `001` → `005` and then `007` → `012`, in order:
 
 1. Open your project → **SQL Editor** → **New query**.
 2. Paste the entire contents of the file.
@@ -88,8 +88,9 @@ For each file `001` → `005` and then `007` → `011`, in order:
 | `009_booking_holds.sql` | `hold_expires_at` + the job that releases cars held by unconfirmed bookings |
 | `010_secret_settings.sql` | `is_secret` on settings so API keys are hidden from non-admins, plus the Resend/Stripe credential rows |
 | `011_notification_delivery.sql` | Retry tracking on `notifications_queue` so queued email can actually be sent |
+| `012_vehicle_types.sql` | Motorbikes and bicycles: `vehicle_type`, per-type categories and specs, hourly rate units, per-type addons |
 
-Run `007` through `011` as well — they are part of the base schema, not demo data. It ships with **no rows**, and the homepage hides the reviews section entirely until you publish one from `/admin/testimonials`.
+Run `007` through `012` as well — they are part of the base schema, not demo data. It ships with **no rows**, and the homepage hides the reviews section entirely until you publish one from `/admin/testimonials`.
 
 `006_demo_seed.sql` is **optional and for the public demo only** — it inserts fake cars, photos and bookings. **Skip it** if you are setting up a real business. It is safe to re-run and safe to ignore.
 

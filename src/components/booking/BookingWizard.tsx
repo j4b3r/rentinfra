@@ -101,7 +101,10 @@ export default function BookingWizard({
   const priceList = getActivePriceList(car.price_lists || [], data.pickupDate)
   const pickupLoc = locations.find(l => l.id === data.pickupLocationId) || null
   const dropoffLoc = locations.find(l => l.id === data.dropoffLocationId) || null
-  const driverAge = data.driverAge ? parseInt(data.driverAge) : null
+  // A bicycle has no licence requirement, so the young-driver surcharge must
+  // not apply: passing null age keeps it out of the price calculation.
+  const driverAge =
+    car.requires_license === false ? null : data.driverAge ? parseInt(data.driverAge) : null
 
   const pricing = priceList
     ? calculateBookingPrice(priceList, totalDays, data.selectedAddons, pickupLoc, dropoffLoc, driverAge, settings)
@@ -199,6 +202,8 @@ export default function BookingWizard({
           <StepDetails
             data={data} update={update} userId={userId}
             settings={settings}
+            requiresLicense={car.requires_license !== false}
+            minRiderAge={car.min_rider_age}
             onBack={() => setStep(1)} onNext={() => setStep(3)}
           />
         )}

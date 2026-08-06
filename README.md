@@ -1,6 +1,6 @@
 # RentInfra
 
-An open-source, generic car rental booking platform — a SaaS boilerplate you can fork and customize for your own car rental business.
+An open-source vehicle rental booking platform — cars, motorbikes and bicycles — a SaaS boilerplate you can fork and customize for your own car rental business.
 
 - **Public site**: browse a fleet, book a car through a 4-step wizard, look up a booking by reference, blog + FAQ pages
 - **Admin panel**: manage bookings, cars, addons, users, locations, and settings; generate PDF rental contracts
@@ -30,7 +30,7 @@ You will still need to create a Supabase project and run the migrations. **[DEPL
 | Step | What |
 |------|------|
 | 1 | Create a Supabase project |
-| 2 | Run `supabase/migrations/001` → `005`, then `007` → `011` in the SQL editor (skip `006`, it is demo data) |
+| 2 | Run `supabase/migrations/001` → `005`, then `007` → `012` in the SQL editor (skip `006`, it is demo data) |
 | 3 | Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL` |
 | 4 | Deploy to Vercel (or any Node host — nothing is Vercel-specific except the cron schedule) |
 | 5 | Set the Supabase **Site URL** and redirect allowlist to your domain |
@@ -79,7 +79,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-Run the SQL migrations in `supabase/migrations/` against your Supabase project (in order, `001` → `005`, then `007`–`011`) via the Supabase SQL editor or CLI. Skip `006_demo_seed.sql` — it only contains fake data for the public demo.
+Run the SQL migrations in `supabase/migrations/` against your Supabase project (in order, `001` → `005`, then `007`–`012`) via the Supabase SQL editor or CLI. Skip `006_demo_seed.sql` — it only contains fake data for the public demo.
 
 After registering an account, promote yourself to admin so `/admin` is reachable:
 

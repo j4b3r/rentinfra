@@ -7,12 +7,21 @@ interface Props {
   update: (p: Partial<WizardData>) => void
   userId?: string
   settings: Record<string, string>
+  /** False for bicycles: no licence, no age limit, no young-driver fee */
+  requiresLicense?: boolean
+  /** Per-vehicle override of the global minimum age */
+  minRiderAge?: number | null
   onBack: () => void
   onNext: () => void
 }
 
-export default function StepDetails({ data, update, userId, settings, onBack, onNext }: Props) {
-  const minAge = parseInt(settings.min_driver_age || '21')
+export default function StepDetails({
+  data, update, userId, settings,
+  requiresLicense = true, minRiderAge, onBack, onNext,
+}: Props) {
+  // A pedal bicycle needs no licence and has no legal minimum rider age, so
+  // those fields disappear rather than blocking the booking.
+  const minAge = minRiderAge ?? parseInt(settings.min_driver_age || '21')
 
   // Name each problem so the form can say what it is waiting for, instead of
   // just presenting a dead button.
@@ -24,10 +33,12 @@ export default function StepDetails({ data, update, userId, settings, onBack, on
     problems.push({ field: 'email', message: 'Check the email address' })
   }
   if (!data.guestPhone.trim()) problems.push({ field: 'phone', message: 'Enter a phone number' })
-  if (!data.driverAge) {
-    problems.push({ field: 'age', message: 'Enter the driver age' })
-  } else if (parseInt(data.driverAge) < minAge) {
-    problems.push({ field: 'age', message: `The driver must be at least ${minAge}` })
+  if (requiresLicense) {
+    if (!data.driverAge) {
+      problems.push({ field: 'age', message: 'Enter the driver age' })
+    } else if (parseInt(data.driverAge) < minAge) {
+      problems.push({ field: 'age', message: `The driver must be at least ${minAge}` })
+    }
   }
 
   const errorFor = (field: string) => problems.find(p => p.field === field)?.message
@@ -76,14 +87,14 @@ export default function StepDetails({ data, update, userId, settings, onBack, on
             className={inputClass('phone')}
           />
         </div>
-        <div>
+        {requiresLicense && <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Driver License Number</label>
           <input type="text"
             value={data.guestLicense}
             onChange={e => update({ guestLicense: e.target.value })}
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0A1F44]"
           />
-        </div>
+        </div>}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">NIE / Passport Number</label>
           <input type="text" placeholder="e.g. X1234567A"
@@ -108,7 +119,7 @@ export default function StepDetails({ data, update, userId, settings, onBack, on
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0A1F44]"
           />
         </div>
-        <div>
+        {requiresLicense && <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Driver Age <span className="text-red-500">*</span>{' '}
             <span className="text-gray-400 font-normal">(min {minAge})</span>
@@ -124,7 +135,7 @@ export default function StepDetails({ data, update, userId, settings, onBack, on
           {data.driverAge && parseInt(data.driverAge) < minAge && (
             <p className="text-xs text-red-600 mt-1">Minimum driver age is {minAge}</p>
           )}
-        </div>
+        </div>}
       </div>
 
       {/* Say what is still needed rather than leaving a dead button. */}

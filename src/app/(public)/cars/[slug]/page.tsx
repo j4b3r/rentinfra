@@ -2,9 +2,15 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Users, DoorOpen, Fuel, Settings, Luggage, Wifi, Navigation, Car } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { getConflictingBookings, nextFreeDate } from '@/lib/availability'
+import { specsFor, categoryLabel, placeholderFor } from '@/lib/vehicles'
+import { Users, DoorOpen, Fuel, Settings, Luggage, Wifi, Navigation, Car, Bike, Gauge, Zap } from 'lucide-react'
+
+const SPEC_ICONS = {
+  users: Users, door: DoorOpen, gauge: Gauge, fuel: Fuel,
+  luggage: Luggage, settings: Settings, bike: Bike, zap: Zap,
+} as const
 import { Car as CarType } from '@/types'
 
 const CAR_PLACEHOLDER: Record<string, string> = {
@@ -90,13 +96,13 @@ export default async function CarDetailPage({
 
             {/* Specs grid */}
             <div className="grid grid-cols-2 gap-3 mb-5">
+              {/* Only the specs that apply to this vehicle type — a bicycle
+                  shows frame size and gears, not seats and transmission. */}
               {[
-                { icon: Users, label: `${typedCar.seats} Seats` },
-                { icon: DoorOpen, label: `${typedCar.doors} Doors` },
-                { icon: Settings, label: typedCar.transmission === 'auto' ? 'Automatic' : 'Manual' },
-                { icon: Fuel, label: typedCar.fuel_type.charAt(0).toUpperCase() + typedCar.fuel_type.slice(1) },
-                { icon: Luggage, label: `${typedCar.luggage_small + typedCar.luggage_large} Bags` },
-                { icon: typedCar.ac ? Wifi : Car, label: typedCar.ac ? 'Air Conditioning' : 'No AC' },
+                ...specsFor(typedCar).map(sp => ({ icon: SPEC_ICONS[sp.icon], label: sp.label })),
+                ...(typedCar.vehicle_type === 'car'
+                  ? [{ icon: typedCar.ac ? Wifi : Car, label: typedCar.ac ? 'Air Conditioning' : 'No AC' }]
+                  : []),
               ].map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
                   <Icon size={15} className="text-[#C9A84C]" /> {label}
