@@ -23,7 +23,11 @@ tracks whether a car is actually free.
 
 ---
 
-## P0 — Blocks real use
+## P0 — Blocks real use ✅ Complete
+
+All four P0 items shipped 2026-08-06/07. A discovery along the way: RLS correctly hides
+`bookings` from anonymous visitors, so any public availability check had to go through a
+`SECURITY DEFINER` function returning only occupied date ranges — never guest details.
 
 ### ~~[#13] Availability check is inverted~~ ✅ Fixed 2026-08-06
 
@@ -32,7 +36,7 @@ made a car unbookable **on every future date**. Verified against production: a V
 was refused with 409 for ranges in 2026, 2027, 2030 and 2031, all genuinely free. Fixed to
 chained strict inequalities, which also permits same-day turnaround. Re-verified live.
 
-### [#14] Show availability before the last step
+### ~~[#14] Show availability before the last step~~ ✅ Done 2026-08-07
 
 `/cars` lists every car regardless of the dates searched, so a customer picks a car, fills in
 four steps, and only then hits "Car is not available for selected dates." Every commercial
@@ -44,7 +48,7 @@ platform removes booked vehicles from search results for the requested range.
 - Reuse one shared helper (`lib/availability.ts`) for the list, the detail page and the API,
   so the three can never disagree
 
-### [#15] Make double-booking structurally impossible
+### ~~[#15] Make double-booking structurally impossible~~ ✅ Done 2026-08-07
 
 The current check is read-then-write: two concurrent requests can both pass and both insert.
 Add a Postgres exclusion constraint so the database rejects the second one regardless of
@@ -61,7 +65,7 @@ ALTER TABLE bookings ADD CONSTRAINT bookings_no_overlap
 
 Then translate the constraint violation into the existing 409 response.
 
-### [#16] Expire unconfirmed holds
+### ~~[#16] Expire unconfirmed holds~~ ✅ Done 2026-08-07
 
 A `pending` booking nobody confirms holds the car forever. Add `hold_expires_at`, a
 `booking_hold_minutes` setting, and a scheduled job (Vercel cron) that cancels expired holds
@@ -164,10 +168,10 @@ for offline bookings.
 | Order | Item | Why |
 |---|---|---|
 | 1 | ~~#13 availability bug~~ ✅ | Was rejecting valid bookings in production |
-| 2 | #14 availability in search | Customers hit the wall after four steps |
-| 3 | #15 exclusion constraint | Makes double-booking impossible, not just unlikely |
+| 2 | ~~#14 availability in search~~ ✅ | Customers hit the wall after four steps |
+| 3 | ~~#15 exclusion constraint~~ ✅ | Makes double-booking impossible, not just unlikely |
 | 4 | #9 email | A booking nobody is told about is not a booking |
-| 5 | #16 hold expiry | Stops abandoned carts eating the fleet |
+| 5 | ~~#16 hold expiry~~ ✅ | Stops abandoned carts eating the fleet |
 | 6 | #10 payments + deposits | Turns reservations into revenue |
 | 7 | #17 condition reports | Protects the deposit; the PDF already implies it |
 | 8 | #7 accounts, #18 fleet ops, #19 reporting | Retention and daily operations |

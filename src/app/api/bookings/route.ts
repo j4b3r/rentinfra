@@ -17,6 +17,21 @@ export async function POST(request: NextRequest) {
       totalDays, pricing,
     } = body
 
+    // An unconfirmed booking holds the car for a limited time, so an abandoned
+    // checkout cannot keep a vehicle off sale indefinitely. Staff clear the
+    // expiry when they confirm.
+    const { data: holdSettings } = await supabase
+      .from('settings')
+      .select('key, value')
+      .in('key', ['booking_hold_enabled', 'booking_hold_minutes'])
+
+    const holdMap = Object.fromEntries((holdSettings || []).map(s => [s.key, s.value]))
+    const holdMinutes = Number(holdMap.booking_hold_minutes) || 1440
+    const holdExpiresAt =
+      holdMap.booking_hold_enabled === 'false'
+        ? null
+        : new Date(Date.now() + holdMinutes * 60_000).toISOString()
+
     // Availability is decided by lib/availability.ts so this route, the fleet
     // listing and the car detail page always agree.
     const conflicts = await getConflictingBookings(supabase, pickupDate, dropoffDate, carId)
@@ -65,6 +80,7 @@ export async function POST(request: NextRequest) {
         total_amount: pricing?.total || 0,
         payment_status: 'unpaid',
         driver_age: driverAge ? parseInt(driverAge) : null,
+        hold_expires_at: holdExpiresAt,
       })
       .select()
       .single()

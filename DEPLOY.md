@@ -69,7 +69,7 @@ The SQL files in `supabase/migrations/` create every table, row-level security p
 
 ### Option A — Supabase SQL Editor (simplest)
 
-For each file `001` → `005` and then `007`, in order:
+For each file `001` → `005` and then `007` → `009`, in order:
 
 1. Open your project → **SQL Editor** → **New query**.
 2. Paste the entire contents of the file.
@@ -83,8 +83,10 @@ For each file `001` → `005` and then `007`, in order:
 | `004_car_images_storage.sql` | The public `car-images` storage bucket + its RLS policies |
 | `005_booking_contract_fields.sql` | Rental-contract fields (license plate, NIE/passport, KM and fuel readings, deposit method) |
 | `007_testimonials.sql` | `testimonials` table + RLS, and the homepage social-proof settings keys |
+| `008_availability.sql` | `get_car_availability()` so the public site can compute availability without read access to booking records, plus the exclusion constraint that makes double-booking impossible |
+| `009_booking_holds.sql` | `hold_expires_at` + the job that releases cars held by unconfirmed bookings |
 
-Run `007` as well — it is part of the base schema, not demo data. It ships with **no rows**, and the homepage hides the reviews section entirely until you publish one from `/admin/testimonials`.
+Run `007`, `008` and `009` as well — they are part of the base schema, not demo data. It ships with **no rows**, and the homepage hides the reviews section entirely until you publish one from `/admin/testimonials`.
 
 `006_demo_seed.sql` is **optional and for the public demo only** — it inserts fake cars, photos and bookings. **Skip it** if you are setting up a real business. It is safe to re-run and safe to ignore.
 

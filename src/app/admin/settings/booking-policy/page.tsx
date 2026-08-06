@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import SettingsSection from '@/components/admin/SettingsSection'
 
-const KEYS = ['min_advance_hours', 'max_booking_days_ahead', 'cancellation_policy_en', 'cancellation_policy_es', 'terms_last_updated']
+const KEYS = ['min_advance_hours', 'max_booking_days_ahead', 'booking_hold_enabled', 'booking_hold_minutes', 'cancellation_policy_en', 'cancellation_policy_es', 'terms_last_updated']
 
 export default async function BookingPolicySettings() {
   const supabase = await createClient()
@@ -15,6 +15,8 @@ export default async function BookingPolicySettings() {
       fields={[
         { key: 'min_advance_hours',      label: 'Minimum Advance Booking (hours)', type: 'number', placeholder: '2',   description: 'Customers must book at least this many hours before pickup' },
         { key: 'max_booking_days_ahead', label: 'Maximum Days in Advance',         type: 'number', placeholder: '365', description: 'How far ahead customers can make a booking' },
+        { key: 'booking_hold_enabled',   label: 'Release Unconfirmed Bookings',    type: 'toggle', description: 'Cancel bookings nobody confirms, so they stop holding the car' },
+        { key: 'booking_hold_minutes',   label: 'Hold Time (minutes)',             type: 'number', placeholder: '1440', description: 'How long an unconfirmed booking keeps the car reserved. 1440 = 24 hours' },
         { key: 'cancellation_policy_en', label: 'Cancellation Policy (English)',   type: 'textarea', placeholder: 'Free cancellation up to 48 hours before pickup...', description: 'Displayed on booking pages and confirmation emails' },
         { key: 'cancellation_policy_es', label: 'Cancellation Policy (Spanish)',   type: 'textarea', placeholder: 'Cancelación gratuita hasta 48 horas antes...', description: 'Shown to Spanish-language customers' },
         { key: 'terms_last_updated',     label: 'Terms Last Updated (date)',       type: 'date', description: 'Shown on the Terms & Conditions page' },
