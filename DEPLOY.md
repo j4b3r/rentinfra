@@ -10,6 +10,7 @@ Estimated time: ~20 minutes.
 - [3. Run the database migrations](#3-run-the-database-migrations)
 - [4. Collect your environment variables](#4-collect-your-environment-variables)
 - [5. Deploy to Vercel](#5-deploy-to-vercel)
+- [5b. Connect email and payments (optional)](#5b-connect-email-and-payments-optional)
 - [6. Configure Supabase Auth (required)](#6-configure-supabase-auth-required)
 - [7. Create your admin user](#7-create-your-admin-user)
 - [8. Custom domain](#8-custom-domain)
@@ -69,7 +70,7 @@ The SQL files in `supabase/migrations/` create every table, row-level security p
 
 ### Option A — Supabase SQL Editor (simplest)
 
-For each file `001` → `005` and then `007` → `009`, in order:
+For each file `001` → `005` and then `007` → `011`, in order:
 
 1. Open your project → **SQL Editor** → **New query**.
 2. Paste the entire contents of the file.
@@ -85,8 +86,10 @@ For each file `001` → `005` and then `007` → `009`, in order:
 | `007_testimonials.sql` | `testimonials` table + RLS, and the homepage social-proof settings keys |
 | `008_availability.sql` | `get_car_availability()` so the public site can compute availability without read access to booking records, plus the exclusion constraint that makes double-booking impossible |
 | `009_booking_holds.sql` | `hold_expires_at` + the job that releases cars held by unconfirmed bookings |
+| `010_secret_settings.sql` | `is_secret` on settings so API keys are hidden from non-admins, plus the Resend/Stripe credential rows |
+| `011_notification_delivery.sql` | Retry tracking on `notifications_queue` so queued email can actually be sent |
 
-Run `007`, `008` and `009` as well — they are part of the base schema, not demo data. It ships with **no rows**, and the homepage hides the reviews section entirely until you publish one from `/admin/testimonials`.
+Run `007` through `011` as well — they are part of the base schema, not demo data. It ships with **no rows**, and the homepage hides the reviews section entirely until you publish one from `/admin/testimonials`.
 
 `006_demo_seed.sql` is **optional and for the public demo only** — it inserts fake cars, photos and bookings. **Skip it** if you are setting up a real business. It is safe to re-run and safe to ignore.
 
@@ -174,6 +177,33 @@ vercel --prod
 ### Deployment protection
 
 New Vercel projects may enable **Deployment Protection**, which puts every URL behind a Vercel login — visitors get redirected to an SSO page instead of your site. If your deployment returns a `302` to `vercel.com/sso-api`, turn it off under **Project → Settings → Deployment Protection → Vercel Authentication → Disabled**.
+
+---
+
+## 5b. Connect email and payments (optional)
+
+RentInfra keeps third-party credentials in the database, not in environment variables, so you
+manage them from **Admin → Settings → Integrations** after deploying. Nothing here is required
+to take bookings — without it, bookings are recorded but no email is sent and no payment is
+collected.
+
+**Email (Resend)**
+
+1. Create an account at [resend.com](https://resend.com) and verify the domain you want to send from.
+2. Create an API key under **API Keys**.
+3. In RentInfra, go to **Settings → Integrations**, paste the key, set **Send from** to an
+   address on your verified domain, and press **Test connection**.
+4. Once the test passes, tick **Enable email** and save.
+
+Customers then receive a booking receipt and a confirmation when you confirm the booking, and
+you get an alert at `notify_admin_email` for each new booking.
+
+**Payments (Stripe)** — the keys can be stored now, but the checkout flow itself is still in
+development. Leave **Enable payments** off until it ships.
+
+> Keys are stored with `is_secret` set, which hides them from every non-admin via row-level
+> security. They are shown masked after saving and are never sent to the public site. Anyone
+> with admin access to your panel can still replace them, so keep admin accounts limited.
 
 ---
 

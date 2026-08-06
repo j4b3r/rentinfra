@@ -76,7 +76,7 @@ time-based policy.
 
 ## P1 — Needed to operate
 
-### [#9] Email notifications *(already on the todo list)*
+### ~~[#9] Email notifications~~ ✅ Done 2026-08-07
 
 `bookings/route.ts` inserts a row into `notifications_queue` and **nothing ever reads it** —
 no email is sent to the customer or the business, ever. The queue table and the
@@ -170,7 +170,7 @@ for offline bookings.
 | 1 | ~~#13 availability bug~~ ✅ | Was rejecting valid bookings in production |
 | 2 | ~~#14 availability in search~~ ✅ | Customers hit the wall after four steps |
 | 3 | ~~#15 exclusion constraint~~ ✅ | Makes double-booking impossible, not just unlikely |
-| 4 | #9 email | A booking nobody is told about is not a booking |
+| 4 | ~~#9 email~~ ✅ | A booking nobody is told about is not a booking |
 | 5 | ~~#16 hold expiry~~ ✅ | Stops abandoned carts eating the fleet |
 | 6 | #10 payments + deposits | Turns reservations into revenue |
 | 7 | #17 condition reports | Protects the deposit; the PDF already implies it |
