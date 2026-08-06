@@ -4,6 +4,7 @@ A complete, start-to-finish guide to running RentInfra on **Vercel** with a **Su
 
 Estimated time: ~20 minutes.
 
+- [Try the live demo first](#try-the-live-demo-first)
 - [1. Prerequisites](#1-prerequisites)
 - [2. Create a Supabase project](#2-create-a-supabase-project)
 - [3. Run the database migrations](#3-run-the-database-migrations)
@@ -14,6 +15,25 @@ Estimated time: ~20 minutes.
 - [8. Custom domain](#8-custom-domain)
 - [9. Post-deploy checklist](#9-post-deploy-checklist)
 - [Troubleshooting](#troubleshooting)
+
+---
+
+## Try the live demo first
+
+Before deploying your own, you can explore a fully working instance — public site and admin panel — at **[rentinfra.vercel.app](https://rentinfra.vercel.app)**.
+
+Sign in at [`/auth/login`](https://rentinfra.vercel.app/auth/login) with either account:
+
+| Role | Email | Password | What you can see |
+|------|-------|----------|------------------|
+| **Admin** | `admin@rentinfra.demo` | `RentInfraDemo2026!` | The full admin panel at `/admin` — bookings, cars, addons, users, locations, settings, and PDF rental contracts |
+| **Customer** | `user@rentinfra.demo` | `RentInfraDemo2026!` | The customer view — profile and booking history |
+
+You can also browse the public site, complete the booking wizard, and look up a booking at `/my-booking` without signing in at all.
+
+> ⚠️ **The demo is public and shared.** Its database is open to everyone and periodically reset — anything you change may be wiped or altered by other visitors. **Do not enter real personal data.** The fleet and bookings are fake, seeded by the optional `supabase/migrations/006_demo_seed.sql` (skip that file in a real deployment — see [step 3](#3-run-the-database-migrations)).
+
+These credentials exist **only on the demo deployment**. Your own instance starts with no users at all — you register normally and then promote yourself to admin, as described in [step 7](#7-create-your-admin-user).
 
 ---
 
