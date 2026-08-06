@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
+import { getFleetAvailability } from '@/lib/availability'
+import { formatDate } from '@/lib/utils'
 import CarCard from '@/components/cars/CarCard'
 import { Car } from '@/types'
 import { Metadata } from 'next'
@@ -57,6 +59,14 @@ export default async function CarsPage({
   const { data: cars } = await query.order('created_at')
   const current = category || 'all'
 
+  // When dates were searched, mark which cars are already taken so the customer
+  // sees it here rather than after filling in the whole booking wizard.
+  const availability =
+    pickup && dropoff ? await getFleetAvailability(supabase, pickup, dropoff) : null
+  const unavailableCount = availability
+    ? (cars || []).filter(c => availability.has(c.id)).length
+    : 0
+
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
       {/* Header */}
@@ -103,9 +113,31 @@ export default async function CarsPage({
               </a>
             ))}
             <span className="ml-auto text-xs text-gray-400">
-              {cars?.length || 0} car{cars?.length !== 1 ? 's' : ''} available
+              {availability
+                ? `${(cars?.length || 0) - unavailableCount} of ${cars?.length || 0} available`
+                : `${cars?.length || 0} car${cars?.length !== 1 ? 's' : ''} available`}
             </span>
           </div>
+
+          {/* Say which dates these results are for, and how to widen them. */}
+          {availability && (
+            <p className="mt-3 border-t border-gray-100 pt-3 text-xs text-gray-500">
+              Showing availability for{' '}
+              <span className="font-semibold text-[#0A1F44]">
+                {formatDate(pickup!)} – {formatDate(dropoff!)}
+              </span>
+              {unavailableCount > 0 && (
+                <>
+                  {' · '}
+                  {unavailableCount} car{unavailableCount !== 1 ? 's are' : ' is'} already booked
+                </>
+              )}
+              {' · '}
+              <a href={current === 'all' ? '/cars' : `/cars?category=${current}`} className="text-[#C9A84C] hover:underline">
+                Clear dates
+              </a>
+            </p>
+          )}
         </div>
 
         {/* Cars Grid */}
@@ -113,7 +145,13 @@ export default async function CarsPage({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {cars.map((car, i) => (
               <div key={car.id} className="animate-fade-up" style={{ animationDelay: `${i * 0.08}s` }}>
-                <CarCard car={car as Car} bookingQuery={bookingQuery} rentalDays={rentalDays} />
+                <CarCard
+                  car={car as Car}
+                  bookingQuery={bookingQuery}
+                  rentalDays={rentalDays}
+                  unavailable={availability?.has(car.id) ?? false}
+                  nextFreeDate={availability?.get(car.id)?.nextFree ?? null}
+                />
               </div>
             ))}
           </div>

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Car } from '@/types'
 import { Users, DoorOpen, Fuel, Settings, Luggage, Zap } from 'lucide-react'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, formatDate } from '@/lib/utils'
 import { getDiscountForDays } from '@/lib/pricing'
 
 const CAR_PLACEHOLDER: Record<string, string> = {
@@ -23,9 +23,19 @@ interface CarCardProps {
   bookingQuery?: string
   /** Length of the searched rental, when the visitor picked dates */
   rentalDays?: number | null
+  /** Already booked for the searched dates */
+  unavailable?: boolean
+  /** First date it frees up again, when unavailable */
+  nextFreeDate?: string | null
 }
 
-export default function CarCard({ car, bookingQuery, rentalDays }: CarCardProps) {
+export default function CarCard({
+  car,
+  bookingQuery,
+  rentalDays,
+  unavailable = false,
+  nextFreeDate,
+}: CarCardProps) {
   const primaryImage = car.car_images?.find(img => img.is_primary)?.url
     || car.car_images?.[0]?.url
     || CAR_PLACEHOLDER[car.category]
@@ -46,17 +56,32 @@ export default function CarCard({ car, bookingQuery, rentalDays }: CarCardProps)
       : null
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden card-lift group">
+    <div
+      className={`bg-white rounded-2xl shadow-sm border overflow-hidden group ${
+        unavailable ? 'border-gray-200' : 'border-gray-100 card-lift'
+      }`}
+    >
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
         <Image
           src={primaryImage}
           alt={`${car.make} ${car.model}`}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          className={`object-cover transition-transform duration-500 ${
+            unavailable ? 'grayscale opacity-60' : 'group-hover:scale-105'
+          }`}
         />
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+        {/* Booked for the searched dates */}
+        {unavailable && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/40">
+            <span className="rounded-full bg-[#0A1F44] px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white shadow-lg">
+              Booked for these dates
+            </span>
+          </div>
+        )}
 
         {/* Category badge */}
         <div className="absolute top-3 left-3">
@@ -125,6 +150,28 @@ export default function CarCard({ car, bookingQuery, rentalDays }: CarCardProps)
         )}
 
         {/* Price & CTA */}
+        {unavailable ? (
+          <div className="flex items-center justify-between gap-3 border-t border-gray-100 pt-3">
+            <div>
+              <span className="text-xs text-gray-400">
+                {activePriceList ? formatCurrency(activePriceList.daily_rate) : '—'}/day
+              </span>
+              <p className="text-sm font-semibold text-[#0A1F44]">
+                {nextFreeDate ? `Free from ${formatDate(nextFreeDate)}` : 'Not available'}
+              </p>
+            </div>
+            <Link
+              href={
+                nextFreeDate
+                  ? `/cars/${car.slug}?pickup=${nextFreeDate}`
+                  : `/cars/${car.slug}`
+              }
+              className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:border-[#0A1F44] hover:text-[#0A1F44]"
+            >
+              {nextFreeDate ? 'See later dates' : 'View details'}
+            </Link>
+          </div>
+        ) : (
         <div className="flex items-center justify-between pt-3 border-t border-gray-100">
           <div>
             <span className="text-xs text-gray-400">{stayTotal ? `Total, ${rentalDays} days` : 'From'}</span>
@@ -152,6 +199,7 @@ export default function CarCard({ car, bookingQuery, rentalDays }: CarCardProps)
             View details
           </Link>
         </div>
+        )}
       </div>
     </div>
   )

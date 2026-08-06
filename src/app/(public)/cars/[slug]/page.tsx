@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Users, DoorOpen, Fuel, Settings, Luggage, Wifi, Navigation, Car } from 'lucide-react'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, formatDate } from '@/lib/utils'
+import { getConflictingBookings, nextFreeDate } from '@/lib/availability'
 import { Car as CarType } from '@/types'
 
 const CAR_PLACEHOLDER: Record<string, string> = {
@@ -40,6 +41,14 @@ export default async function CarDetailPage({
   if (!car) notFound()
 
   const typedCar = car as CarType
+
+  // Same availability rules as the fleet list and the booking API.
+  const conflicts =
+    pickup && dropoff
+      ? await getConflictingBookings(supabase, pickup, dropoff, typedCar.id)
+      : []
+  const isUnavailable = conflicts.length > 0
+  const carNextFree = nextFreeDate(conflicts)
 
   const primaryImage = typedCar.car_images?.find(img => img.is_primary)?.url
     || typedCar.car_images?.[0]?.url
@@ -107,12 +116,41 @@ export default async function CarDetailPage({
               </div>
             )}
 
-            <Link
-              href={bookingQuery ? `/booking/${typedCar.slug}?${bookingQuery}` : `/booking/${typedCar.slug}`}
-              className="w-full block text-center bg-[#C9A84C] text-[#0A1F44] py-3 rounded-lg font-bold text-lg hover:bg-yellow-400 transition-colors"
-            >
-              Book This Car
-            </Link>
+            {isUnavailable ? (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <p className="text-sm font-semibold text-amber-900">
+                  Already booked for {formatDate(pickup!)} – {formatDate(dropoff!)}
+                </p>
+                {carNextFree && (
+                  <p className="mt-1 text-sm text-amber-800">
+                    This car is free again from {formatDate(carNextFree)}.
+                  </p>
+                )}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {carNextFree && (
+                    <Link
+                      href={`/booking/${typedCar.slug}?pickup=${carNextFree}`}
+                      className="rounded-lg bg-[#0A1F44] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0d2a5c]"
+                    >
+                      Book from {formatDate(carNextFree)}
+                    </Link>
+                  )}
+                  <Link
+                    href="/cars"
+                    className="rounded-lg border border-amber-300 px-4 py-2 text-sm font-semibold text-amber-900 transition hover:bg-amber-100"
+                  >
+                    See available cars
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <Link
+                href={bookingQuery ? `/booking/${typedCar.slug}?${bookingQuery}` : `/booking/${typedCar.slug}`}
+                className="w-full block text-center bg-[#C9A84C] text-[#0A1F44] py-3 rounded-lg font-bold text-lg hover:bg-yellow-400 transition-colors"
+              >
+                Book This Car
+              </Link>
+            )}
           </div>
         </div>
       </div>

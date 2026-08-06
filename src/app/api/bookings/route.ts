@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
+import { getConflictingBookings, nextFreeDate } from '@/lib/availability'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,23 +17,18 @@ export async function POST(request: NextRequest) {
       totalDays, pricing,
     } = body
 
-    // Check car availability (no overlapping confirmed/active bookings).
-    // Two ranges overlap when the existing booking starts before the new one
-    // ends AND ends after the new one starts. The inequalities are strict so a
-    // car returned on the 14th can be picked up again on the 14th — same-day
-    // turnaround is normal in rental and the times are handled at the counter.
-    // Chained filters are ANDed by PostgREST; an .or() here would treat almost
-    // any existing booking as a conflict and lock the car out permanently.
-    const { data: conflicts } = await supabase
-      .from('bookings')
-      .select('id')
-      .eq('car_id', carId)
-      .in('status', ['confirmed', 'active', 'pending'])
-      .lt('pickup_date', dropoffDate)
-      .gt('dropoff_date', pickupDate)
+    // Availability is decided by lib/availability.ts so this route, the fleet
+    // listing and the car detail page always agree.
+    const conflicts = await getConflictingBookings(supabase, pickupDate, dropoffDate, carId)
 
-    if (conflicts && conflicts.length > 0) {
-      return NextResponse.json({ error: 'Car is not available for selected dates' }, { status: 409 })
+    if (conflicts.length > 0) {
+      return NextResponse.json(
+        {
+          error: 'Car is not available for selected dates',
+          nextAvailableDate: nextFreeDate(conflicts),
+        },
+        { status: 409 }
+      )
     }
 
     // Create booking
@@ -74,6 +70,19 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (bookingError) {
+      // 23P01 = exclusion constraint violation. Another request booked this car
+      // for overlapping dates between our availability check and this insert,
+      // so the database rejected it. Report it as a conflict, not a failure.
+      if (bookingError.code === '23P01') {
+        const latest = await getConflictingBookings(supabase, pickupDate, dropoffDate, carId)
+        return NextResponse.json(
+          {
+            error: 'Car is not available for selected dates',
+            nextAvailableDate: nextFreeDate(latest),
+          },
+          { status: 409 }
+        )
+      }
       console.error('Booking error:', bookingError)
       return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 })
     }

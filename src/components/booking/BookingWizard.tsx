@@ -124,7 +124,19 @@ export default function BookingWizard({
         }),
       })
       const json = await res.json()
-      if (!res.ok) throw new Error(json.error || 'Failed to create booking')
+      if (!res.ok) {
+        // Someone else took the car while this booking was being filled in.
+        // Say when it frees up rather than just refusing.
+        if (res.status === 409) {
+          const freeFrom = json.nextAvailableDate
+            ? ` It is free again from ${new Date(json.nextAvailableDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}.`
+            : ''
+          throw new Error(
+            `This car was booked for your dates while you were filling in the form.${freeFrom} Please choose different dates or another car.`
+          )
+        }
+        throw new Error(json.error || 'Failed to create booking')
+      }
       setBookingRef(json.reference)
       setStep(4)
     } catch (e) {
