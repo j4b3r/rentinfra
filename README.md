@@ -70,6 +70,12 @@ npm run build    # Production build (always run before deploying)
 npm run lint     # Lint check
 ```
 
+## Roadmap
+
+RentInfra covers the full booking funnel and admin panel, but it is not yet a complete rental
+operation — there is no payment collection and no email delivery. **[ROADMAP.md](./ROADMAP.md)**
+compares it against commercial rental platforms and lays out what to build next, in order.
+
 ## Customizing for your business
 
 - Replace `public/logo.*` and wire it up in `Navbar`, `Footer`, auth pages, and the PDF contract generator (each has a `TODO` marking where)

@@ -162,11 +162,33 @@ NEXT_PUBLIC_SITE_URL=
 - Rental contract PDF (2-page A4, EN + ES, logo, Inter font, WhatsApp QR, damage inspection diagram)
 
 ## Planned / Todo
+
+See **[ROADMAP.md](./ROADMAP.md)** for the full gap analysis against commercial rental
+platforms, with rationale and suggested build order.
+
+**P0 — blocks real use**
+- ~~**[#13]** Availability check inverted (one booking locked a car out forever)~~ — fixed 2026-08-06
+- **[#14]** Filter `/cars` by availability for the searched dates (currently only fails at submit)
+- **[#15]** Postgres exclusion constraint so double-booking is structurally impossible
+- **[#16]** Expire unconfirmed `pending` holds (`hold_expires_at` + cron) so they stop holding inventory
+
+**P1 — needed to operate**
+- **[#9]** Email notifications — `notifications_queue` rows are inserted but **nothing ever sends them**
+- **[#10]** Payments (Stripe/PayPal) + deposit pre-authorization and release
+- **[#17]** Vehicle handover: condition photos, damage markers, signature, deposit deductions
+- **[#7]** User profile page + booking history (/account)
+
+**P2 — competitive**
+- **[#18]** Fleet ops: maintenance schedule, richer vehicle status, fleet calendar
+- **[#19]** Reporting: utilization, RevPAV, ADR, cancellation and attach rates
+- **[#20]** Rate management: day-of-week rates, blackout dates, per-location pricing
 - **[#4]** Admin: Addon CRUD
 - **[#5]** Admin: Location CRUD
 - **[#6]** Admin: Offline booking form
-- **[#7]** User profile page + booking history (/account)
-- **[#9]** Email notifications (booking confirmation + admin alert) via SMTP/Resend
-- **[#10]** Payment integration (Stripe + PayPal)
+
+**P3 — later**
+- **[#21]** Driver licence verification (store + staff-verify; automated check is third-party)
+- **[#22]** Multi-location logistics: one-way rentals, inter-branch transfers
 - **[#11]** WhatsApp notifications via Twilio
 - **[#12]** German + Russian translations
+- **[#23]** Channel/OTA sync
