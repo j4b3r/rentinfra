@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { SITE_URL } from '@/lib/site'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentinfra.com'
+  const baseUrl = SITE_URL
   const supabase = await createClient()
 
   const { data: cars } = await supabase.from('cars').select('slug, updated_at').eq('is_active', true)

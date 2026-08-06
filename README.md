@@ -8,7 +8,7 @@ An open-source, generic car rental booking platform — a SaaS boilerplate you c
 
 ## Live demo
 
-**→ [rentinfra.vercel.app](https://rentinfra.vercel.app)**
+**→ [demo.rentinfra.infranomad.com](https://demo.rentinfra.infranomad.com)**
 
 Sign in to try the full product, including the admin panel:
 
@@ -24,6 +24,40 @@ Sign in to try the full product, including the admin panel:
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/j4b3r/rentinfra&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,SUPABASE_SERVICE_ROLE_KEY,NEXT_PUBLIC_SITE_URL&envDescription=Supabase%20credentials%20and%20your%20public%20site%20URL&envLink=https://github.com/j4b3r/rentinfra/blob/main/DEPLOY.md%234-collect-your-environment-variables)
 
 You will still need to create a Supabase project and run the migrations. **[DEPLOY.md](./DEPLOY.md) is the full step-by-step guide** — Supabase setup, migrations, environment variables, Vercel deploy, auth configuration, custom domain, and troubleshooting.
+
+**In short:**
+
+| Step | What |
+|------|------|
+| 1 | Create a Supabase project |
+| 2 | Run `supabase/migrations/001` → `005`, then `007` → `011` in the SQL editor (skip `006`, it is demo data) |
+| 3 | Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL` |
+| 4 | Deploy to Vercel (or any Node host — nothing is Vercel-specific except the cron schedule) |
+| 5 | Set the Supabase **Site URL** and redirect allowlist to your domain |
+| 6 | Register an account, then flip `profiles.is_admin` to `true` for it |
+| 7 | Optional: connect Resend for email in **Admin → Settings → Integrations** |
+
+## What's included
+
+**Booking**
+- Date and location search from the homepage, carried through to the booking wizard
+- Availability enforced everywhere: booked cars are shown as unavailable in search with the date they free up, and a database exclusion constraint makes double-booking impossible
+- Unconfirmed bookings hold the car for a configurable window, then release it automatically
+- Pricing engine: seasonal rate lists, duration discount tiers, addons, location fees, young-driver surcharge, tax
+- Guest booking with a reference (`RIF-YYYY-NNNNN`) plus lookup at `/my-booking`
+
+**Admin**
+- Bookings with status, payment state, mileage, fuel, deposit method and notes
+- Cars with photos, pricing and discount tiers; testimonials; users; locations
+- Two-page A4 rental contract PDF (EN/ES) with damage diagram and WhatsApp QR
+- Every configurable value lives in the `settings` table, editable from the panel
+
+**Platform**
+- Email via Resend: booking receipt, confirmation, cancellation and admin alert, queued with retry
+- API keys managed from the admin panel, stored with row-level security so they never reach the browser
+- EN/ES translations, SEO metadata and sitemap driven by your own domain
+
+Not yet included: payment collection, condition-report photos, and a customer account area. See **[ROADMAP.md](./ROADMAP.md)**.
 
 ## License
 

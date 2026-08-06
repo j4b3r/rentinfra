@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { Phone, MessageCircle, MapPin, Clock, HelpCircle, FileText, Car } from 'lucide-react'
 import { getSettingsMap } from '@/lib/settings'
+import { absoluteUrl } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Customer Care | RentInfra Car Rental',
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Customer Care — RentInfra',
     description: 'We\'re here to help. Contact our team by phone, WhatsApp or visit us.',
-    url: 'https://rentinfra.com/customer-care',
+    url: absoluteUrl('/customer-care'),
   },
 }
 

@@ -5,12 +5,13 @@ import CarCard from '@/components/cars/CarCard'
 import { Car } from '@/types'
 import { Metadata } from 'next'
 import { Car as CarIcon, SlidersHorizontal } from 'lucide-react'
+import { absoluteUrl } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Our Fleet — Car Rental | RentInfra',
   description: 'Browse our full fleet of rental cars. Economy from €45/day, SUV from €85/day, Luxury from €150/day. Airport pickup and hotel delivery.',
   keywords: 'car rental fleet, economy car hire, suv rental, luxury car rental',
-  alternates: { canonical: 'https://rentinfra.com/cars' },
+  alternates: { canonical: absoluteUrl('/cars') },
 }
 
 const categories = [

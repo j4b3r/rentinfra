@@ -3,6 +3,7 @@ import { Metadata } from 'next'
 import FaqAccordion from '@/components/FaqAccordion'
 import Link from 'next/link'
 import { MessageCircle, Phone } from 'lucide-react'
+import { absoluteUrl } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Frequently Asked Questions | RentInfra Car Rental',
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'FAQ — RentInfra Car Rental',
     description: 'Answers to common questions about our car rental service.',
-    url: 'https://rentinfra.com/faq',
+    url: absoluteUrl('/faq'),
   },
 }
 

@@ -1,11 +1,17 @@
 import { Metadata } from 'next'
+import { getSettingsMap } from '@/lib/settings'
 
 export const metadata: Metadata = {
   title: 'Terms & Conditions | RentInfra Demo Car Rental',
   description: 'Read the full terms and conditions for renting a car with RentInfra Demo.',
 }
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const settings = await getSettingsMap()
+  const phone = settings.company_phone || ''
+  const email = settings.company_email || ''
+  const contactLine = [phone && `Tel: ${phone}`, email && `Email: ${email}`].filter(Boolean).join(' · ')
+
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
       <div className="bg-[#0A1F44] py-10 px-4">
@@ -86,7 +92,7 @@ export default function TermsPage() {
 
           <h2>9. Contact</h2>
           <p>RentInfra Demo · 123 Example Street, Suite 100 · 00000 Demo City · Demo Country<br />
-          Tel: +1 000 000 0000 · Email: info@rentinfra.com</p>
+          {contactLine}</p>
         </div>
       </div>
     </div>

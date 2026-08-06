@@ -2,6 +2,7 @@ import { waitUntil } from '@vercel/functions'
 import { createAdminClient } from '@/lib/supabase/server'
 import { getSecret } from '@/lib/settings'
 import { renderTemplate, TemplateContext } from './templates'
+import { SITE_URL } from '@/lib/site'
 
 /**
  * Email delivery.
@@ -162,7 +163,7 @@ export async function processEmailQueue(limit = 25): Promise<{
   const rows = (queued || []) as QueueRow[]
   if (rows.length === 0) return { sent: 0, failed: 0, skipped: 0 }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rentinfra.vercel.app'
+  const siteUrl = SITE_URL
   let sent = 0
   let failed = 0
   let skipped = 0

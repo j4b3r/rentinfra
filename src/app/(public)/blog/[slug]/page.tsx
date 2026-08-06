@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Metadata } from 'next'
 import { Calendar, ChevronLeft, Tag } from 'lucide-react'
+import { SITE_URL, absoluteUrl } from '@/lib/site'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title: post.title_en,
       description: post.excerpt_en,
-      url: `https://rentinfra.com/blog/${slug}`,
+      url: absoluteUrl(`/blog/${slug}`),
       type: 'article',
       publishedTime: post.published_at,
       images: post.cover_image ? [{ url: post.cover_image }] : [],
@@ -48,7 +49,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     publisher: {
       '@type': 'Organization',
       name: 'RentInfra',
-      url: 'https://rentinfra.com',
+      url: SITE_URL,
     },
   }
 

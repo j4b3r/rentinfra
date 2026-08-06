@@ -1,11 +1,21 @@
 import { Metadata } from 'next'
+import { getSettingsMap } from '@/lib/settings'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | RentInfra Demo Car Rental',
   description: 'Learn how RentInfra Demo collects, uses and protects your personal data in accordance with applicable data protection law.',
 }
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  // Contact details come from Settings → General so a fork does not publish
+  // someone else's address in its legal pages.
+  const settings = await getSettingsMap()
+  const company = settings.company_name || 'RentInfra'
+  const address = settings.company_address || ''
+  const email = settings.company_email || ''
+  const phone = settings.company_phone || ''
+  const contactLine = [email, phone].filter(Boolean).join(' · ')
+
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
       <div className="bg-[#0A1F44] py-10 px-4">
@@ -25,8 +35,8 @@ export default function PrivacyPage() {
           <p>RentInfra Demo (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is committed to protecting your personal data. This Privacy Policy explains how we collect, use and safeguard your information in accordance with applicable data protection law (e.g. GDPR, or your local equivalent).</p>
 
           <h2>1. Data Controller</h2>
-          <p>RentInfra Demo, 123 Example Street, Suite 100, 00000 Demo City, Demo Country.<br />
-          Contact: info@rentinfra.com · Tel: +1 000 000 0000</p>
+          <p>{company}{address ? `, ${address}` : ''}.<br />
+          {contactLine && <>Contact: {contactLine}</>}</p>
 
           <h2>2. Data We Collect</h2>
           <ul>
@@ -74,7 +84,7 @@ export default function PrivacyPage() {
           <p>We share your data with: Supabase (database hosting), Vercel (website hosting), Stripe/PayPal (payment processing). All processors are GDPR compliant. We do not sell your data to third parties.</p>
 
           <h2>9. Contact</h2>
-          <p>For any data protection enquiries: info@rentinfra.com · +1 000 000 0000</p>
+          <p>For any data protection enquiries{contactLine ? <>: {contactLine}</> : null}</p>
         </div>
       </div>
     </div>

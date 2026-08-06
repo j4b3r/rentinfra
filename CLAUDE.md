@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 RentInfra — an open-source car rental SaaS boilerplate. It ships as a full car rental booking website (public site, booking wizard, admin panel) with generic placeholder branding and content, meant to be forked/deployed and customized for a real car rental business. Deployed on Vercel, database on Supabase.
 
-- **Example deployment**: rentinfra.com (replace with your own domain)
+- **Live demo**: https://demo.rentinfra.infranomad.com (replace with your own domain)
 - **Stack**: Next.js 14 (App Router), Tailwind CSS, Supabase (PostgreSQL + Auth + Storage), next-intl (EN/ES)
 - **Repo**: github.com/j4b3r/rentinfra
 - **License**: MIT

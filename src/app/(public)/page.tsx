@@ -8,6 +8,7 @@ import HowItWorks from '@/components/home/HowItWorks'
 import Testimonials, { Testimonial } from '@/components/home/Testimonials'
 import ClosingCta from '@/components/home/ClosingCta'
 import { Car, Location } from '@/types'
+import { SITE_URL, absoluteUrl } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'RentInfra — Car Rental Booked in Minutes',
@@ -18,10 +19,10 @@ export const metadata: Metadata = {
     title: 'RentInfra — Car Rental Booked in Minutes',
     description:
       'Insurance and unlimited mileage included. Free cancellation up to 24 hours before pick-up.',
-    url: 'https://rentinfra.com',
+    url: SITE_URL,
     siteName: 'RentInfra',
     // TODO: replace with your own logo/OG image
-    images: [{ url: 'https://rentinfra.com/og-image.png', width: 800, height: 800, alt: 'RentInfra' }],
+    images: [{ url: absoluteUrl('/og-image.png'), width: 800, height: 800, alt: 'RentInfra' }],
     type: 'website',
   },
   twitter: {
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
     title: 'RentInfra — Car Rental Booked in Minutes',
     description: 'Insurance and unlimited mileage included. Book online in four steps.',
   },
-  alternates: { canonical: 'https://rentinfra.com' },
+  alternates: { canonical: SITE_URL },
 }
 
 export default async function HomePage() {

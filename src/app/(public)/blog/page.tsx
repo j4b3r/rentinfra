@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Metadata } from 'next'
 import { Calendar, Tag } from 'lucide-react'
+import { absoluteUrl } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Car Rental Tips & Travel Guide | RentInfra Blog',
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'RentInfra Blog — Travel Tips & Driving Guides',
     description: 'Explore the best drives, hidden gems and travel tips.',
-    url: 'https://rentinfra.com/blog',
+    url: absoluteUrl('/blog'),
     type: 'website',
   },
 }

@@ -21,9 +21,9 @@ Estimated time: ~20 minutes.
 
 ## Try the live demo first
 
-Before deploying your own, you can explore a fully working instance — public site and admin panel — at **[rentinfra.vercel.app](https://rentinfra.vercel.app)**.
+Before deploying your own, you can explore a fully working instance — public site and admin panel — at **[demo.rentinfra.infranomad.com](https://demo.rentinfra.infranomad.com)**.
 
-Sign in at [`/auth/login`](https://rentinfra.vercel.app/auth/login) with either account:
+Sign in at [`/auth/login`](https://demo.rentinfra.infranomad.com/auth/login) with either account:
 
 | Role | Email | Password | What you can see |
 |------|-------|----------|------------------|

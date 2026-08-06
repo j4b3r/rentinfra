@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { CheckCircle } from 'lucide-react'
+import { SITE_HOST } from '@/lib/site'
 
 interface Props {
   reference: string
@@ -26,7 +27,7 @@ export default function BookingConfirmation({ reference, email }: Props) {
       <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 text-sm text-amber-800 mb-6 text-left">
         <strong>Save your reference number!</strong><br />
         You can use it at{' '}
-        <Link href="/my-booking" className="underline font-medium">rentinfra.com/my-booking</Link>
+        <Link href="/my-booking" className="underline font-medium">{SITE_HOST}/my-booking</Link>
         {' '}to check your booking status anytime.
       </div>
 
