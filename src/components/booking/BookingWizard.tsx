@@ -82,9 +82,12 @@ export default function BookingWizard({
     // Carry over whatever the visitor already chose on the homepage search
     ...(initialPickupDate ? { pickupDate: initialPickupDate } : {}),
     ...(initialDropoffDate ? { dropoffDate: initialDropoffDate } : {}),
-    ...(initialLocationId
-      ? { pickupLocationId: initialLocationId, dropoffLocationId: initialLocationId }
-      : {}),
+    // Preselect the location chosen in the homepage search, otherwise fall back
+    // to the first one so step 1 does not start in a blocked state.
+    ...(() => {
+      const id = initialLocationId || locations[0]?.id
+      return id ? { pickupLocationId: id, dropoffLocationId: id } : {}
+    })(),
   })
   const [bookingRef, setBookingRef] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)

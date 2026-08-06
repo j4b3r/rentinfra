@@ -19,12 +19,14 @@ export default function StepDates({ data, update, locations, onNext }: Props) {
     pickupLoc?.type === 'hotel_delivery' ||
     locations.find(l => l.id === data.dropoffLocationId)?.type === 'hotel_delivery'
 
-  function validate() {
-    if (!data.pickupDate || !data.dropoffDate) return false
-    if (!data.pickupLocationId || !data.dropoffLocationId) return false
-    if (data.pickupDate >= data.dropoffDate) return false
-    return true
-  }
+  // Spell out what is missing so the button is never dead without a reason.
+  const problems: string[] = []
+  if (!data.pickupDate || !data.dropoffDate) problems.push('Choose both a pickup and a return date')
+  else if (data.pickupDate >= data.dropoffDate) problems.push('The return date must be after the pickup date')
+  if (!data.pickupLocationId) problems.push('Choose a pickup location')
+  if (!data.dropoffLocationId) problems.push('Choose a return location')
+
+  const isValid = problems.length === 0
 
   return (
     <div className="space-y-5">
@@ -123,9 +125,22 @@ export default function StepDates({ data, update, locations, onNext }: Props) {
         </div>
       )}
 
+      {!isValid && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+          <p className="text-sm font-medium text-amber-900">
+            To continue, complete {problems.length} {problems.length === 1 ? 'field' : 'fields'}:
+          </p>
+          <ul className="mt-1 list-disc pl-5 text-sm text-amber-800">
+            {problems.map(p => (
+              <li key={p}>{p}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <button
         onClick={onNext}
-        disabled={!validate()}
+        disabled={!isValid}
         className="w-full bg-[#0A1F44] text-white py-3 rounded-lg font-semibold hover:bg-[#C9A84C] hover:text-[#0A1F44] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
         Continue to Extras →
