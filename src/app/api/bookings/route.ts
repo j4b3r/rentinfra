@@ -16,13 +16,20 @@ export async function POST(request: NextRequest) {
       totalDays, pricing,
     } = body
 
-    // Check car availability (no overlapping confirmed/active bookings)
+    // Check car availability (no overlapping confirmed/active bookings).
+    // Two ranges overlap when the existing booking starts before the new one
+    // ends AND ends after the new one starts. The inequalities are strict so a
+    // car returned on the 14th can be picked up again on the 14th — same-day
+    // turnaround is normal in rental and the times are handled at the counter.
+    // Chained filters are ANDed by PostgREST; an .or() here would treat almost
+    // any existing booking as a conflict and lock the car out permanently.
     const { data: conflicts } = await supabase
       .from('bookings')
       .select('id')
       .eq('car_id', carId)
       .in('status', ['confirmed', 'active', 'pending'])
-      .or(`pickup_date.lte.${dropoffDate},dropoff_date.gte.${pickupDate}`)
+      .lt('pickup_date', dropoffDate)
+      .gt('dropoff_date', pickupDate)
 
     if (conflicts && conflicts.length > 0) {
       return NextResponse.json({ error: 'Car is not available for selected dates' }, { status: 409 })
