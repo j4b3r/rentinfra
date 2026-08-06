@@ -7,9 +7,14 @@ import { createAdminClient } from '@/lib/supabase/server'
  * A `pending` booking blocks its car, so an abandoned checkout would keep a
  * vehicle off sale forever. This cancels holds past `hold_expires_at`.
  *
- * Scheduled hourly by vercel.json. Vercel signs cron requests with
- * CRON_SECRET; when that variable is set the header must match, so the
- * endpoint cannot be triggered by anyone who finds the URL.
+ * Scheduled daily by vercel.json, because Vercel's Hobby plan allows one cron
+ * run per day. On Pro, change the schedule to "0 * * * *" so holds are released
+ * within an hour of expiring rather than at the next nightly run — worth doing
+ * if you shorten `booking_hold_minutes` below a day.
+ *
+ * Vercel signs cron requests with CRON_SECRET; when that variable is set the
+ * header must match, so the endpoint cannot be triggered by anyone who finds
+ * the URL.
  */
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET

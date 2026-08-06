@@ -107,7 +107,7 @@ Go to **Table Editor**. You should see 15 tables including `cars`, `bookings` an
 
 ## 4. Collect your environment variables
 
-RentInfra needs exactly four variables.
+RentInfra needs four variables, plus one optional secret for the scheduled job.
 
 In your Supabase project, go to **Project Settings → API Keys**:
 
@@ -117,6 +117,7 @@ In your Supabase project, go to **Project Settings → API Keys**:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Project Settings → API Keys → **anon / public** | Yes — safe to expose, RLS protects your data |
 | `SUPABASE_SERVICE_ROLE_KEY` | Project Settings → API Keys → **service_role** | **NO — secret** |
 | `NEXT_PUBLIC_SITE_URL` | Your final public URL, e.g. `https://your-domain.com` | Yes |
+| `CRON_SECRET` | Any random string, e.g. `openssl rand -hex 24`. Optional but recommended — it stops anyone from triggering the scheduled job at `/api/cron/expire-holds`. Vercel sends it automatically for real cron runs. | **NO — secret** |
 
 > ⚠️ **The `service_role` key bypasses all row-level security.** Never commit it, never put it in a `NEXT_PUBLIC_*` variable, and never expose it to the browser. It is used only in server-side code (`src/lib/supabase/server.ts`).
 
