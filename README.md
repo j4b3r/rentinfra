@@ -2,8 +2,8 @@
 
 An open-source vehicle rental booking platform — cars, motorbikes and bicycles — a SaaS boilerplate you can fork and customize for your own car rental business.
 
-- **Public site**: browse a fleet, book a car through a 4-step wizard, look up a booking by reference, blog + FAQ pages
-- **Admin panel**: manage bookings, cars, addons, users, locations, and settings; generate PDF rental contracts
+- **Public site**: browse cars, motorbikes and bicycles, book through a 4-step wizard, look up a booking by reference, blog + FAQ pages
+- **Admin panel**: manage bookings, the fleet, addons, users, locations, testimonials and settings; generate PDF rental contracts
 - **Stack**: Next.js (App Router), TypeScript, Tailwind CSS, Supabase (PostgreSQL + Auth + Storage), next-intl (EN/ES)
 
 ## Live demo
@@ -39,16 +39,20 @@ You will still need to create a Supabase project and run the migrations. **[DEPL
 
 ## What's included
 
+**Fleet**
+- Cars, motorbikes and bicycles in one fleet, each showing only the specs that apply
+- Bicycles skip the licence, minimum age and young-driver surcharge; addons are filtered per vehicle type
+
 **Booking**
 - Date and location search from the homepage, carried through to the booking wizard
-- Availability enforced everywhere: booked cars are shown as unavailable in search with the date they free up, and a database exclusion constraint makes double-booking impossible
-- Unconfirmed bookings hold the car for a configurable window, then release it automatically
+- Availability enforced everywhere: booked vehicles are shown as unavailable in search with the date they free up, and a database exclusion constraint makes double-booking impossible
+- Unconfirmed bookings hold the vehicle for a configurable window, then release it automatically
 - Pricing engine: seasonal rate lists, duration discount tiers, addons, location fees, young-driver surcharge, tax
 - Guest booking with a reference (`RIF-YYYY-NNNNN`) plus lookup at `/my-booking`
 
 **Admin**
 - Bookings with status, payment state, mileage, fuel, deposit method and notes
-- Cars with photos, pricing and discount tiers; testimonials; users; locations
+- Vehicles with photos, pricing and discount tiers; testimonials; users; locations
 - Two-page A4 rental contract PDF (EN/ES) with damage diagram and WhatsApp QR
 - Every configurable value lives in the `settings` table, editable from the panel
 
@@ -107,7 +111,7 @@ npm run lint     # Lint check
 ## Roadmap
 
 RentInfra covers the full booking funnel and admin panel, but it is not yet a complete rental
-operation — there is no payment collection and no email delivery. **[ROADMAP.md](./ROADMAP.md)**
+operation — there is no payment collection yet. **[ROADMAP.md](./ROADMAP.md)**
 compares it against commercial rental platforms and lays out what to build next, in order.
 
 ## Customizing for your business
