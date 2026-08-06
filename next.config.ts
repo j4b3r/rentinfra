@@ -7,9 +7,11 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        // Example project ref — replace with your own Supabase project's storage hostname
+        // Any Supabase project's public Storage bucket. This matches the
+        // `<project-ref>.supabase.co` host of whichever project you point
+        // NEXT_PUBLIC_SUPABASE_URL at, so no edit is needed when you fork.
         protocol: 'https',
-        hostname: 'dbjgaorvsdvumlusntji.supabase.co',
+        hostname: '*.supabase.co',
         pathname: '/storage/v1/object/public/**',
       },
       {
