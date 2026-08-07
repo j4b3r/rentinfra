@@ -87,15 +87,18 @@ no email is sent to the customer or the business, ever. The queue table and the
 - Admin alert on new booking, to `notify_admin_email`
 - Respect the existing `notify_new_booking` / `notify_booking_confirm` toggles
 
-### [#10] Payments and deposits *(already on the todo list)*
+### ~~[#10] Payments~~ ✅ Done 2026-08-07 (deposit pre-auth deliberately not built — see below)
 
 No money is collected anywhere. `payment_status`, `deposit_amount`, `stripe_payment_intent_id`
 and `paypal_order_id` columns exist and are never written by the app.
 
 - Stripe Checkout for the rental, webhook → `payment_status`
-- **Deposit pre-authorization** — the industry norm is a hold placed before handover and
-  released automatically after return, not a charge. Tie the hold to the booking and the
-  condition report so any deduction is evidence-backed
+- ~~Stripe Checkout for the rental, webhook → `payment_status`~~ ✅
+- **Deposit pre-authorization — not built, and deliberately.** Stripe manual-capture
+  authorizations expire after ~7 days, so a hold placed at booking time is impossible for
+  anything booked more than a week ahead, which is most rentals. The security deposit therefore
+  remains a counter operation (`payment_method_deposit`), as it already was. Revisit alongside
+  #17 condition reports, where a deduction would finally have evidence attached.
 - Refund path on cancellation, honouring the cancellation policy already in settings
 
 ### [#17] Vehicle handover and condition reports
@@ -172,7 +175,7 @@ for offline bookings.
 | 3 | ~~#15 exclusion constraint~~ ✅ | Makes double-booking impossible, not just unlikely |
 | 4 | ~~#9 email~~ ✅ | A booking nobody is told about is not a booking |
 | 5 | ~~#16 hold expiry~~ ✅ | Stops abandoned carts eating the fleet |
-| 6 | #10 payments + deposits | Turns reservations into revenue |
+| 6 | ~~#10 payments~~ ✅ | Turns reservations into revenue |
 | 7 | #17 condition reports | Protects the deposit; the PDF already implies it |
 | 8 | #7 accounts, #18 fleet ops, #19 reporting | Retention and daily operations |
 

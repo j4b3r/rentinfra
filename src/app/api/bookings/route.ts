@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { getConflictingBookings, nextFreeDate } from '@/lib/availability'
 import { enqueueEmail, flushEmailQueueInBackground } from '@/lib/email/send'
+import { isPaymentsEnabled, getUpfrontAmount } from '@/lib/payments/stripe'
 
 export async function POST(request: NextRequest) {
   try {
@@ -171,7 +172,20 @@ export async function POST(request: NextRequest) {
     // response the customer is waiting on.
     flushEmailQueueInBackground()
 
-    return NextResponse.json({ reference: booking.reference, id: booking.id })
+    // Tell the client whether to offer payment. When payments are off this is
+    // all false/null and the flow is exactly as it was before Stripe existed.
+    let payment: { enabled: boolean; amountDue: number | null; isPartial: boolean } = {
+      enabled: false,
+      amountDue: null,
+      isPartial: false,
+    }
+
+    if (await isPaymentsEnabled()) {
+      const { amount, isPartial } = await getUpfrontAmount(Number(pricing?.total || 0))
+      payment = { enabled: true, amountDue: amount, isPartial }
+    }
+
+    return NextResponse.json({ reference: booking.reference, id: booking.id, payment })
   } catch (e) {
     console.error('API error:', e)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

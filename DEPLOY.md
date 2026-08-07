@@ -70,7 +70,7 @@ The SQL files in `supabase/migrations/` create every table, row-level security p
 
 ### Option A — Supabase SQL Editor (simplest)
 
-For each file `001` → `005` and then `007` → `012`, in order:
+For each file `001` → `005` and then `007` → `013`, in order:
 
 1. Open your project → **SQL Editor** → **New query**.
 2. Paste the entire contents of the file.
@@ -89,8 +89,9 @@ For each file `001` → `005` and then `007` → `012`, in order:
 | `010_secret_settings.sql` | `is_secret` on settings so API keys are hidden from non-admins, plus the Resend/Stripe credential rows |
 | `011_notification_delivery.sql` | Retry tracking on `notifications_queue` so queued email can actually be sent |
 | `012_vehicle_types.sql` | Motorbikes and bicycles: `vehicle_type`, per-type categories and specs, hourly rate units, per-type addons |
+| `013_payments.sql` | Stripe Checkout columns, and the guard that stops a paid booking being auto-cancelled |
 
-Run `007` through `012` as well — they are part of the base schema, not demo data. It ships with **no rows**, and the homepage hides the reviews section entirely until you publish one from `/admin/testimonials`.
+Run `007` through `013` as well — they are part of the base schema, not demo data. It ships with **no rows**, and the homepage hides the reviews section entirely until you publish one from `/admin/testimonials`.
 
 `006_demo_seed.sql` is **optional and for the public demo only** — it inserts fake cars, photos and bookings. **Skip it** if you are setting up a real business. It is safe to re-run and safe to ignore.
 
@@ -199,8 +200,28 @@ collected.
 Customers then receive a booking receipt and a confirmation when you confirm the booking, and
 you get an alert at `notify_admin_email` for each new booking.
 
-**Payments (Stripe)** — the keys can be stored now, but the checkout flow itself is still in
-development. Leave **Enable payments** off until it ships.
+**Payments (Stripe)**
+
+1. In the [Stripe dashboard](https://dashboard.stripe.com/apikeys), copy your **secret key**.
+   Start with a test key (`sk_test_…`) — test mode moves no real money.
+2. Add a webhook endpoint at **Developers → Webhooks** pointing to
+   `https://your-domain.com/api/payments/webhook`, subscribed to
+   `checkout.session.completed`, `checkout.session.expired` and `charge.refunded`.
+   Copy its **signing secret** (`whsec_…`).
+3. Paste both into **Settings → Integrations**, press **Test connection**, then tick
+   **Enable payments**.
+
+How much is charged is set by **`deposit_percentage`** in Settings → Rental Rules: `100` (or
+`0`) takes the full amount at checkout, `20` takes a 20% deposit with the balance due at
+pick-up. The **security deposit** is separate and stays a counter operation — it is recorded
+against the booking at handover, not charged online.
+
+Refunds are issued by staff from the booking detail page, full or partial. They are deliberately
+not automatic: the cancellation policy is free text, so only a human can decide what is owed.
+A refund issued directly in the Stripe dashboard syncs back automatically.
+
+> Bookings work perfectly well with payments switched off — they are simply recorded as unpaid
+> and settled at the counter.
 
 > Keys are stored with `is_secret` set, which hides them from every non-admin via row-level
 > security. They are shown masked after saving and are never sent to the public site. Anyone

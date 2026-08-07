@@ -90,6 +90,9 @@ export default function BookingWizard({
     })(),
   })
   const [bookingRef, setBookingRef] = useState<string | null>(null)
+  const [payment, setPayment] = useState<{ enabled: boolean; amountDue: number | null; isPartial: boolean }>({
+    enabled: false, amountDue: null, isPartial: false,
+  })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -141,6 +144,7 @@ export default function BookingWizard({
         throw new Error(json.error || 'Failed to create booking')
       }
       setBookingRef(json.reference)
+      if (json.payment) setPayment(json.payment)
       setStep(4)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Error')
@@ -150,7 +154,15 @@ export default function BookingWizard({
   }
 
   if (step === 4 && bookingRef) {
-    return <BookingConfirmation reference={bookingRef} email={data.guestEmail} />
+    return (
+      <BookingConfirmation
+        reference={bookingRef}
+        email={data.guestEmail}
+        paymentsEnabled={payment.enabled}
+        amountDue={payment.amountDue}
+        isPartialPayment={payment.isPartial}
+      />
+    )
   }
 
   return (

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowLeft, Car, MapPin, User, CreditCard, Calendar, Clock, FileText } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import BookingActions from '@/components/admin/BookingActions'
+import RefundPanel from '@/components/admin/RefundPanel'
 
 const statusColor: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700',
@@ -214,6 +215,13 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
               initialPaymentMethodDeposit={b.payment_method_deposit}
             />
           </div>
+
+          <RefundPanel
+            bookingId={b.id}
+            amountPaid={Number(b.amount_paid || 0)}
+            refundedAmount={Number(b.refunded_amount || 0)}
+            hasStripePayment={Boolean(b.stripe_payment_intent_id)}
+          />
 
           {/* Timestamps */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
