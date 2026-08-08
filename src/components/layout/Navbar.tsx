@@ -136,6 +136,13 @@ export default function Navbar({ user, isAdmin, settings = {} }: NavbarProps) {
             className="block text-gray-300 hover:text-white hover:bg-white/8 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors">
             {t('myBooking')}
           </Link>
+          {user && (
+            <Link href="/account"
+              onClick={() => setMobileOpen(false)}
+              className="block text-gray-300 hover:text-white hover:bg-white/8 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors">
+              {t('myAccount')}
+            </Link>
+          )}
 
           <div className="pt-3 border-t border-white/10 space-y-2">
             <div className="flex items-center justify-between">

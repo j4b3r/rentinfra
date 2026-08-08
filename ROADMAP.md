@@ -123,10 +123,19 @@ deposit disputes are won or lost.
   act on at the counter (against the cash/card deposit already taken there), not a button that
   moves money. Revisit if/when a saved-card flow is added.
 
-### [#7] Customer accounts *(already on the todo list)*
+### ~~[#7] Customer accounts~~ ✅ Done 2026-08-08
 
-Auth exists but there is no `/account`. A signed-in customer cannot see their own bookings —
-they must use the guest reference lookup like everyone else.
+Auth existed but there was no `/account`. A signed-in customer couldn't see their own bookings —
+they had to use the guest reference lookup like everyone else.
+
+- `/account` — profile fields (name, phone, nationality, licence number), sign out, and a list of
+  bookings placed while signed in, reusing the RLS policies that already existed
+  (`bookings_user_own`, `profiles_own`) rather than adding new API routes
+- **Only shows bookings with `user_id` set.** A booking placed as a guest (no account, or signed
+  out) with the same email does not link back automatically — that would need matching on email,
+  which RLS can't do without a `SECURITY DEFINER` function, and email isn't a safe join key
+  without more thought. The account page is honest about this: a visible note points guests at
+  `/my-booking` instead of a misleadingly empty list.
 
 ---
 
@@ -189,7 +198,7 @@ for offline bookings.
 | 5 | ~~#16 hold expiry~~ ✅ | Stops abandoned carts eating the fleet |
 | 6 | ~~#10 payments~~ ✅ | Turns reservations into revenue |
 | 7 | ~~#17 condition reports~~ ✅ | Protects the deposit; the PDF already implies it |
-| 8 | #7 accounts, #18 fleet ops, #19 reporting | Retention and daily operations |
+| 8 | ~~#7 accounts~~ ✅, #18 fleet ops, #19 reporting | Retention and daily operations |
 
 Items 1–5 are what separate "a booking form" from "a rental system." Items 6–7 are what
 separate that from a business.
