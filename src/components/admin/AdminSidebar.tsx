@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Car, Calendar, Users, MapPin,
-  Settings, Languages, Package, ExternalLink, LogOut, Star
+  Settings, Languages, Package, ExternalLink, LogOut, Star, BarChart3
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation'
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/bookings', label: 'Bookings', icon: Calendar },
+  { href: '/admin/reports', label: 'Reports', icon: BarChart3 },
   { href: '/admin/cars', label: 'Cars', icon: Car },
   { href: '/admin/addons', label: 'Addons', icon: Package },
   { href: '/admin/users', label: 'Users', icon: Users },

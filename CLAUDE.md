@@ -199,6 +199,7 @@ NEXT_PUBLIC_SITE_URL=
 - Rental contract PDF (2-page A4, EN + ES, logo, Inter font, WhatsApp QR, damage inspection diagram)
 - Handover condition reports: pickup/return photo capture (private Storage bucket, signed URLs), staff-raised damage claims citing specific photos — see `ConditionReportPanel` on the admin booking detail page
 - Customer account area (`/account`): profile edit (writes directly via RLS, no API route needed), sign out, and bookings placed while signed in — guest bookings aren't linked, page points to `/my-booking` instead
+- Business reporting (`/admin/reports`, `src/lib/reporting.ts`): net revenue, fleet utilization, RevPAV, achieved ADR, cancellation rate (customer-cancelled vs expired-hold, kept separate), addon attach rate, revenue by month, utilization by category — pure functions over existing `bookings`/`cars` data, no new tables
 
 ## Planned / Todo
 

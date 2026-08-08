@@ -151,17 +151,30 @@ they had to use the guest reference lookup like everyone else.
 - **Fleet calendar** — one timeline of every car and every booking, which is how rental
   desks actually work day to day
 
-### [#19] Business reporting
+### ~~[#19] Business reporting~~ ✅ Done 2026-08-08
 
-The admin dashboard shows counts. Operators run on:
+The admin dashboard showed counts only. `/admin/reports` now computes standard rental KPIs
+straight from `bookings`/`cars` — no new tables, no separate reporting store. Pure functions in
+`src/lib/reporting.ts`, each with a stated, deliberate definition rather than an implied
+industry-standard one:
 
-- **Utilization rate** (rented days ÷ available days) per car and per category
-- **RevPAV** — revenue per available vehicle day
-- **ADR** — average daily rate achieved vs list price
-- Average rental length, cancellation and no-show rate, addon attach rate
-- Revenue by month, car and category
+- **Net revenue** — `total_amount − refunded_amount`, by the date the sale was made
+- **Utilization** — rented days ÷ available days, **cars only** (motorbikes/bicycles can rent
+  hourly and would distort a days-based figure); rented days count `active`/`completed` bookings
+  clamped to the period via the same `rangesOverlap()` used by availability, not a second overlap
+  rule; available days clamp to each car's `created_at` so a mid-period fleet addition isn't
+  counted as available before it existed
+- **RevPAV** — net revenue ÷ the same available-days denominator as utilization
+- **Achieved ADR** — the average `daily_rate_snapshot` actually charged. Deliberately **not**
+  compared against list price: a car can have more than one active price list (seasonal vs
+  standard), so there's no single baseline to diff against without picking one arbitrarily
+- **Cancellation rate** — customer-cancelled only; hold-expiry sweep cancellations
+  (`cancellation_reason = 'Hold expired before confirmation'`) are abandoned carts, not customer
+  decisions, and are reported separately so they can't inflate the number
+- Average rental length, addon attach rate, revenue by month, utilization by category
 
-These are the standard rental KPIs and all are derivable from data already stored.
+Period selector (this month / last month / this year / last 12 months) via `?period=`, no date
+picker.
 
 ### [#20] Rate and revenue management
 
