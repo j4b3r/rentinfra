@@ -5,6 +5,7 @@ import { ArrowLeft, Car, MapPin, User, CreditCard, Calendar, Clock, FileText } f
 import { formatCurrency } from '@/lib/utils'
 import BookingActions from '@/components/admin/BookingActions'
 import RefundPanel from '@/components/admin/RefundPanel'
+import ConditionReportPanel from '@/components/admin/ConditionReportPanel'
 
 const statusColor: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700',
@@ -131,6 +132,9 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
             <Row label="Category" value={b.car?.category} />
             <Row label="Transmission" value={b.car?.transmission === 'auto' ? 'Automatic' : 'Manual'} />
           </Section>
+
+          {/* Handover condition */}
+          <ConditionReportPanel bookingId={b.id} />
 
           {/* Dates & Locations */}
           <Section icon={Calendar} title="Rental Period">

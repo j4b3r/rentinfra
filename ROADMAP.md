@@ -101,15 +101,27 @@ and `paypal_order_id` columns exist and are never written by the app.
   #17 condition reports, where a deduction would finally have evidence attached.
 - Refund path on cancellation, honouring the cancellation policy already in settings
 
-### [#17] Vehicle handover and condition reports
+### ~~[#17] Vehicle handover and condition reports~~ ✅ Done 2026-08-08 (partial — see below)
 
-The contract PDF has a damage diagram, but nothing digital records condition. This is where
+The contract PDF has a damage diagram, but nothing digital recorded condition. This is where
 deposit disputes are won or lost.
 
-- Photo capture at pickup and return, stored in Supabase Storage against the booking
-- Damage markers, fuel and odometer readings (the `km_*`/`fuel_*` columns already exist)
-- Customer signature captured at handover
-- Deposit deduction flow that cites specific photos
+- ~~Photo capture at pickup and return, stored in Supabase Storage against the booking~~ ✅ —
+  private `condition-photos` bucket (unlike the public `car-images` one), signed URLs only,
+  admin-only via `requireAdmin()`
+- ~~Damage claim flow that cites specific photos~~ ✅ — staff raise a claim (description, amount,
+  cited photo IDs) from the admin booking page; status open/resolved/waived
+- Fuel and odometer readings — already existed (`km_*`/`fuel_*` columns, editable in
+  `BookingActions`), shown alongside the new condition report
+- **Damage markers on a diagram — not built.** The printed contract already has a marked
+  diagram; a digital coordinate-overlay UI is separate follow-up work, not bundled here.
+- **Customer signature capture — not built.** Same reasoning; the contract stays the signed
+  paper record for now.
+- **Automatic deposit deduction — not built, and deliberately.** The Stripe Checkout Session
+  used for payment runs `mode: 'payment'` with no `customer` / `setup_future_usage`, so there is
+  no saved payment method to charge off-session later. A damage claim is a record for staff to
+  act on at the counter (against the cash/card deposit already taken there), not a button that
+  moves money. Revisit if/when a saved-card flow is added.
 
 ### [#7] Customer accounts *(already on the todo list)*
 
@@ -176,7 +188,7 @@ for offline bookings.
 | 4 | ~~#9 email~~ ✅ | A booking nobody is told about is not a booking |
 | 5 | ~~#16 hold expiry~~ ✅ | Stops abandoned carts eating the fleet |
 | 6 | ~~#10 payments~~ ✅ | Turns reservations into revenue |
-| 7 | #17 condition reports | Protects the deposit; the PDF already implies it |
+| 7 | ~~#17 condition reports~~ ✅ | Protects the deposit; the PDF already implies it |
 | 8 | #7 accounts, #18 fleet ops, #19 reporting | Retention and daily operations |
 
 Items 1–5 are what separate "a booking form" from "a rental system." Items 6–7 are what
