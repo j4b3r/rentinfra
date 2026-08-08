@@ -193,10 +193,20 @@ picker.
 The pricing engine is strong but static. Add day-of-week rates, blackout dates, minimum
 rental length per season, and per-location pricing.
 
-### [#4] [#5] [#6] Remaining admin CRUD *(already on the todo list)*
+### ~~[#4] [#5] [#6] Remaining admin CRUD~~ ✅ Done 2026-08-08
 
-Addons and Locations are read-only lists with no create/edit. `/admin/bookings/new` exists
-for offline bookings.
+Addons and Locations were read-only lists with no create/edit — the list pages already linked
+to `/new` and `/[id]` routes that didn't exist. Both now have full create/edit/delete, matching
+`CarForm`'s conventions. `/admin/bookings/new` already existed for offline bookings (#6).
+
+- Addon delete is blocked (409) if the addon is linked to specific cars via `car_addons` —
+  deactivate instead. A `booking_addons` reference doesn't block it: that table snapshots the
+  name and price at booking time, so it doesn't need the addon row to survive.
+- Location delete relies on the existing FK constraint (`bookings.pickup_location_id` /
+  `dropoff_location_id` have no `ON DELETE` clause) — the API catches the `23503` violation and
+  surfaces "used by existing bookings, deactivate instead" rather than a raw 500.
+- Per-car addon assignment (the `car_addons` join, for non-global addons) is **not** part of
+  this pass — the record CRUD was the gap, not that linking UI.
 
 ---
 
