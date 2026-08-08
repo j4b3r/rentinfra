@@ -83,7 +83,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-Run `supabase/migrations/001_schema.sql` against your Supabase project via the Supabase SQL editor or CLI — it's the full schema in one file. Skip `demo_seed.sql` — it only contains fake data for the public demo.
+Run the files in `supabase/migrations/` against your Supabase project in numeric order (`001_schema.sql`, then `002_maintenance_blocks.sql`, then any later ones) via the Supabase SQL editor or CLI. Skip `demo_seed.sql` — it only contains fake data for the public demo.
 
 After registering an account, promote yourself to admin so `/admin` is reachable:
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Car, PriceList, PriceListDiscount } from '@/types'
 import { Plus, Trash2, Save, ArrowLeft, AlertCircle } from 'lucide-react'
 import CarImageUploader from './CarImageUploader'
+import MaintenancePanel from './MaintenancePanel'
 import { CATEGORIES_BY_TYPE } from '@/lib/vehicles'
 import type { VehicleType } from '@/types'
 
@@ -359,6 +360,13 @@ export default function CarForm({ car }: CarFormProps) {
       {!isEdit && (
         <div className="bg-gray-50 rounded-2xl border border-dashed border-gray-200 p-5 mb-4 text-center">
           <p className="text-sm text-gray-400">Save the car first, then you can add photos.</p>
+        </div>
+      )}
+
+      {/* Maintenance — only meaningful once the car exists */}
+      {isEdit && (
+        <div className="mb-4">
+          <MaintenancePanel carId={car!.id} />
         </div>
       )}
 

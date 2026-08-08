@@ -141,15 +141,27 @@ they had to use the guest reference lookup like everyone else.
 
 ## P2 — Makes it competitive
 
-### [#18] Fleet operations
+### ~~[#18] Fleet operations~~ ✅ Done 2026-08-08 (partial — see below)
 
-- **Maintenance schedule** — service intervals, MOT/ITV expiry, insurance renewal, with a car
-  marked unavailable while in the workshop (a maintenance block is just a booking the public
-  cannot make)
-- **Vehicle status** beyond the current `is_available` boolean: available / rented /
-  maintenance / cleaning / off-fleet
-- **Fleet calendar** — one timeline of every car and every booking, which is how rental
-  desks actually work day to day
+- ~~**Maintenance schedule**~~ ✅ — `maintenance_blocks` table, separate from `bookings` on
+  purpose: bookings is the universe every metric in `lib/reporting.ts` sums over, and a workshop
+  visit isn't a sale (it would also mint a `CMB-` reference and show up in customer-facing
+  lists). `get_car_availability()` now `UNION ALL`s blocks with blocking bookings, so every
+  existing caller — fleet listing, car detail page, `POST /api/bookings` — picked this up with
+  zero code changes. A block overlapping another block is stopped at the DB level
+  (`maintenance_blocks_no_overlap`); a block overlapping an existing *booking* is checked in the
+  API route, since scheduling maintenance isn't concurrent-user traffic. Managed from a
+  Maintenance panel on the car edit page.
+- ~~**Vehicle status**~~ ✅ — `available` / `rented` / `maintenance` / `off-fleet`, but
+  deliberately **derived, not stored** (`lib/vehicle-status.ts`): "rented" and "maintenance" are
+  both just "does today fall inside a row for this car," and a stored column would drift from
+  the bookings/blocks it's supposed to summarize the first time someone edits a date. Only
+  "off-fleet" is a real persistent attribute, and `cars.is_active` already carried it. Shown as a
+  badge on `/admin/cars`. **`cleaning` status not built** — no cleaning-turnaround tracking exists
+  yet to derive it from.
+- **Fleet calendar — not built.** A genuinely separate UI problem (timeline grid, per-car rows,
+  horizontal scroll) that's more useful now that maintenance blocks exist to plot alongside
+  bookings. Left for a future pass.
 
 ### ~~[#19] Business reporting~~ ✅ Done 2026-08-08
 

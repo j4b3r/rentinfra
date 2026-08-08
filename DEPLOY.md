@@ -70,11 +70,13 @@ The SQL files in `supabase/migrations/` create every table, row-level security p
 
 ### Option A — Supabase SQL Editor (simplest)
 
-1. Open your project → **SQL Editor** → **New query**.
-2. Paste the entire contents of `001_schema.sql`.
-3. Click **Run**. Confirm it reports success.
+For each file in `supabase/migrations/` in numeric order (`001_schema.sql`, then `002_maintenance_blocks.sql`, then any later ones):
 
-`001_schema.sql` is the full schema — every table, RLS policy, trigger, function and storage bucket, consolidated into one file. It ships with **no rows** other than baseline seed data (3 cars, 3 locations, 5 addons, default settings); the homepage hides the reviews section entirely until you publish a testimonial from `/admin/testimonials`.
+1. Open your project → **SQL Editor** → **New query**.
+2. Paste the entire contents of the file.
+3. Click **Run**. Confirm it reports success before moving to the next file.
+
+`001_schema.sql` is the base schema — every table, RLS policy, trigger, function and storage bucket as of the initial release, consolidated into one file. It ships with **no rows** other than baseline seed data (3 cars, 3 locations, 5 addons, default settings); the homepage hides the reviews section entirely until you publish a testimonial from `/admin/testimonials`. Later-numbered files are additive schema changes since then (`002` adds fleet maintenance blocks).
 
 `demo_seed.sql` is **optional and for the public demo only** — it inserts fake cars, photos and bookings on top of the schema. **Skip it** if you are setting up a real business. It is safe to re-run and safe to ignore.
 

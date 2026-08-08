@@ -2,7 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatCurrency } from '@/lib/utils'
-import { Plus, Pencil, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Plus, Pencil, ToggleLeft, ToggleRight, Wrench } from 'lucide-react'
+import { deriveVehicleStatus, VEHICLE_STATUS_LABEL, VEHICLE_STATUS_COLOR } from '@/lib/vehicle-status'
 
 const CAR_PLACEHOLDER: Record<string, string> = {
   economy: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=200&q=60',
@@ -19,10 +20,29 @@ const categoryBadge: Record<string, string> = {
 export default async function AdminCars() {
   const supabase = await createClient()
 
-  const { data: cars } = await supabase
-    .from('cars')
-    .select('*, car_images(*), price_lists(daily_rate, is_active, season_start)')
-    .order('created_at')
+  const today = new Date().toISOString().slice(0, 10)
+
+  const [{ data: cars }, { data: activeBookings }, { data: activeBlocks }] = await Promise.all([
+    supabase
+      .from('cars')
+      .select('*, car_images(*), price_lists(daily_rate, is_active, season_start)')
+      .order('created_at'),
+    // "Today" for status purposes: pickup_date <= today < dropoff_date.
+    supabase
+      .from('bookings')
+      .select('car_id, pickup_date, dropoff_date')
+      .in('status', ['pending', 'confirmed', 'active'])
+      .lte('pickup_date', today)
+      .gt('dropoff_date', today),
+    supabase
+      .from('maintenance_blocks')
+      .select('car_id, start_date, end_date')
+      .lte('start_date', today)
+      .gt('end_date', today),
+  ])
+
+  const rentedCarIds = new Set((activeBookings || []).map(b => b.car_id))
+  const maintenanceCarIds = new Set((activeBlocks || []).map(b => b.car_id))
 
   return (
     <div className="space-y-5">
@@ -51,6 +71,11 @@ export default async function AdminCars() {
             }) => {
               const img = car.car_images?.find(i => i.is_primary)?.url || car.car_images?.[0]?.url || CAR_PLACEHOLDER[car.category]
               const price = car.price_lists?.find(pl => pl.is_active && !pl.season_start)?.daily_rate
+              const status = deriveVehicleStatus({
+                isActive: car.is_active,
+                hasActiveBooking: rentedCarIds.has(car.id),
+                hasActiveMaintenance: maintenanceCarIds.has(car.id),
+              })
 
               return (
                 <div key={car.id} className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50/60 transition-colors group">
@@ -80,7 +105,11 @@ export default async function AdminCars() {
                   </div>
 
                   {/* Status badges */}
-                  <div className="flex flex-col gap-1 shrink-0">
+                  <div className="flex flex-col items-start gap-1.5 shrink-0">
+                    <span className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-semibold ${VEHICLE_STATUS_COLOR[status]}`}>
+                      {status === 'maintenance' && <Wrench size={10} />}
+                      {VEHICLE_STATUS_LABEL[status]}
+                    </span>
                     <div className="flex items-center gap-1.5">
                       {car.is_active
                         ? <ToggleRight size={18} className="text-emerald-500" />
