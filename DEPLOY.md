@@ -32,7 +32,7 @@ Sign in at [`/auth/login`](https://demo.rentinfra.infranomad.com/auth/login) wit
 
 You can also browse the public site, complete the booking wizard, and look up a booking at `/my-booking` without signing in at all.
 
-> ⚠️ **The demo is public and shared.** Its database is open to everyone and periodically reset — anything you change may be wiped or altered by other visitors. **Do not enter real personal data.** The fleet and bookings are fake, seeded by the optional `supabase/migrations/006_demo_seed.sql` (skip that file in a real deployment — see [step 3](#3-run-the-database-migrations)).
+> ⚠️ **The demo is public and shared.** Its database is open to everyone and periodically reset — anything you change may be wiped or altered by other visitors. **Do not enter real personal data.** The fleet and bookings are fake, seeded by the optional `supabase/migrations/demo_seed.sql` (skip that file in a real deployment — see [step 3](#3-run-the-database-migrations)).
 
 These credentials exist **only on the demo deployment**. Your own instance starts with no users at all — you register normally and then promote yourself to admin, as described in [step 7](#7-create-your-admin-user).
 
@@ -66,34 +66,17 @@ npm install
 
 ## 3. Run the database migrations
 
-The SQL files in `supabase/migrations/` create every table, row-level security policy, trigger and the storage bucket. **Run them in numerical order** — later files depend on earlier ones.
+The SQL files in `supabase/migrations/` create every table, row-level security policy, trigger and the storage bucket.
 
 ### Option A — Supabase SQL Editor (simplest)
 
-For each file `001` → `005` and then `007` → `013`, in order:
-
 1. Open your project → **SQL Editor** → **New query**.
-2. Paste the entire contents of the file.
-3. Click **Run**. Confirm it reports success before moving to the next file.
+2. Paste the entire contents of `001_schema.sql`.
+3. Click **Run**. Confirm it reports success.
 
-| File | What it creates |
-|------|-----------------|
-| `001_initial_schema.sql` | All core tables (cars, bookings, price lists, addons, locations, profiles, settings…), RLS policies, the `is_admin()` function, the `handle_new_user()` signup trigger, booking-reference trigger, and baseline seed data (3 cars, 3 locations, 5 addons, settings) |
-| `002_blog_faq.sql` | `blog_posts` and `faqs` tables + seed content |
-| `003_settings_expansion.sql` | Additional settings keys |
-| `004_car_images_storage.sql` | The public `car-images` storage bucket + its RLS policies |
-| `005_booking_contract_fields.sql` | Rental-contract fields (license plate, NIE/passport, KM and fuel readings, deposit method) |
-| `007_testimonials.sql` | `testimonials` table + RLS, and the homepage social-proof settings keys |
-| `008_availability.sql` | `get_car_availability()` so the public site can compute availability without read access to booking records, plus the exclusion constraint that makes double-booking impossible |
-| `009_booking_holds.sql` | `hold_expires_at` + the job that releases cars held by unconfirmed bookings |
-| `010_secret_settings.sql` | `is_secret` on settings so API keys are hidden from non-admins, plus the Resend/Stripe credential rows |
-| `011_notification_delivery.sql` | Retry tracking on `notifications_queue` so queued email can actually be sent |
-| `012_vehicle_types.sql` | Motorbikes and bicycles: `vehicle_type`, per-type categories and specs, hourly rate units, per-type addons |
-| `013_payments.sql` | Stripe Checkout columns, and the guard that stops a paid booking being auto-cancelled |
+`001_schema.sql` is the full schema — every table, RLS policy, trigger, function and storage bucket, consolidated into one file. It ships with **no rows** other than baseline seed data (3 cars, 3 locations, 5 addons, default settings); the homepage hides the reviews section entirely until you publish a testimonial from `/admin/testimonials`.
 
-Run `007` through `013` as well — they are part of the base schema, not demo data. It ships with **no rows**, and the homepage hides the reviews section entirely until you publish one from `/admin/testimonials`.
-
-`006_demo_seed.sql` is **optional and for the public demo only** — it inserts fake cars, photos and bookings. **Skip it** if you are setting up a real business. It is safe to re-run and safe to ignore.
+`demo_seed.sql` is **optional and for the public demo only** — it inserts fake cars, photos and bookings on top of the schema. **Skip it** if you are setting up a real business. It is safe to re-run and safe to ignore.
 
 ### Option B — Supabase CLI
 
@@ -102,11 +85,11 @@ npx supabase link --project-ref <your-project-ref>
 npx supabase db push
 ```
 
-> Note: the migration files use plain `001_…`-style names rather than the CLI's timestamp convention, so the SQL Editor route (Option A) is the more predictable one.
+> Note: the migration file uses a plain `001_…`-style name rather than the CLI's timestamp convention, so the SQL Editor route (Option A) is the more predictable one.
 
 ### Verify
 
-Go to **Table Editor**. You should see 15 tables including `cars`, `bookings` and `settings`, and `cars` should already contain 3 rows.
+Go to **Table Editor**. You should see the full set of tables including `cars`, `bookings` and `settings`, and `cars` should already contain 3 rows.
 
 ---
 
@@ -329,7 +312,7 @@ The migrations did not run, or ran against a different project than the one your
 The Supabase **Site URL** is still the default. Fix it in [step 6](#6-configure-supabase-auth-required).
 
 **Car images 404 or fail to load**
-Confirm `004_car_images_storage.sql` ran and that a public `car-images` bucket exists under **Storage**. `next.config.ts` already allows `*.supabase.co`, so no change is needed there when you fork.
+Confirm `001_schema.sql` ran and that a public `car-images` bucket exists under **Storage**. `next.config.ts` already allows `*.supabase.co`, so no change is needed there when you fork.
 
 **Supabase free-tier project got paused**
 Free projects pause after a week of inactivity. Restore it from the dashboard, or upgrade for anything customer-facing.

@@ -17,7 +17,7 @@ Sign in to try the full product, including the admin panel:
 | Admin | `admin@rentinfra.demo` | `RentInfraDemo2026!` |
 | Customer | `user@rentinfra.demo` | `RentInfraDemo2026!` |
 
-> The demo database is public, shared, and periodically reset — anything you change there may be wiped or altered by other visitors. Don't enter real personal data. The demo fleet and bookings are fake (seeded by the optional `supabase/migrations/006_demo_seed.sql`, which you should skip for a real deployment).
+> The demo database is public, shared, and periodically reset — anything you change there may be wiped or altered by other visitors. Don't enter real personal data. The demo fleet and bookings are fake (seeded by the optional `supabase/migrations/demo_seed.sql`, which you should skip for a real deployment).
 
 ## Deploy your own
 
@@ -83,7 +83,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-Run the SQL migrations in `supabase/migrations/` against your Supabase project (in order, `001` → `005`, then `007`–`012`) via the Supabase SQL editor or CLI. Skip `006_demo_seed.sql` — it only contains fake data for the public demo.
+Run `supabase/migrations/001_schema.sql` against your Supabase project via the Supabase SQL editor or CLI — it's the full schema in one file. Skip `demo_seed.sql` — it only contains fake data for the public demo.
 
 After registering an account, promote yourself to admin so `/admin` is reachable:
 

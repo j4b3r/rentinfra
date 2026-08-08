@@ -1,5 +1,5 @@
 -- ============================================================
--- 006_demo_seed.sql — OPTIONAL demo content
+-- demo_seed.sql — OPTIONAL demo content
 -- ============================================================
 -- This migration is NOT required to run RentInfra. It exists to
 -- populate the public live demo (demo.rentinfra / the Vercel
