@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { getConflictingBookings, nextFreeDate } from '@/lib/availability'
 import { enqueueEmail, flushEmailQueueInBackground } from '@/lib/email/send'
+import { enqueueMessage, flushMessageQueueInBackground } from '@/lib/twilio/send'
 import { isPaymentsEnabled, getUpfrontAmount } from '@/lib/payments/stripe'
 
 export async function POST(request: NextRequest) {
@@ -144,7 +145,10 @@ export async function POST(request: NextRequest) {
     const { data: notifySettings } = await supabase
       .from('settings')
       .select('key, value')
-      .in('key', ['notify_new_booking', 'notify_admin_email', 'notify_booking_confirm'])
+      .in('key', [
+        'notify_new_booking', 'notify_admin_email', 'notify_booking_confirm',
+        'notify_whatsapp_enabled', 'notify_sms_enabled',
+      ])
 
     const notify = Object.fromEntries(
       (notifySettings || []).map(s => [s.key, (s.value || '').trim()])
@@ -168,9 +172,34 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // WhatsApp/SMS toggles are separate from email's — a deployment can run
+    // either, both, or neither. processMessageQueue() checks the account-
+    // level whatsapp_enabled/sms_enabled switches too, so a row queued here
+    // with the per-notification toggle on but the channel off overall just
+    // sits pending rather than sending; harmless, but worth knowing.
+    if (notify.notify_whatsapp_enabled === 'true' && guestPhone) {
+      await enqueueMessage({
+        channel: 'whatsapp',
+        bookingId: booking.id,
+        recipient: guestPhone,
+        templateKey: 'booking_confirmation',
+        payload: emailPayload,
+      })
+    }
+    if (notify.notify_sms_enabled === 'true' && guestPhone) {
+      await enqueueMessage({
+        channel: 'sms',
+        bookingId: booking.id,
+        recipient: guestPhone,
+        templateKey: 'booking_confirmation',
+        payload: emailPayload,
+      })
+    }
+
     // Send now rather than waiting for the nightly cron; does not block the
     // response the customer is waiting on.
     flushEmailQueueInBackground()
+    flushMessageQueueInBackground()
 
     // Tell the client whether to offer payment. When payments are off this is
     // all false/null and the flow is exactly as it was before Stripe existed.

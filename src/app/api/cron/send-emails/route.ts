@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth-guard'
 import { processEmailQueue } from '@/lib/email/send'
+import { processMessageQueue } from '@/lib/twilio/send'
 
 /**
- * Sends queued emails.
+ * Sends queued emails, WhatsApp and SMS messages.
  *
  * Two ways in: the Vercel cron (Bearer CRON_SECRET) and an admin pressing
  * "Send now" in the admin panel, which matters because Hobby plans only run
  * crons once a day and nobody wants to wait until 03:00 for a confirmation.
+ *
+ * WhatsApp/SMS share this cron slot rather than getting their own — the
+ * Hobby plan caps daily crons, and the queue-drain here is only the
+ * backstop anyway; flushEmailQueueInBackground()/flushMessageQueueInBackground()
+ * already send immediately when a booking is created or updated.
  */
 async function handle(request: NextRequest) {
   const secret = process.env.CRON_SECRET
@@ -18,15 +24,20 @@ async function handle(request: NextRequest) {
     if (denied) return denied
   }
 
-  const result = await processEmailQueue()
+  const [email, messages] = await Promise.all([processEmailQueue(), processMessageQueue()])
 
-  if (result.sent || result.failed) {
+  if (email.sent || email.failed) {
     console.log(
-      `[cron/send-emails] sent=${result.sent} failed=${result.failed} skipped=${result.skipped}`
+      `[cron/send-emails] sent=${email.sent} failed=${email.failed} skipped=${email.skipped}`
+    )
+  }
+  if (messages.sent || messages.failed) {
+    console.log(
+      `[cron/send-emails] whatsapp/sms sent=${messages.sent} failed=${messages.failed} skipped=${messages.skipped}`
     )
   }
 
-  return NextResponse.json(result)
+  return NextResponse.json({ email, messages })
 }
 
 export async function GET(request: NextRequest) {

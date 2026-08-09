@@ -17,7 +17,7 @@ export interface IntegrationField {
 }
 
 export interface IntegrationGroup {
-  provider: 'resend' | 'stripe'
+  provider: 'resend' | 'stripe' | 'twilio'
   title: string
   blurb: string
   docsUrl: string

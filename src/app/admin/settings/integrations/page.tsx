@@ -3,7 +3,7 @@ import { maskSecret } from '@/lib/settings'
 import IntegrationsForm, { IntegrationGroup } from '@/components/admin/IntegrationsForm'
 import type { Setting } from '@/types'
 
-const SECRET_KEYS = ['resend_api_key', 'stripe_secret_key', 'stripe_webhook_secret']
+const SECRET_KEYS = ['resend_api_key', 'stripe_secret_key', 'stripe_webhook_secret', 'twilio_account_sid', 'twilio_auth_token']
 
 const GROUPS: IntegrationGroup[] = [
   {
@@ -67,6 +67,53 @@ const GROUPS: IntegrationGroup[] = [
         label: 'Enable payments',
         type: 'toggle',
         description: 'Ask customers to pay during booking. Test the connection first.',
+      },
+    ],
+  },
+  {
+    provider: 'twilio',
+    title: 'WhatsApp & SMS (Twilio)',
+    blurb:
+      'Sends booking updates to customers over WhatsApp or SMS, alongside email. One Twilio account covers both — each channel has its own sender number and on/off switch below.',
+    docsUrl: 'https://console.twilio.com',
+    fields: [
+      {
+        key: 'twilio_account_sid',
+        label: 'Account SID',
+        secret: true,
+        placeholder: 'AC…',
+        description: 'From the Twilio Console dashboard.',
+      },
+      {
+        key: 'twilio_auth_token',
+        label: 'Auth Token',
+        secret: true,
+        placeholder: '••••••••',
+        description: 'Also on the Console dashboard — click "show" to reveal it there.',
+      },
+      {
+        key: 'twilio_whatsapp_from',
+        label: 'WhatsApp sender number',
+        placeholder: 'whatsapp:+14155238886',
+        description: 'Twilio\'s WhatsApp sandbox number while testing, or your approved WhatsApp Business sender once live. Include the "whatsapp:" prefix.',
+      },
+      {
+        key: 'whatsapp_enabled',
+        label: 'Enable WhatsApp',
+        type: 'toggle',
+        description: 'Turns the channel on. Also requires the WhatsApp toggle in Settings → Notifications for a specific message to be sent.',
+      },
+      {
+        key: 'twilio_sms_from',
+        label: 'SMS sender number',
+        placeholder: '+14155238886',
+        description: 'A Twilio phone number capable of sending SMS.',
+      },
+      {
+        key: 'sms_enabled',
+        label: 'Enable SMS',
+        type: 'toggle',
+        description: 'Turns the channel on. Also requires the SMS toggle in Settings → Notifications.',
       },
     ],
   },

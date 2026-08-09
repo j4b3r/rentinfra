@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth-guard'
 import { enqueueEmail, flushEmailQueueInBackground } from '@/lib/email/send'
+import { enqueueMessage, flushMessageQueueInBackground } from '@/lib/twilio/send'
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const denied = await requireAdmin()
@@ -47,27 +48,59 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         ? 'booking_cancelled'
         : null
 
-  if (template && data?.guest_email) {
+  if (template && (data?.guest_email || data?.guest_phone)) {
     const { data: car } = data.car_id
       ? await supabase.from('cars').select('make, model').eq('id', data.car_id).single()
       : { data: null }
 
-    await enqueueEmail({
-      bookingId: data.id,
-      recipient: data.guest_email,
-      templateKey: template,
-      payload: {
-        reference: data.reference,
-        name: data.guest_name || 'there',
-        carName: car ? `${car.make} ${car.model}` : undefined,
-        pickupDate: data.pickup_date,
-        dropoffDate: data.dropoff_date,
-        totalAmount: data.total_amount ? Number(data.total_amount) : null,
-      },
-    })
+    const notifyPayload = {
+      reference: data.reference,
+      name: data.guest_name || 'there',
+      carName: car ? `${car.make} ${car.model}` : undefined,
+      pickupDate: data.pickup_date,
+      dropoffDate: data.dropoff_date,
+      totalAmount: data.total_amount ? Number(data.total_amount) : null,
+    }
+
+    if (data.guest_email) {
+      await enqueueEmail({
+        bookingId: data.id,
+        recipient: data.guest_email,
+        templateKey: template,
+        payload: notifyPayload,
+      })
+    }
+
+    if (data.guest_phone) {
+      const { data: notifySettings } = await supabase
+        .from('settings')
+        .select('key, value')
+        .in('key', ['notify_whatsapp_enabled', 'notify_sms_enabled'])
+      const notify = Object.fromEntries((notifySettings || []).map(s => [s.key, (s.value || '').trim()]))
+
+      if (notify.notify_whatsapp_enabled === 'true') {
+        await enqueueMessage({
+          channel: 'whatsapp',
+          bookingId: data.id,
+          recipient: data.guest_phone,
+          templateKey: template,
+          payload: notifyPayload,
+        })
+      }
+      if (notify.notify_sms_enabled === 'true') {
+        await enqueueMessage({
+          channel: 'sms',
+          bookingId: data.id,
+          recipient: data.guest_phone,
+          templateKey: template,
+          payload: notifyPayload,
+        })
+      }
+    }
   }
 
   flushEmailQueueInBackground()
+  flushMessageQueueInBackground()
 
   return NextResponse.json({ booking: data })
 }

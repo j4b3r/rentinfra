@@ -242,7 +242,17 @@ to `/new` and `/[id]` routes that didn't exist. Both now have full create/edit/d
     determine it the moment someone edits a dropoff location. The consistent answer is derived
     (most recent booking's dropoff location, or `home_location_id` if none), which is a bigger,
     genuinely separate build — deferred, alongside the fleet calendar.
-- **[#11] WhatsApp notifications** *(already on the todo list)*
+- ~~**[#11] WhatsApp notifications**~~ ✅ Done 2026-08-09 — and SMS alongside it, same account.
+  `notifications_queue.type` already allowed `'whatsapp'`/`'sms'` and `notify_whatsapp_enabled`
+  already existed as an unused toggle; this finishes what those were scaffolded for.
+  `lib/twilio/send.ts` mirrors `lib/email/send.ts` exactly — queue, retry up to 3 attempts,
+  immediate send via `waitUntil()` with the daily cron as backstop, plain `fetch` calls to
+  Twilio's REST API (no SDK). Credentials (`twilio_account_sid`, `twilio_auth_token`) and sender
+  numbers are admin-managed settings entered from **Settings → Integrations**, exactly like
+  Resend/Stripe — never an env var, never hardcoded. WhatsApp and SMS have independent on/off
+  switches at both the channel level (Integrations: is the number connected at all) and the
+  per-notification level (Notifications: should *this* booking event use it), so an operator can
+  run email only, WhatsApp only, both, or neither.
 - **[#12] German and Russian translations** *(already on the todo list)*
 - **[#23] Channel/OTA sync** — only relevant at real scale
 

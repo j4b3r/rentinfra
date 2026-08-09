@@ -68,6 +68,36 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    if (provider === 'twilio') {
+      const [accountSid, authToken] = await Promise.all([
+        getSecret('twilio_account_sid'),
+        getSecret('twilio_auth_token'),
+      ])
+      if (!accountSid || !authToken) {
+        return NextResponse.json({ ok: false, message: 'No Twilio Account SID or Auth Token saved yet.' })
+      }
+
+      // Fetching the account itself is a cheap authenticated call that sends
+      // no message.
+      const basicAuth = Buffer.from(`${accountSid}:${authToken}`).toString('base64')
+      const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}.json`, {
+        headers: { Authorization: `Basic ${basicAuth}` },
+      })
+
+      if (res.status === 401) {
+        return NextResponse.json({ ok: false, message: 'Twilio rejected this Account SID / Auth Token.' })
+      }
+      if (!res.ok) {
+        return NextResponse.json({ ok: false, message: `Twilio returned ${res.status}.` })
+      }
+
+      const account = await res.json()
+      return NextResponse.json({
+        ok: true,
+        message: `Connected to ${account.friendly_name || accountSid} (${account.status}).`,
+      })
+    }
+
     return NextResponse.json({ ok: false, message: 'Unknown provider.' }, { status: 400 })
   } catch (e) {
     return NextResponse.json({

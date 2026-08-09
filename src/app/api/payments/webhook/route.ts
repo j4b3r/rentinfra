@@ -3,6 +3,7 @@ import type Stripe from 'stripe'
 import { createAdminClient } from '@/lib/supabase/server'
 import { getStripe, getWebhookSecret } from '@/lib/payments/stripe'
 import { enqueueEmail, flushEmailQueueInBackground } from '@/lib/email/send'
+import { enqueueMessage, flushMessageQueueInBackground } from '@/lib/twilio/send'
 
 /**
  * Stripe webhook.
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
 
         const { data: booking } = await supabase
           .from('bookings')
-          .select('id, reference, guest_email, guest_name, payment_status, total_amount, car_id, pickup_date, dropoff_date')
+          .select('id, reference, guest_email, guest_phone, guest_name, payment_status, total_amount, car_id, pickup_date, dropoff_date')
           .eq('id', bookingId)
           .single()
 
@@ -95,25 +96,58 @@ export async function POST(req: NextRequest) {
           })
           .eq('id', booking.id)
 
-        if (booking.guest_email) {
+        if (booking.guest_email || booking.guest_phone) {
           const { data: car } = booking.car_id
             ? await supabase.from('cars').select('make, model').eq('id', booking.car_id).single()
             : { data: null }
 
-          await enqueueEmail({
-            bookingId: booking.id,
-            recipient: booking.guest_email,
-            templateKey: 'booking_confirmed',
-            payload: {
-              reference: booking.reference,
-              name: booking.guest_name || 'there',
-              carName: car ? `${car.make} ${car.model}` : undefined,
-              pickupDate: booking.pickup_date,
-              dropoffDate: booking.dropoff_date,
-              totalAmount: booking.total_amount ? Number(booking.total_amount) : null,
-            },
-          })
+          const notifyPayload = {
+            reference: booking.reference,
+            name: booking.guest_name || 'there',
+            carName: car ? `${car.make} ${car.model}` : undefined,
+            pickupDate: booking.pickup_date,
+            dropoffDate: booking.dropoff_date,
+            totalAmount: booking.total_amount ? Number(booking.total_amount) : null,
+          }
+
+          if (booking.guest_email) {
+            await enqueueEmail({
+              bookingId: booking.id,
+              recipient: booking.guest_email,
+              templateKey: 'booking_confirmed',
+              payload: notifyPayload,
+            })
+          }
+
+          if (booking.guest_phone) {
+            const { data: notifySettings } = await supabase
+              .from('settings')
+              .select('key, value')
+              .in('key', ['notify_whatsapp_enabled', 'notify_sms_enabled'])
+            const notify = Object.fromEntries((notifySettings || []).map(s => [s.key, (s.value || '').trim()]))
+
+            if (notify.notify_whatsapp_enabled === 'true') {
+              await enqueueMessage({
+                channel: 'whatsapp',
+                bookingId: booking.id,
+                recipient: booking.guest_phone,
+                templateKey: 'booking_confirmed',
+                payload: notifyPayload,
+              })
+            }
+            if (notify.notify_sms_enabled === 'true') {
+              await enqueueMessage({
+                channel: 'sms',
+                bookingId: booking.id,
+                recipient: booking.guest_phone,
+                templateKey: 'booking_confirmed',
+                payload: notifyPayload,
+              })
+            }
+          }
+
           flushEmailQueueInBackground()
+          flushMessageQueueInBackground()
         }
         break
       }
