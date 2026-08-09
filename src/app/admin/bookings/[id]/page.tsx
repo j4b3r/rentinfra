@@ -6,6 +6,7 @@ import { formatCurrency } from '@/lib/utils'
 import BookingActions from '@/components/admin/BookingActions'
 import RefundPanel from '@/components/admin/RefundPanel'
 import ConditionReportPanel from '@/components/admin/ConditionReportPanel'
+import LicencePanel from '@/components/admin/LicencePanel'
 
 const statusColor: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700',
@@ -54,7 +55,7 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
     .from('bookings')
     .select(`
       *,
-      car:cars(make, model, year, category, transmission, fuel_type),
+      car:cars(make, model, year, category, transmission, fuel_type, requires_license),
       pickup_location:locations!bookings_pickup_location_id_fkey(name_en, type, extra_fee),
       dropoff_location:locations!bookings_dropoff_location_id_fkey(name_en, type, extra_fee),
       booking_addons(addon_name_snapshot, pricing_type_snapshot, price_snapshot, quantity, subtotal)
@@ -226,6 +227,9 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
             refundedAmount={Number(b.refunded_amount || 0)}
             hasStripePayment={Boolean(b.stripe_payment_intent_id)}
           />
+
+          {/* Bicycles have no licence requirement — nothing to verify */}
+          {b.car?.requires_license !== false && <LicencePanel bookingId={b.id} />}
 
           {/* Timestamps */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">

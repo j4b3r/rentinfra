@@ -212,9 +212,20 @@ to `/new` and `/[id]` routes that didn't exist. Both now have full create/edit/d
 
 ## P3 — Later
 
-- **[#21] Driver licence verification** — commercial platforms scan the licence and face-match
-  before release. Start by storing licence images against the booking and letting staff mark
-  them verified; automated verification is a paid third-party integration
+- ~~**[#21] Driver licence verification**~~ ✅ Done 2026-08-09 — store + staff-verify, as scoped.
+  Commercial platforms scan the licence and face-match before release; that's a paid third-party
+  integration and deliberately **not built**. What ships: front/back photo capture into a
+  private `licence-documents` bucket (same signed-URL pattern as condition photos — 10 min TTL,
+  never a stored public URL), captured at the counter by staff rather than during online
+  checkout (adding a file-upload requirement to the booking wizard was judged a conversion risk
+  for what is fundamentally a staff check). Verification (`licence_verified_at` /
+  `licence_verified_by` / `licence_rejection_reason`) lives on `bookings`, not on the photo rows
+  — "verified" is a fact about the booking's driver after a visual check, not something either
+  individual JPEG can carry independently. Uploading a replacement photo resets verification so a
+  stale approval can't silently carry over to a different image. No automatic retention/deletion
+  — a licence scan is personal data and an operator will need to remove it manually after the
+  rental; there's no cron for this yet.
+- **[#22] Multi-location logistics** — one-way rentals, inter-branch transfers, per-branch fleet
 - **[#22] Multi-location logistics** — one-way rentals, inter-branch transfers, per-branch fleet
 - **[#11] WhatsApp notifications** *(already on the todo list)*
 - **[#12] German and Russian translations** *(already on the todo list)*
