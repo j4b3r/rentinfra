@@ -1,10 +1,13 @@
 # RentInfra
 
-An open-source vehicle rental booking platform — cars, motorbikes and bicycles — a SaaS boilerplate you can fork and customize for your own car rental business.
+An open-source vehicle rental platform — cars, motorbikes and bicycles — free and MIT-licensed,
+built to run an actual rental business rather than demo a booking form: real payments, an
+availability system that can't be double-booked, vehicle handover and licence verification,
+fleet maintenance, and business reporting computed from real bookings.
 
-- **Public site**: browse cars, motorbikes and bicycles, book through a 4-step wizard, look up a booking by reference, blog + FAQ pages
-- **Admin panel**: manage bookings, the fleet, addons, users, locations, testimonials and settings; generate PDF rental contracts
-- **Stack**: Next.js (App Router), TypeScript, Tailwind CSS, Supabase (PostgreSQL + Auth + Storage), next-intl (EN/ES)
+- **Public site**: browse cars, motorbikes and bicycles, book through a 4-step wizard, pay via Stripe, look up a booking by reference, blog + FAQ pages, customer account area
+- **Admin panel**: bookings, fleet (with maintenance scheduling), addons, users, locations, testimonials, business reports, and settings; generate PDF rental contracts
+- **Stack**: Next.js (App Router), TypeScript, Tailwind CSS, Supabase (PostgreSQL + Auth + Storage), Stripe, Resend, Twilio, next-intl (EN/ES)
 
 ## Live demo
 
@@ -30,7 +33,7 @@ You will still need to create a Supabase project and run the migrations. **[DEPL
 | Step | What |
 |------|------|
 | 1 | Create a Supabase project |
-| 2 | Run `supabase/migrations/001` → `005`, then `007` → `012` in the SQL editor (skip `006`, it is demo data) |
+| 2 | Run `supabase/migrations/001_schema.sql` through `006_ota_settings.sql` in numeric order in the SQL editor (skip `demo_seed.sql` — it's demo-only data) |
 | 3 | Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL` |
 | 4 | Deploy to Vercel (or any Node host — nothing is Vercel-specific except the cron schedule) |
 | 5 | Set the Supabase **Site URL** and redirect allowlist to your domain |
@@ -42,26 +45,35 @@ You will still need to create a Supabase project and run the migrations. **[DEPL
 **Fleet**
 - Cars, motorbikes and bicycles in one fleet, each showing only the specs that apply
 - Bicycles skip the licence, minimum age and young-driver surcharge; addons are filtered per vehicle type
+- Per-branch fleet: cars can be scoped to a home location, or available everywhere (default)
+- Maintenance blocks pull a vehicle from sale for a service window without faking a booking — every existing availability check picks this up automatically
 
 **Booking**
 - Date and location search from the homepage, carried through to the booking wizard
 - Availability enforced everywhere: booked vehicles are shown as unavailable in search with the date they free up, and a database exclusion constraint makes double-booking impossible
 - Unconfirmed bookings hold the vehicle for a configurable window, then release it automatically
 - Pricing engine: seasonal rate lists, duration discount tiers, addons, location fees, young-driver surcharge, tax
-- Guest booking with a reference (`RIF-YYYY-NNNNN`) plus lookup at `/my-booking`
+- Guest booking with a reference (`RIF-YYYY-NNNNN`) plus lookup at `/my-booking`, or a signed-in customer account at `/account` with booking history
+- Payment via Stripe Checkout (full or partial deposit), with refunds synced back automatically via webhook
+
+**Vehicle handover & compliance**
+- Pickup/return condition photos and staff-raised damage claims, stored in a private Storage bucket with signed URLs (never public)
+- Driver's licence capture and staff verify/reject step, in its own private bucket separate from condition photos
 
 **Admin**
-- Bookings with status, payment state, mileage, fuel, deposit method and notes
-- Vehicles with photos, pricing and discount tiers; testimonials; users; locations
+- Bookings with status, payment state, mileage, fuel, deposit method, condition reports, licence verification and notes
+- Vehicles with photos, pricing, discount tiers and maintenance scheduling; addons, testimonials, users, locations — full CRUD
+- Business reports: net revenue, utilization, RevPAV, achieved ADR, cancellation rate, addon attach rate
 - Two-page A4 rental contract PDF (EN/ES) with damage diagram and WhatsApp QR
-- Every configurable value lives in the `settings` table, editable from the panel
+- Every configurable value — including all API keys — lives in the `settings` table, editable from the panel, never in an env var
 
 **Platform**
-- Email via Resend: booking receipt, confirmation, cancellation and admin alert, queued with retry
+- Email via Resend, WhatsApp/SMS via Twilio: booking receipt, confirmation, cancellation and admin alerts, queued with retry
+- Outbound channel-manager/OTA availability feed (bearer-token authenticated) for connecting a booking aggregator
 - API keys managed from the admin panel, stored with row-level security so they never reach the browser
 - EN/ES translations, SEO metadata and sitemap driven by your own domain
 
-Not yet included: payment collection, condition-report photos, and a customer account area. See **[ROADMAP.md](./ROADMAP.md)**.
+See **[ROADMAP.md](./ROADMAP.md)** for what's deliberately not built yet and why (inbound OTA sync, deposit pre-authorization, digital signature capture, DE/RU translations, per-car addon assignment UI).
 
 ## License
 
@@ -110,9 +122,10 @@ npm run lint     # Lint check
 
 ## Roadmap
 
-RentInfra covers the full booking funnel and admin panel, but it is not yet a complete rental
-operation — there is no payment collection yet. **[ROADMAP.md](./ROADMAP.md)**
-compares it against commercial rental platforms and lays out what to build next, in order.
+RentInfra covers the full booking funnel, payments, handover/compliance and admin panel.
+**[ROADMAP.md](./ROADMAP.md)** compares it against commercial rental platforms, tracks what's
+shipped, and lays out what's left — inbound OTA/channel-manager sync, deposit pre-authorization,
+digital signature capture, and German/Russian translations.
 
 ## Customizing for your business
 
