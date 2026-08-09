@@ -21,9 +21,10 @@ interface Discount {
 
 interface CarFormProps {
   car?: Car & { price_lists?: (PriceList & { price_list_discounts?: PriceListDiscount[] })[] }
+  locations?: { id: string; name_en: string }[]
 }
 
-export default function CarForm({ car }: CarFormProps) {
+export default function CarForm({ car, locations = [] }: CarFormProps) {
   const router = useRouter()
   const isEdit = !!car
 
@@ -74,6 +75,7 @@ export default function CarForm({ car }: CarFormProps) {
   const [bluetooth, setBluetooth] = useState(car?.bluetooth ?? true)
   const [gpsBuiltin, setGpsBuiltin] = useState(car?.gps_builtin ?? false)
   const [licensePlate, setLicensePlate] = useState(car?.license_plate || '')
+  const [homeLocationId, setHomeLocationId] = useState(car?.home_location_id || '')
   const [descEn, setDescEn] = useState(car?.description_en || '')
   const [descEs, setDescEs] = useState(car?.description_es || '')
   const [isActive, setIsActive] = useState(car?.is_active ?? true)
@@ -143,6 +145,7 @@ export default function CarForm({ car }: CarFormProps) {
       bluetooth,
       gps_builtin: gpsBuiltin,
       license_plate: licensePlate.trim() || null,
+      home_location_id: homeLocationId || null,
       description_en: descEn || null,
       description_es: descEs || null,
       is_active: isActive,
@@ -284,6 +287,16 @@ export default function CarForm({ car }: CarFormProps) {
           <div>
             <label className={labelCls}>License Plate</label>
             <input className={inputCls} value={licensePlate} onChange={e => setLicensePlate(e.target.value)} placeholder="e.g. 1234 ABC" />
+          </div>
+          <div>
+            <label className={labelCls}>Home Branch</label>
+            <select className={inputCls} value={homeLocationId} onChange={e => setHomeLocationId(e.target.value)}>
+              <option value="">Any location (whole fleet)</option>
+              {locations.map(l => (
+                <option key={l.id} value={l.id}>{l.name_en}</option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-gray-400">Leave as &quot;Any location&quot; unless this car is tied to a specific branch.</p>
           </div>
           <div>
             <label className={labelCls}>Seats</label>

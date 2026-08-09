@@ -59,6 +59,8 @@ export interface Car {
   bluetooth: boolean
   gps_builtin: boolean
   license_plate: string | null
+  /** The branch this car is normally based at. NULL = available at every location. */
+  home_location_id: string | null
   description_en: string | null
   description_es: string | null
   is_available: boolean

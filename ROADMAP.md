@@ -225,8 +225,23 @@ to `/new` and `/[id]` routes that didn't exist. Both now have full create/edit/d
   stale approval can't silently carry over to a different image. No automatic retention/deletion
   — a licence scan is personal data and an operator will need to remove it manually after the
   rental; there's no cron for this yet.
-- **[#22] Multi-location logistics** — one-way rentals, inter-branch transfers, per-branch fleet
-- **[#22] Multi-location logistics** — one-way rentals, inter-branch transfers, per-branch fleet
+- ~~**[#22] Multi-location logistics**~~ ✅ Done 2026-08-09 (partial — see below)
+  - **One-way rentals already worked before this pass** — `bookings.pickup_location_id` and
+    `dropoff_location_id` are independent, and `pricing.ts` already sums both locations'
+    `extra_fee`. Nothing needed to change for that part.
+  - ~~**Per-branch fleet**~~ ✅ — `cars.home_location_id`, nullable, and **NULL means available
+    at every location**, not "unset." Every deployment (including the shared demo's 15 cars) has
+    no location on any car; if location filtering treated NULL as "exclude," every fork's fleet
+    page would go empty the moment this shipped. The public fleet listing filters with
+    `home_location_id.is.null OR home_location_id.eq.<requested>` — cars stay visible everywhere
+    until an operator deliberately ties one to a branch, from a new "Home Branch" field on the
+    car edit form.
+  - **Inter-branch transfers — not built.** Where a car currently sits after a one-way rental
+    isn't tracked as a stored column — that's the same drift risk #18 avoided for vehicle
+    status: a stored `current_location_id` would disagree with the bookings that actually
+    determine it the moment someone edits a dropoff location. The consistent answer is derived
+    (most recent booking's dropoff location, or `home_location_id` if none), which is a bigger,
+    genuinely separate build — deferred, alongside the fleet calendar.
 - **[#11] WhatsApp notifications** *(already on the todo list)*
 - **[#12] German and Russian translations** *(already on the todo list)*
 - **[#23] Channel/OTA sync** — only relevant at real scale

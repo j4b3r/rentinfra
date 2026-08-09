@@ -62,10 +62,20 @@ export default async function CarsPage({
   if (category && category !== 'all') {
     query = query.eq('category', category)
   }
+  // home_location_id is NULL for most cars in a single-branch deployment —
+  // that means "available everywhere," not "unset, so exclude it." Only
+  // cars explicitly tied to a different branch are filtered out.
+  if (location) {
+    query = query.or(`home_location_id.is.null,home_location_id.eq.${location}`)
+  }
 
   const { data: cars } = await query.order('created_at')
   const currentType = type || 'all'
   const currentCategory = category || 'all'
+
+  const { data: selectedLocation } = location
+    ? await supabase.from('locations').select('name_en').eq('id', location).single()
+    : { data: null }
 
   // When dates were searched, mark which cars are already taken so the customer
   // sees it here rather than after filling in the whole booking wizard.
@@ -148,22 +158,33 @@ export default async function CarsPage({
             </div>
           )}
 
-          {/* Say which dates these results are for, and how to widen them. */}
-          {availability && (
+          {/* Say which dates and location these results are for, and how to widen them. */}
+          {(availability || selectedLocation) && (
             <p className="mt-3 border-t border-gray-100 pt-3 text-xs text-gray-500">
-              Showing availability for{' '}
-              <span className="font-semibold text-[#0A1F44]">
-                {formatDate(pickup!)} – {formatDate(dropoff!)}
-              </span>
-              {unavailableCount > 0 && (
+              {availability && (
                 <>
-                  {' · '}
-                  {unavailableCount} car{unavailableCount !== 1 ? 's are' : ' is'} already booked
+                  Showing availability for{' '}
+                  <span className="font-semibold text-[#0A1F44]">
+                    {formatDate(pickup!)} – {formatDate(dropoff!)}
+                  </span>
+                  {unavailableCount > 0 && (
+                    <>
+                      {' · '}
+                      {unavailableCount} car{unavailableCount !== 1 ? 's are' : ' is'} already booked
+                    </>
+                  )}
+                </>
+              )}
+              {selectedLocation && (
+                <>
+                  {availability && ' · '}
+                  Available at <span className="font-semibold text-[#0A1F44]">{selectedLocation.name_en}</span>
+                  {' '}or from any branch-free car
                 </>
               )}
               {' · '}
               <a href={currentType === 'all' ? '/cars' : `/cars?type=${currentType}`} className="text-[#C9A84C] hover:underline">
-                Clear dates
+                Clear {selectedLocation && !availability ? 'location' : availability && !selectedLocation ? 'dates' : 'filters'}
               </a>
             </p>
           )}
