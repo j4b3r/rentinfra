@@ -98,6 +98,44 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    if (provider === 'ota') {
+      const [key, enabledSetting] = await Promise.all([
+        getSecret('ota_api_key'),
+        getSecret('ota_enabled'),
+      ])
+      if (!key) {
+        return NextResponse.json({ ok: false, message: 'No API key saved yet.' })
+      }
+      if (enabledSetting !== 'true') {
+        return NextResponse.json({
+          ok: false,
+          message: 'A key is saved, but the feed is switched off — turn on "Enable feed" to serve it.',
+        })
+      }
+
+      // There's no external provider to call — this validates the feed
+      // itself renders without error, which is what "connected" can mean
+      // when the other end is an unnamed, not-yet-configured channel manager.
+      try {
+        const { createAdminClient } = await import('@/lib/supabase/server')
+        const { getOtaAvailabilityFeed } = await import('@/lib/ota/availability')
+        const supabase = await createAdminClient()
+        const today = new Date().toISOString().slice(0, 10)
+        const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)
+        const feed = await getOtaAvailabilityFeed(supabase, today, tomorrow)
+
+        return NextResponse.json({
+          ok: true,
+          message: `Feed is live at /api/ota/availability with a Bearer token. ${feed.length} car${feed.length !== 1 ? 's' : ''} in the response.`,
+        })
+      } catch (e) {
+        return NextResponse.json({
+          ok: false,
+          message: e instanceof Error ? `Feed failed to build: ${e.message}` : 'Feed failed to build.',
+        })
+      }
+    }
+
     return NextResponse.json({ ok: false, message: 'Unknown provider.' }, { status: 400 })
   } catch (e) {
     return NextResponse.json({

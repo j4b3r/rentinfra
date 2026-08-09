@@ -254,7 +254,29 @@ to `/new` and `/[id]` routes that didn't exist. Both now have full create/edit/d
   per-notification level (Notifications: should *this* booking event use it), so an operator can
   run email only, WhatsApp only, both, or neither.
 - **[#12] German and Russian translations** *(already on the todo list)*
-- **[#23] Channel/OTA sync** — only relevant at real scale
+- ~~**[#23] Channel/OTA sync**~~ ✅ Done 2026-08-09 (partial — see below). Still only relevant at
+  real scale, but the credential/feed scaffolding is admin-configurable rather than blocking on
+  code once an operator does have a channel manager.
+  - ~~**Outbound availability + rate feed**~~ ✅ — `GET /api/ota/availability?start=&end=`,
+    authenticated by a bearer token compared with `timingSafeEqual` (this route is public, not
+    under `/api/admin/*`, so `requireAdmin()` cannot gate it — same reasoning as the Stripe
+    webhook). Built from `getConflictingBookings()` over the whole range in one call, which is
+    backed by the same `get_car_availability()` RPC the public fleet listing and booking API
+    use — so a car in maintenance is correctly reported unavailable here too, without
+    `lib/ota/availability.ts` needing to know `maintenance_blocks` exists. Credentials
+    (`ota_provider`, `ota_api_key`, `ota_property_id`, `ota_enabled`) are admin-managed settings
+    from Settings → Integrations, same pattern as every other connected service — the operator
+    picks their own bearer token and gives the same value to whichever channel manager they
+    connect.
+  - **No specific provider is integrated.** Booking.com Connectivity, SiteMinder, Channex and
+    others differ in auth, payload shape and direction; picking one blind would have shipped
+    something that looks connected but works with nothing. What's here is provider-agnostic and
+    genuinely pullable today by a script or a channel manager that speaks bearer-token REST.
+  - **Inbound booking ingestion — not built, deliberately.** A webhook that turns an OTA booking
+    into a row in `bookings` needs a payload contract from a real provider to write against; a
+    guessed one risks creating bookings that bypass the assumptions `getConflictingBookings()`
+    and `bookings_no_overlap` make about `pickup_date`/`dropoff_date`. This is the one-way half
+    of "sync" — it publishes, it does not import.
 
 ---
 

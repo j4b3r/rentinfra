@@ -11,7 +11,7 @@ import { requireAdmin } from '@/lib/auth-guard'
  * someone actually types a new one.
  */
 
-const SECRET_KEYS = ['resend_api_key', 'stripe_secret_key', 'stripe_webhook_secret', 'twilio_account_sid', 'twilio_auth_token']
+const SECRET_KEYS = ['resend_api_key', 'stripe_secret_key', 'stripe_webhook_secret', 'twilio_account_sid', 'twilio_auth_token', 'ota_api_key']
 
 /** The form sends this back when the field was not edited. */
 const UNCHANGED = '__UNCHANGED__'

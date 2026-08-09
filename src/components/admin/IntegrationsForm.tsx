@@ -17,10 +17,12 @@ export interface IntegrationField {
 }
 
 export interface IntegrationGroup {
-  provider: 'resend' | 'stripe' | 'twilio'
+  provider: 'resend' | 'stripe' | 'twilio' | 'ota'
   title: string
   blurb: string
   docsUrl: string
+  /** Overrides the default "Get keys →" link text — e.g. when there's no provider site to link to. */
+  docsLabel?: string
   fields: IntegrationField[]
 }
 
@@ -115,7 +117,7 @@ export default function IntegrationsForm({ groups, values: initial, configured }
                 rel="noopener noreferrer"
                 className="shrink-0 text-xs font-semibold text-[#C9A84C] hover:underline"
               >
-                Get keys →
+                {group.docsLabel || 'Get keys →'}
               </a>
             </div>
 

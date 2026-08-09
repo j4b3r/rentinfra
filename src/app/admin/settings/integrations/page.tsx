@@ -3,7 +3,7 @@ import { maskSecret } from '@/lib/settings'
 import IntegrationsForm, { IntegrationGroup } from '@/components/admin/IntegrationsForm'
 import type { Setting } from '@/types'
 
-const SECRET_KEYS = ['resend_api_key', 'stripe_secret_key', 'stripe_webhook_secret', 'twilio_account_sid', 'twilio_auth_token']
+const SECRET_KEYS = ['resend_api_key', 'stripe_secret_key', 'stripe_webhook_secret', 'twilio_account_sid', 'twilio_auth_token', 'ota_api_key']
 
 const GROUPS: IntegrationGroup[] = [
   {
@@ -114,6 +114,40 @@ const GROUPS: IntegrationGroup[] = [
         label: 'Enable SMS',
         type: 'toggle',
         description: 'Turns the channel on. Also requires the SMS toggle in Settings → Notifications.',
+      },
+    ],
+  },
+  {
+    provider: 'ota',
+    title: 'Channel Manager / OTA',
+    blurb:
+      'Exposes a read-only availability + rate feed at /api/ota/availability for a channel manager (Booking.com Connectivity, SiteMinder, Channex, or similar) to pull. This is one-way: it publishes availability out, it does not import bookings from the OTA. No specific provider is wired in — set any bearer token below and give the same value to whichever channel manager you connect.',
+    docsUrl: '/api/ota/availability',
+    docsLabel: 'View feed →',
+    fields: [
+      {
+        key: 'ota_provider',
+        label: 'Channel manager name',
+        placeholder: 'e.g. SiteMinder',
+        description: 'Display only, so you remember which one this is set up for.',
+      },
+      {
+        key: 'ota_api_key',
+        label: 'API key',
+        secret: true,
+        placeholder: 'Any value you choose',
+        description: 'Generate a long random string and give the same value to your channel manager as its bearer token — this app does not issue it for you.',
+      },
+      {
+        key: 'ota_property_id',
+        label: 'Property ID',
+        placeholder: 'Optional — only if your channel manager needs one',
+      },
+      {
+        key: 'ota_enabled',
+        label: 'Enable feed',
+        type: 'toggle',
+        description: 'Serves the feed once on. Off returns 404 to any request, key or no key.',
       },
     ],
   },
