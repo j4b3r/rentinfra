@@ -43,7 +43,7 @@ troubleshooting.
 | Step | What |
 |------|------|
 | 1 | Create a Supabase project |
-| 2 | Run `supabase/migrations/001_schema.sql` through `008_ev_specs.sql` in numeric order in the SQL editor (skip `demo_seed.sql` — it's demo-only data) |
+| 2 | Run `supabase/migrations/001_schema.sql` through `008_booking_signatures.sql` in numeric order in the SQL editor (skip `demo_seed.sql` — it's demo-only data) |
 | 3 | Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL` |
 | 4 | Deploy to Vercel (or any Node host) |
 | 5 | Set the Supabase **Site URL** and redirect allowlist to your domain |

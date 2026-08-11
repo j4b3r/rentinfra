@@ -5,9 +5,20 @@
 // as part of the FIRST deploy's Build Command (see DEPLOY.md), then switch
 // the Build Command back to a plain `next build` / `npm run build`.
 //
-// Safe to run more than once: applied files are tracked in a
-// `schema_migrations` bookkeeping table, so re-running only applies files
-// that haven't been recorded yet.
+// Re-running is safe: applied files are tracked in a `schema_migrations`
+// bookkeeping table, so a second run only applies files that haven't been
+// recorded yet. That tracking is what makes it safe, NOT the migration SQL
+// itself — several files (e.g. 003_licence_documents.sql's CREATE POLICY
+// statements) have no IF NOT EXISTS guard, because Postgres has no
+// "CREATE POLICY IF NOT EXISTS". So on a database that already has the
+// schema from BEFORE this script existed (an existing manually-provisioned
+// project, or a project migrated by hand before upgrading to this flow),
+// blindly running 001 onward would fail on the first already-existing
+// object. Guard against that: if `schema_migrations` is empty but
+// `public.cars` already exists, assume the schema predates this script,
+// seed every currently-known file as already-applied, and stop — this run
+// applies nothing. A genuinely fresh project has neither table, so the
+// normal apply-from-001 path runs unimpeded.
 //
 // Looks for POSTGRES_URL_NON_POOLING (what the Vercel Supabase integration
 // injects for direct, non-pgbouncer connections) or DATABASE_URL as a
@@ -45,6 +56,28 @@ async function main() {
     const files = readdirSync(dir)
       .filter((f) => f.endsWith('.sql') && f !== 'demo_seed.sql')
       .sort() // zero-padded numeric prefixes (001_, 002_, ...) sort correctly as strings
+
+    const { rows: appliedRows } = await client.query('SELECT count(*)::int AS n FROM public.schema_migrations')
+    if (appliedRows[0].n === 0) {
+      const { rows: existing } = await client.query(`
+        SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'cars'
+      `)
+      if (existing.length) {
+        console.log(
+          '[migrate] public.cars already exists but schema_migrations is empty — ' +
+            'this schema predates this script. Marking all known files as already-applied ' +
+            'instead of re-running DDL against an existing schema.'
+        )
+        for (const file of files) {
+          await client.query(
+            'INSERT INTO public.schema_migrations (filename) VALUES ($1) ON CONFLICT DO NOTHING',
+            [file]
+          )
+        }
+        console.log('[migrate] done (schema assumed pre-existing, nothing applied)')
+        return
+      }
+    }
 
     for (const file of files) {
       const { rows } = await client.query(

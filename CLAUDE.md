@@ -146,6 +146,8 @@ Migrations live in `supabase/migrations/`:
 - `004_car_home_location.sql` — `cars.home_location_id`, nullable, NULL = available everywhere (never "excluded").
 - `005_twilio_settings.sql` — Twilio credential/sender/toggle settings rows for WhatsApp + SMS.
 - `006_ota_settings.sql` — OTA/channel-manager settings rows (`ota_provider`, `ota_api_key`, `ota_property_id`, `ota_enabled`).
+- `007_ev_specs.sql` — `cars.ev_range_km`/`ev_charging_connector`/`ev_charging_time_hours`, nullable.
+- `008_booking_signatures.sql` — `booking_signatures` table + private `signatures` bucket.
 - `demo_seed.sql` — **optional**, demo-only fleet/photos/bookings. Skip for real deployments.
 
 Run `001_schema.sql` then any later-numbered files, in order, against a fresh Supabase project. When adding new schema going forward, start a new incrementally-numbered file rather than editing `001_schema.sql` in place — that file is a fresh-install snapshot, and `002` establishes the pattern for what comes after it.

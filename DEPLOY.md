@@ -59,10 +59,15 @@ first admin) — see below for why those can't be automated away.
    ```bash
    vercel integration add supabase
    ```
-   Confirm it worked: `vercel env ls` should list `NEXT_PUBLIC_SUPABASE_URL` and either
-   `NEXT_PUBLIC_SUPABASE_ANON_KEY` or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (both names are
-   supported — see `src/lib/supabase/env.ts`), plus `SUPABASE_SERVICE_ROLE_KEY` and a
-   `POSTGRES_URL_NON_POOLING`.
+   Confirm it worked and check the exact variable names: `vercel env ls`. This app reads
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (falling back to
+   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` if the anon key isn't present under that name), and
+   `SUPABASE_SERVICE_ROLE_KEY` (falling back to `SUPABASE_SECRET_KEY`) — see
+   `src/lib/supabase/env.ts`. The Marketplace integration has changed its injected names before
+   and may again, so if `vercel env ls` shows something that matches none of those, add an
+   explicit alias: `vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production` (paste the value
+   from whichever var the integration actually injected). Also confirm a `POSTGRES_URL_NON_POOLING`
+   is present — step 4 below needs it.
 3. Set `NEXT_PUBLIC_SITE_URL` and `CRON_SECRET` too — the Marketplace integration only knows
    about Supabase, not the rest of the app's env vars:
    ```bash
