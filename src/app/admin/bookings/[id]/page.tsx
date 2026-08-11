@@ -7,6 +7,7 @@ import BookingActions from '@/components/admin/BookingActions'
 import RefundPanel from '@/components/admin/RefundPanel'
 import ConditionReportPanel from '@/components/admin/ConditionReportPanel'
 import LicencePanel from '@/components/admin/LicencePanel'
+import SignaturePanel from '@/components/admin/SignaturePanel'
 
 const statusColor: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700',
@@ -136,6 +137,9 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
 
           {/* Handover condition */}
           <ConditionReportPanel bookingId={b.id} />
+
+          {/* Signatures */}
+          <SignaturePanel bookingId={b.id} />
 
           {/* Dates & Locations */}
           <Section icon={Calendar} title="Rental Period">

@@ -228,6 +228,7 @@ const S = StyleSheet.create({
   signBox:      { flex: 1 },
   signTop:      { fontSize: 6, color: '#444', marginBottom: 10 },
   signLine:     { borderTopWidth: 0.75, borderTopColor: '#aaa', marginBottom: 2 },
+  signImg:      { height: 26, objectFit: 'contain', marginBottom: 2 },
   signLabel:    { fontSize: 6, color: '#888' },
 
   // QR
@@ -305,6 +306,8 @@ interface Props {
   lang: 'es' | 'en'
   logoDataUrl: string
   qrDataUrl: string
+  /** Keyed `${stage}-${role}`, e.g. "contract-client". Missing key = unsigned, shows a blank line. */
+  signatureDataUrls?: Record<string, string>
 }
 
 // ─── load car diagram ─────────────────────────────────────────────────────────
@@ -316,7 +319,20 @@ try {
 } catch { /* skip if missing */ }
 
 // ─── component ────────────────────────────────────────────────────────────────
-export function RentalContract({ booking: b, settings, lang, logoDataUrl, qrDataUrl }: Props) {
+// Renders the captured signature image when one exists for this stage/role,
+// falling back to the original blank line so print-and-sign-by-hand keeps
+// working when e-sign wasn't used. A plain function, not a component defined
+// inside RentalContract, so it isn't re-created every render.
+function signMark(
+  signatureDataUrls: Record<string, string>,
+  stage: 'contract' | 'delivery' | 'return',
+  role: 'client' | 'company'
+) {
+  const url = signatureDataUrls[`${stage}-${role}`]
+  return url ? <Image src={url} style={S.signImg} /> : <View style={S.signLine} />
+}
+
+export function RentalContract({ booking: b, settings, lang, logoDataUrl, qrDataUrl, signatureDataUrls = {} }: Props) {
   const t = T[lang]
   const locName = (loc: { name_en: string; name_es: string } | null) =>
     loc ? (lang === 'es' ? loc.name_es : loc.name_en) : '—'
@@ -498,12 +514,12 @@ export function RentalContract({ booking: b, settings, lang, logoDataUrl, qrData
         <View style={S.signArea}>
           <View style={S.signBox}>
             <Text style={S.signTop}>{t.clientName}: {b.guest_name || '____________________'}</Text>
-            <View style={S.signLine} />
+            {signMark(signatureDataUrls, 'contract', 'client')}
             <Text style={S.signLabel}>{t.clientSign}</Text>
           </View>
           <View style={S.signBox}>
             <Text style={S.signTop}>{settings.company_name || 'RentInfra'}</Text>
-            <View style={S.signLine} />
+            {signMark(signatureDataUrls, 'contract', 'company')}
             <Text style={S.signLabel}>{t.companySign}</Text>
           </View>
           {/* QR code */}
@@ -556,12 +572,12 @@ export function RentalContract({ booking: b, settings, lang, logoDataUrl, qrData
         <View style={S.signArea}>
           <View style={S.signBox}>
             <Text style={S.signTop}>{t.clientName}: {b.guest_name || '____________________'}</Text>
-            <View style={S.signLine} />
+            {signMark(signatureDataUrls, 'delivery', 'client')}
             <Text style={S.signLabel}>{t.page2ClientSign}</Text>
           </View>
           <View style={S.signBox}>
             <Text style={S.signTop}>{settings.company_name || 'RentInfra'}</Text>
-            <View style={S.signLine} />
+            {signMark(signatureDataUrls, 'delivery', 'company')}
             <Text style={S.signLabel}>{t.page2CompSign}</Text>
           </View>
           {qrDataUrl ? (
@@ -596,12 +612,12 @@ export function RentalContract({ booking: b, settings, lang, logoDataUrl, qrData
           <View style={S.signArea}>
             <View style={S.signBox}>
               <Text style={S.signTop}>{t.clientName}: {b.guest_name || '____________________'}</Text>
-              <View style={S.signLine} />
+              {signMark(signatureDataUrls, 'return', 'client')}
               <Text style={S.signLabel}>{t.page2ClientSignReturn}</Text>
             </View>
             <View style={S.signBox}>
               <Text style={S.signTop}>{settings.company_name || 'RentInfra'}</Text>
-              <View style={S.signLine} />
+              {signMark(signatureDataUrls, 'return', 'company')}
               <Text style={S.signLabel}>{t.page2CompSignReturn}</Text>
             </View>
           </View>

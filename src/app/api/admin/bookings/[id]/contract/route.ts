@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import { createElement, type ReactElement } from 'react'
@@ -73,8 +73,29 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     qrDataUrl = await QRCode.toDataURL(waUrl, { width: 256, margin: 1, color: { dark: '#0A1F44', light: '#ffffff' } })
   } catch { /* QR failed — skip */ }
 
+  // Captured e-signatures, if any. Downloaded server-side (not via a signed
+  // URL fetch — @react-pdf/renderer's Image needs a data URL/buffer, not a
+  // remote URL) and inlined as base64, same treatment as the logo/QR above.
+  const signatureDataUrls: Record<string, string> = {}
+  const adminClient = await createAdminClient()
+  const { data: sigRows } = await adminClient
+    .from('booking_signatures')
+    .select('role, stage, storage_path')
+    .eq('booking_id', id)
+
+  if (sigRows?.length) {
+    await Promise.all(
+      sigRows.map(async row => {
+        const { data: blob } = await adminClient.storage.from('signatures').download(row.storage_path)
+        if (!blob) return
+        const buf = Buffer.from(await blob.arrayBuffer())
+        signatureDataUrls[`${row.stage}-${row.role}`] = `data:image/png;base64,${buf.toString('base64')}`
+      })
+    )
+  }
+
   const buffer = await renderToBuffer(
-    createElement(RentalContract, { booking: b, settings: s, lang, logoDataUrl, qrDataUrl }) as ReactElement<DocumentProps>
+    createElement(RentalContract, { booking: b, settings: s, lang, logoDataUrl, qrDataUrl, signatureDataUrls }) as ReactElement<DocumentProps>
   )
 
   const filename = `contrato-${b.reference}-${lang}.pdf`
