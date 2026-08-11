@@ -55,7 +55,7 @@ export default function StepDetails({
 
       {userId && (
         <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 text-sm text-blue-700">
-          You're logged in. Fill in your details below.
+          You&apos;re logged in. Fill in your details below.
         </div>
       )}
 

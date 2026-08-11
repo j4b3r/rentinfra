@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getFleetAvailability } from '@/lib/availability'
 import { formatDate } from '@/lib/utils'
@@ -209,7 +210,7 @@ export default async function CarsPage({
           <div className="text-center py-20">
             <div className="text-5xl mb-4">🚗</div>
             <p className="text-gray-500 text-lg">Nothing available in this category right now.</p>
-            <a href="/cars" className="mt-4 inline-block text-[#C9A84C] hover:underline font-medium">View the whole fleet →</a>
+            <Link href="/cars" className="mt-4 inline-block text-[#C9A84C] hover:underline font-medium">View the whole fleet →</Link>
           </div>
         )}
       </div>

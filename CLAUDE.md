@@ -14,12 +14,57 @@ RentInfra — an open-source car rental SaaS boilerplate. It ships as a full car
 ## Commands
 
 ```bash
-npm run dev      # Start dev server on localhost:3000
-npm run build    # Production build (always run before pushing)
-npm run lint     # Lint check
+npm run dev         # Start dev server on localhost:3000
+npm run build       # Production build (always run before pushing)
+npm run lint        # Lint check
+npm test            # Run the test suite once
+npm run test:watch  # Run tests in watch mode
 ```
 
 Always run `npm run build` before pushing — Vercel auto-deploys from main.
+
+## Testing
+
+Vitest, configured at `vitest.config.ts` (Vite's native `resolve.tsconfigPaths`, so the
+`@/*` alias just works — no separate alias config to keep in sync). Tests are co-located
+`*.test.ts` files next to the source they cover.
+
+**Covered**: pure business-logic functions — `src/lib/pricing.ts` (day/discount/price-
+breakdown math), `src/lib/availability.ts`'s `rangesOverlap`/`nextFreeDate` (the functions
+behind a real production bug — see the file's own header comment — so the same-day
+turnaround case is the single most important test in the suite), `src/lib/vehicle-status.ts`
+(status precedence), `src/lib/vehicles.ts` (`specsFor()` per vehicle type, EV specs, the
+bicycle "Pedal assist" branch). Plus smoke tests for three representative API routes using
+`src/test/supabase-mock.ts` (a chainable fake Supabase client — there's no dependency-
+injection seam in the route handlers, so tests intercept at the module level via
+`vi.mock('@/lib/supabase/server')`): `POST /api/bookings` (conflict/success/race/error
+paths), `POST /api/admin/cars` (the admin-guard 403 paths — this one route stands in for
+all 27 `/api/admin/*` routes, which share the same `requireAdmin()`-first pattern; not
+individually tested), `POST /api/payments/webhook` (signature verification, fail-closed
+when unconfigured, and the idempotency guarantee that stops a Stripe retry from re-sending
+a confirmation email).
+
+**Not covered, deliberately**: component/UI tests, full E2E/browser tests (Playwright etc),
+a real Supabase-backed integration suite — `supabase-mock.ts` is a hand-rolled fake, not a
+test database, so it can't catch an actual RLS policy or DB constraint regression.
+
+**Known issue documented, not fixed, by a test**: `getDiscountForDays()` in
+`src/lib/pricing.ts` matches a `discount_type: 'fixed'` tier but only `'percentage'`
+contributes to the returned `pct`, so a fixed-amount discount configured in the admin panel
+silently applies as 0% today. `pricing.test.ts` has a test named to document this rather
+than assert it's correct — fixing it is a separate decision, not bundled into test-writing.
+
+**CI** (`.github/workflows/ci.yml`): build, lint, test, and `npm audit --audit-level=critical`
+run on every push and PR. The audit job also runs `--audit-level=high` non-blocking, purely
+for visibility — there are pre-existing high-severity findings (mostly the pinned
+`next@16.2.4`; bumping it, together with the matching pinned `eslint-config-next`, is a
+follow-up, not gated here yet). **CodeQL** (`.github/workflows/codeql.yml`) does static
+analysis on push/PR to main plus weekly — this is what actually protects the
+`settings.is_secret`/`getSecret()`-only rule above: a hardcoded-credential finding here
+would be a real regression against that architecture, not generic boilerplate. **Dependabot**
+(`.github/dependabot.yml`) opens weekly PRs for npm and GitHub Actions dependencies; its PRs
+trigger `ci.yml` like any other PR. None of this gates Vercel's own auto-deploy from
+`main` — a red X on the commit/PR is the signal, deploy behavior is unchanged.
 
 ## Architecture
 
