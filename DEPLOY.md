@@ -5,6 +5,7 @@ A complete, start-to-finish guide to running RentInfra on **Vercel** with a **Su
 Estimated time: ~20 minutes.
 
 - [Try the live demo first](#try-the-live-demo-first)
+- [Fast path: Vercel Marketplace](#fast-path-vercel-marketplace)
 - [1. Prerequisites](#1-prerequisites)
 - [2. Create a Supabase project](#2-create-a-supabase-project)
 - [3. Run the database migrations](#3-run-the-database-migrations)
@@ -38,7 +39,61 @@ These credentials exist **only on the demo deployment**. Your own instance start
 
 ---
 
-## 1. Prerequisites
+## Fast path: Vercel Marketplace
+
+If you're deploying on Vercel, this is the shortest route to a running instance — Vercel
+provisions the Supabase project for you and wires the environment variables into your project
+automatically. It skips manual Supabase account creation and manual env var copying, but two
+things still need a minute of manual setup afterward (Supabase Auth URLs, and promoting your
+first admin) — see below for why those can't be automated away.
+
+1. Fork the repo on GitHub, then link it as a new Vercel project:
+   ```bash
+   npm i -g vercel@latest
+   git clone https://github.com/<you>/rentinfra.git
+   cd rentinfra
+   vercel link
+   ```
+2. Provision Supabase through the Marketplace — this creates a Supabase project and injects its
+   URL/keys as environment variables on your linked Vercel project, no copy-pasting:
+   ```bash
+   vercel integration add supabase
+   ```
+   Confirm it worked: `vercel env ls` should list `NEXT_PUBLIC_SUPABASE_URL` and either
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY` or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (both names are
+   supported — see `src/lib/supabase/env.ts`), plus `SUPABASE_SERVICE_ROLE_KEY` and a
+   `POSTGRES_URL_NON_POOLING`.
+3. Set `NEXT_PUBLIC_SITE_URL` and `CRON_SECRET` too — the Marketplace integration only knows
+   about Supabase, not the rest of the app's env vars:
+   ```bash
+   vercel env add NEXT_PUBLIC_SITE_URL production   # your vercel.app URL for now
+   vercel env add CRON_SECRET production             # any random string, e.g. `openssl rand -hex 24`
+   ```
+4. **For the first deploy only**, override the Build Command so the fresh, schema-empty Supabase
+   project gets `supabase/migrations/*.sql` applied before the app builds: Vercel → your project
+   → **Settings → Build & Development → Build Command** → set to
+   ```
+   npm run db:migrate && npm run build
+   ```
+   Deploy (`vercel --prod`, or push to trigger one), and check the build log for
+   `[migrate] done` with each file listed as applied.
+5. **Put the Build Command back to `next build`** (or delete the override) once that first
+   deploy succeeds. `db:migrate` is idempotent and safe to leave in place, but there's no reason
+   to open a database connection on every routine push once the schema exists — see
+   `scripts/migrate.ts` for what it does if you ever want to re-run it by hand instead
+   (`npm run db:migrate` locally, pointed at `POSTGRES_URL_NON_POOLING` from `vercel env pull`).
+6. Finish the two steps that can't be automated, because the Vercel-assigned URL doesn't exist
+   until step 4 deploys, and admin promotion is deliberately not exposed as an API a fork could
+   leave unguarded: [step 6, Configure Supabase Auth](#6-configure-supabase-auth-required) and
+   [step 7, Create your admin user](#7-create-your-admin-user).
+
+From here, skip straight to [step 8, Custom domain](#8-custom-domain) — steps 1–5 below describe
+the manual path (a separate Supabase account, useful if you want to manage Supabase directly, or
+you're not deploying on Vercel at all) and don't need repeating.
+
+---
+
+## 1. Prerequisites (manual path)
 
 - A [GitHub](https://github.com) account (to fork this repo)
 - A [Supabase](https://supabase.com) account — the free tier is enough
@@ -52,6 +107,9 @@ git clone https://github.com/j4b3r/rentinfra.git
 cd rentinfra
 npm install
 ```
+
+> Already used the [fast path](#fast-path-vercel-marketplace) above? Skip to
+> [step 8, Custom domain](#8-custom-domain) — everything below is the manual alternative.
 
 ---
 

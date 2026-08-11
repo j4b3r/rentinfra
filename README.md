@@ -24,18 +24,28 @@ Sign in to try the full product, including the admin panel:
 
 ## Deploy your own
 
+**Fastest path, on Vercel:** `vercel link` your fork, then `vercel integration add supabase` —
+this provisions a Supabase project and wires its keys into your Vercel project automatically, no
+manual Supabase account or env var copying. See **[DEPLOY.md → Fast path](./DEPLOY.md#fast-path-vercel-marketplace)**
+for the full sequence, including the one-time Build Command override that applies
+`supabase/migrations/*.sql` on first deploy.
+
+Deploying elsewhere, or want to manage Supabase directly? The manual path still works:
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/j4b3r/rentinfra&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,SUPABASE_SERVICE_ROLE_KEY,NEXT_PUBLIC_SITE_URL&envDescription=Supabase%20credentials%20and%20your%20public%20site%20URL&envLink=https://github.com/j4b3r/rentinfra/blob/main/DEPLOY.md%234-collect-your-environment-variables)
 
-You will still need to create a Supabase project and run the migrations. **[DEPLOY.md](./DEPLOY.md) is the full step-by-step guide** — Supabase setup, migrations, environment variables, Vercel deploy, auth configuration, custom domain, and troubleshooting.
+**[DEPLOY.md](./DEPLOY.md) is the full step-by-step guide** for both paths — Supabase setup,
+migrations, environment variables, Vercel deploy, auth configuration, custom domain, and
+troubleshooting.
 
-**In short:**
+**Manual path, in short:**
 
 | Step | What |
 |------|------|
 | 1 | Create a Supabase project |
-| 2 | Run `supabase/migrations/001_schema.sql` through `006_ota_settings.sql` in numeric order in the SQL editor (skip `demo_seed.sql` — it's demo-only data) |
+| 2 | Run `supabase/migrations/001_schema.sql` through `008_ev_specs.sql` in numeric order in the SQL editor (skip `demo_seed.sql` — it's demo-only data) |
 | 3 | Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL` |
-| 4 | Deploy to Vercel (or any Node host — nothing is Vercel-specific except the cron schedule) |
+| 4 | Deploy to Vercel (or any Node host) |
 | 5 | Set the Supabase **Site URL** and redirect allowlist to your domain |
 | 6 | Register an account, then flip `profiles.is_admin` to `true` for it |
 | 7 | Optional: connect Resend for email in **Admin → Settings → Integrations** |
