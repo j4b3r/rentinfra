@@ -95,6 +95,7 @@ export function specsFor(vehicle: Car): SpecItem[] {
       specs.push({ icon: 'fuel', label: capitalize(vehicle.fuel_type) })
     const bags = (vehicle.luggage_small ?? 0) + (vehicle.luggage_large ?? 0)
     if (bags) specs.push({ icon: 'luggage', label: `${bags} bags` })
+    if (vehicle.fuel_type === 'electric') specs.push(...evSpecs(vehicle))
     return specs
   }
 
@@ -107,6 +108,7 @@ export function specsFor(vehicle: Car): SpecItem[] {
       })
     if (vehicle.seats) specs.push({ icon: 'users', label: vehicle.seats > 1 ? '2 riders' : '1 rider' })
     if (vehicle.helmet_included) specs.push({ icon: 'bike', label: 'Helmet included' })
+    if (vehicle.fuel_type === 'electric') specs.push(...evSpecs(vehicle))
     return specs
   }
 
@@ -115,6 +117,19 @@ export function specsFor(vehicle: Car): SpecItem[] {
   if (vehicle.gears) specs.push({ icon: 'settings', label: `${vehicle.gears} gears` })
   if (vehicle.fuel_type === 'electric') specs.push({ icon: 'zap', label: 'Pedal assist' })
   if (vehicle.helmet_included) specs.push({ icon: 'bike', label: 'Helmet included' })
+  return specs
+}
+
+/** Range/connector/charging-time specs for cars and motorbikes with fuel_type 'electric'. */
+function evSpecs(
+  vehicle: Pick<Car, 'ev_range_km' | 'ev_charging_connector' | 'ev_charging_time_hours'>
+): SpecItem[] {
+  const specs: SpecItem[] = []
+  if (vehicle.ev_range_km) specs.push({ icon: 'zap', label: `${vehicle.ev_range_km} km range` })
+  if (vehicle.ev_charging_connector)
+    specs.push({ icon: 'zap', label: vehicle.ev_charging_connector })
+  if (vehicle.ev_charging_time_hours)
+    specs.push({ icon: 'zap', label: `${vehicle.ev_charging_time_hours}h charge` })
   return specs
 }
 

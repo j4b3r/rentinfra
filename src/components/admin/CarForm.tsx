@@ -49,10 +49,15 @@ export default function CarForm({ car, locations = [] }: CarFormProps) {
   const [helmetIncluded, setHelmetIncluded] = useState(car?.helmet_included ?? false)
   const [requiresLicense, setRequiresLicense] = useState(car?.requires_license ?? true)
   const [minRiderAge, setMinRiderAge] = useState(car?.min_rider_age?.toString() || '')
+  // EV specs — only meaningful when fuelType === 'electric'
+  const [evRangeKm, setEvRangeKm] = useState(car?.ev_range_km?.toString() || '')
+  const [evChargingConnector, setEvChargingConnector] = useState(car?.ev_charging_connector || '')
+  const [evChargingTimeHours, setEvChargingTimeHours] = useState(car?.ev_charging_time_hours?.toString() || '')
 
   const isCar = vehicleType === 'car'
   const isBike = vehicleType === 'bicycle'
   const isMoto = vehicleType === 'motorbike'
+  const isElectric = !isBike && fuelType === 'electric'
 
   // Switching type invalidates the category (a DB constraint enforces the pairing)
   // and resets the rules that differ per type.
@@ -141,6 +146,9 @@ export default function CarForm({ car, locations = [] }: CarFormProps) {
       helmet_included: isCar ? false : helmetIncluded,
       requires_license: requiresLicense,
       min_rider_age: minRiderAge ? parseInt(minRiderAge) : null,
+      ev_range_km: isElectric && evRangeKm ? parseInt(evRangeKm) : null,
+      ev_charging_connector: isElectric ? evChargingConnector.trim() || null : null,
+      ev_charging_time_hours: isElectric && evChargingTimeHours ? parseFloat(evChargingTimeHours) : null,
       ac,
       bluetooth,
       gps_builtin: gpsBuiltin,
@@ -276,6 +284,30 @@ export default function CarForm({ car, locations = [] }: CarFormProps) {
             <div>
               <label className={labelCls}>Gears</label>
               <input className={inputCls} type="number" value={gears} onChange={e => setGears(e.target.value)} placeholder="e.g. 21" />
+            </div>
+          )}
+          {isElectric && (
+            <div>
+              <label className={labelCls}>Range (km)</label>
+              <input className={inputCls} type="number" value={evRangeKm} onChange={e => setEvRangeKm(e.target.value)} placeholder="e.g. 350" />
+            </div>
+          )}
+          {isElectric && (
+            <div>
+              <label className={labelCls}>Charging Connector</label>
+              <select className={selectCls} value={evChargingConnector} onChange={e => setEvChargingConnector(e.target.value)}>
+                <option value="">Not specified</option>
+                <option value="Type 2">Type 2</option>
+                <option value="CCS">CCS</option>
+                <option value="CHAdeMO">CHAdeMO</option>
+                <option value="NACS">NACS</option>
+              </select>
+            </div>
+          )}
+          {isElectric && (
+            <div>
+              <label className={labelCls}>Charging Time (hours)</label>
+              <input className={inputCls} type="number" step="0.5" value={evChargingTimeHours} onChange={e => setEvChargingTimeHours(e.target.value)} placeholder="e.g. 0.5" />
             </div>
           )}
           {!isCar && (

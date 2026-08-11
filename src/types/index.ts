@@ -61,6 +61,10 @@ export interface Car {
   license_plate: string | null
   /** The branch this car is normally based at. NULL = available at every location. */
   home_location_id: string | null
+  /** EV specs — only meaningful when fuel_type === 'electric' */
+  ev_range_km: number | null
+  ev_charging_connector: string | null
+  ev_charging_time_hours: number | null
   description_en: string | null
   description_es: string | null
   is_available: boolean

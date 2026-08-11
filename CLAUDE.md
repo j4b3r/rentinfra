@@ -45,6 +45,12 @@ scooter/motorcycle/touring; bicycle: city/mountain/electric/road). `specsFor()` 
 specs that apply, so a bicycle shows frame size and gears rather than seats and transmission.
 `requires_license = false` (bicycles) removes the licence field, the minimum age check and the
 young-driver surcharge. Addons carry an optional `vehicle_type` so helmets only appear on bikes.
+EV is a `fuel_type` variant (`'electric'`), not a separate `vehicle_type`/category — cars and
+motorbikes get three optional spec columns (`ev_range_km`, `ev_charging_connector`,
+`ev_charging_time_hours`, `supabase/migrations/007_ev_specs.sql`) shown in `CarForm` only when
+fuel type is Electric and rendered by `specsFor()` alongside the other specs. A future
+per-rental EV charging fee is better modeled as an `Addon` (already `vehicle_type`-scoped) than
+a `pricing.ts` special case — not built.
 
 ### Availability (`src/lib/availability.ts`)
 Single source of truth for overlap rules — used by `/cars`, the car detail page and
