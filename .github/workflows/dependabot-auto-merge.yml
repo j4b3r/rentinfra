@@ -1,0 +1,37 @@
+name: Dependabot auto-merge
+
+# Auto-merges Dependabot PRs once CI (build/lint/test/audit — required
+# checks on main) passes, but only for patch and minor version bumps.
+# Majors are left for manual review — a major bump is exactly the case
+# where CI can be green and the result still wrong (e.g. a linter config
+# a minor ahead of the framework it's meant to match), so "checks passed"
+# isn't the same guarantee there that it is for a patch/minor bump.
+#
+# GitHub Actions bumps (actions/checkout, setup-node, codeql-action) go
+# through the same gate — their "version" is the action tag, and
+# dependabot/fetch-metadata classifies those the same way as npm semver.
+on:
+  pull_request_target:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Enable auto-merge for patch/minor updates
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

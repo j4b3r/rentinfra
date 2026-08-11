@@ -5,6 +5,13 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    ignore:
+      # eslint-config-next is meant to track the exact next version pinned
+      # in package.json — a solo minor bump (e.g. 16.2.4 -> 16.3.0) would
+      # pass the auto-merge workflow's patch/minor filter and still be
+      # wrong, since next itself stays exact-pinned. Bump both together by
+      # hand instead.
+      - dependency-name: "eslint-config-next"
 
   # The CI workflows' own actions (checkout, setup-node, codeql-action) are a
   # dependency surface too, now that they exist.
