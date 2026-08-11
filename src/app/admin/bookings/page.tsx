@@ -58,7 +58,7 @@ export default async function AdminBookings({
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
         <div className="flex items-center gap-2 flex-wrap">
           {statuses.map(s => (
-            <a key={s}
+            <Link key={s}
               href={s === 'all' ? '/admin/bookings' : `/admin/bookings?status=${s}`}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
                 current === s && !type
@@ -66,15 +66,15 @@ export default async function AdminBookings({
                   : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
               }`}>
               {s}
-            </a>
+            </Link>
           ))}
           <div className="w-px h-4 bg-gray-200 mx-1" />
-          <a href="/admin/bookings?type=offline"
+          <Link href="/admin/bookings?type=offline"
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               type === 'offline' ? 'bg-[#0A1F44] text-white shadow-sm' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
             }`}>
             Offline Only
-          </a>
+          </Link>
         </div>
       </div>
 

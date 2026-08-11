@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Car, Location, Addon } from '@/types'
 import { ArrowLeft, Plus, Trash2, Save, Loader2, AlertCircle, FileText } from 'lucide-react'
@@ -78,16 +78,15 @@ export default function OfflineBookingForm({ cars, locations, addons, settings }
   const totalDays = calculateDays(pickupDate, dropoffDate)
   const priceList = selectedCar ? getActivePriceList(selectedCar.price_lists || [], pickupDate) : null
   const pickupLoc = locations.find(l => l.id === pickupLocationId) || null
-  const dropoffLoc = locations.find(l => l.id === dropoffLocationId) || null
+  // An empty dropoff location means "same as pickup" (see the select's
+  // placeholder option below) — derived directly rather than synced via an
+  // effect, so it can't drift from pickupLocationId between renders.
+  const effectiveDropoffLocationId = dropoffLocationId || pickupLocationId
+  const dropoffLoc = locations.find(l => l.id === effectiveDropoffLocationId) || null
   const ageNum = driverAge ? parseInt(driverAge) : null
   const pricing = priceList && totalDays > 0
     ? calculateBookingPrice(priceList, totalDays, selectedAddons, pickupLoc, dropoffLoc, ageNum, settings)
     : null
-
-  // auto same-as-pickup for dropoff
-  useEffect(() => {
-    if (!dropoffLocationId && pickupLocationId) setDropoffLocationId(pickupLocationId)
-  }, [pickupLocationId])
 
   function toggleAddon(addon: Addon) {
     setSelectedAddons(prev => {
@@ -117,7 +116,7 @@ export default function OfflineBookingForm({ cars, locations, addons, settings }
         carId, bookingType: 'offline',
         pickupDate, pickupTime, dropoffDate, dropoffTime,
         pickupLocationId: pickupLocationId || null,
-        dropoffLocationId: dropoffLocationId || null,
+        dropoffLocationId: effectiveDropoffLocationId || null,
         hotelName: hotelName || null,
         hotelAddress: hotelAddress || null,
         guestName: guestName.trim(),

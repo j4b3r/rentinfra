@@ -1,0 +1,61 @@
+name: CI
+
+# Runs on every push and every PR — not gated to PRs only — so a red X shows
+# up before anything is merged or before you'd manually trigger a Vercel
+# deploy. This does NOT gate Vercel's own auto-deploy (Vercel Hobby has no
+# native "wait for GitHub Actions" check); it's a separate, visible signal.
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      # Hard gate — currently 0 critical findings, so this is a real check,
+      # not theater. See CLAUDE.md's Testing section for the current status
+      # of the pre-existing high-severity findings (mostly the pinned
+      # next@16.2.4) and why they're not gated here yet.
+      - run: npm audit --audit-level=critical
+      # Visible in logs without failing the build for a pre-existing
+      # condition unrelated to any given change.
+      - run: npm audit --audit-level=high || true

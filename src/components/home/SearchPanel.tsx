@@ -23,13 +23,18 @@ function toDateInput(d: Date) {
 export default function SearchPanel({ locations, minAdvanceHours = 2 }: SearchPanelProps) {
   const router = useRouter()
 
-  const earliest = new Date(Date.now() + minAdvanceHours * 3600 * 1000)
-  const defaultPickup = new Date(earliest)
-  const defaultDropoff = new Date(earliest)
-  defaultDropoff.setDate(defaultDropoff.getDate() + 3)
-
-  const [pickup, setPickup] = useState(toDateInput(defaultPickup))
-  const [dropoff, setDropoff] = useState(toDateInput(defaultDropoff))
+  // Date.now() is impure, so it can't run directly in the render body — the
+  // lazy useState initializer form runs it exactly once, on mount, which is
+  // what "the earliest bookable date" actually needs. Kept as state (not
+  // recomputed per render) so the pickup <input min> and both default dates
+  // below all agree on the same "now".
+  const [earliest] = useState(() => new Date(Date.now() + minAdvanceHours * 3600 * 1000))
+  const [pickup, setPickup] = useState(() => toDateInput(earliest))
+  const [dropoff, setDropoff] = useState(() => {
+    const defaultDropoff = new Date(earliest)
+    defaultDropoff.setDate(defaultDropoff.getDate() + 3)
+    return toDateInput(defaultDropoff)
+  })
   const [locationId, setLocationId] = useState(locations[0]?.id ?? '')
 
   // Keep the range valid: a pickup past the return pushes the return with it.
