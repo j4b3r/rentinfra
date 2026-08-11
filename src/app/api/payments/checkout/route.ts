@@ -95,6 +95,13 @@ export async function POST(req: NextRequest) {
         booking_reference: booking.reference,
         is_partial: String(isPartial),
       },
+      // 'automatic' only challenges the card when Stripe's risk engine or the
+      // issuing bank already requires it — no added friction on an ordinary
+      // payment, meaningfully reduces card-testing/chargeback exposure on
+      // ones that are flagged.
+      payment_method_options: {
+        card: { request_three_d_secure: 'automatic' },
+      },
       success_url: `${SITE_URL}/booking/success?ref=${booking.reference}`,
       cancel_url: `${SITE_URL}/my-booking?ref=${booking.reference}&payment=cancelled`,
     })

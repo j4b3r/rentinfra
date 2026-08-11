@@ -277,6 +277,13 @@ to `/new` and `/[id]` routes that didn't exist. Both now have full create/edit/d
     guessed one risks creating bookings that bypass the assumptions `getConflictingBookings()`
     and `bookings_no_overlap` make about `pickup_date`/`dropoff_date`. This is the one-way half
     of "sync" — it publishes, it does not import.
+- ~~**Stripe 3D Secure**~~ ✅ Done — Checkout now requests 3DS automatically
+  (`payment_method_options.card.request_three_d_secure: 'automatic'`), only challenging when
+  Stripe's risk engine or the issuing bank already requires it. **Not built**: handling
+  `radar.early_fraud_warning`/`payment_intent.requires_action` in the webhook — Checkout Sessions
+  already resolve 3DS before `checkout.session.completed` fires, so nothing more is needed for
+  payments to keep working; a fraud-ops review workflow for early-warning events is a bigger,
+  separate build with no existing admin UI surface to land it in.
 
 ---
 
