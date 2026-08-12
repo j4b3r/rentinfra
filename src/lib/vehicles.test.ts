@@ -57,7 +57,10 @@ describe('placeholderFor', () => {
   })
 
   it('falls back to the economy placeholder for an unknown category', () => {
-    expect(placeholderFor({ vehicle_type: 'car', category: 'spaceship' })).toBe(VEHICLE_PLACEHOLDER.economy)
+    // Deliberately outside the VehicleCategory union — exercises the runtime
+    // fallback for a value that could arrive from the DB without a matching
+    // TS-level guarantee (e.g. after a schema/enum change).
+    expect(placeholderFor({ vehicle_type: 'car', category: 'spaceship' as Car['category'] })).toBe(VEHICLE_PLACEHOLDER.economy)
   })
 })
 
