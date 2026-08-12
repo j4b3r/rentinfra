@@ -20,14 +20,15 @@ cp .env.example .env.local
 ```
 
 Create a Supabase project and run the migrations in `supabase/migrations/` in numeric order
-(`001_schema.sql` → `006_ota_settings.sql`; skip `demo_seed.sql` unless you want the demo fleet
-for local testing). Full steps, including auth configuration, are in
+(`001_schema.sql` → `008_booking_signatures.sql`; skip `demo_seed.sql` unless you want the demo
+fleet for local testing). Full steps, including auth configuration, are in
 **[DEPLOY.md](./DEPLOY.md)**.
 
 ```bash
 npm run dev      # http://localhost:3000
 npm run build    # must pass before opening a PR
 npm run lint
+npm test         # must pass before opening a PR
 ```
 
 ## Making changes
@@ -53,6 +54,10 @@ npm run lint
   new parameter, not a local reimplementation.
 - **Log lifecycle events** with `logEvent()` from `lib/events.ts` when adding anything that
   changes a booking's state.
+- **Add tests for anything in `src/lib/`** that's a pure function of its arguments — see the
+  existing `*.test.ts` files co-located next to their source, and CLAUDE.md's Testing section for
+  the mocking pattern used for API route tests (there's no dependency-injection seam in the route
+  handlers, so those intercept `@/lib/supabase/server` at the module level via `vi.mock`).
 
 ## Where the sharp edges are
 
@@ -65,15 +70,18 @@ These are the places where a change that looks safe in isolation can break somet
 - RLS policies gate every table. If a new table needs to be readable by anonymous visitors,
   prefer a narrow `SECURITY DEFINER` RPC (like `get_car_availability()`) over relaxing RLS on the
   underlying table.
-- `condition-photos` and `licence-documents` are private Storage buckets, deliberately separate
-  from each other and from the public `car-images` bucket. Don't consolidate them — a licence
-  scan is an identity document with a different retention profile than vehicle-damage evidence.
+- `condition-photos`, `licence-documents` and `signatures` are private Storage buckets,
+  deliberately separate from each other and from the public `car-images` bucket. Don't
+  consolidate them — a licence scan is an identity document with a different retention profile
+  than vehicle-damage evidence or a captured signature.
 
 ## Pull requests
 
 - Keep PRs scoped to one change. Large mixed PRs (feature + refactor + formatting) are hard to
   review and easy to get wrong.
-- Run `npm run build` and `npm run lint` before opening the PR.
+- Run `npm run build`, `npm run lint`, and `npm test` before opening the PR — CI runs all three
+  (plus a dependency audit) on every push and PR, so a red check on your PR reflects one of these
+  failing.
 - Describe what changed and why, not just what — especially for anything touching pricing,
   availability, or RLS.
 - If you're adding a new setting, confirm the migration number doesn't collide with one already

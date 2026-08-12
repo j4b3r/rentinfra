@@ -6,7 +6,7 @@ Estimated time: ~20 minutes.
 
 - [Try the live demo first](#try-the-live-demo-first)
 - [Fast path: Vercel Marketplace](#fast-path-vercel-marketplace)
-- [1. Prerequisites](#1-prerequisites)
+- [1. Prerequisites (manual path)](#1-prerequisites-manual-path)
 - [2. Create a Supabase project](#2-create-a-supabase-project)
 - [3. Run the database migrations](#3-run-the-database-migrations)
 - [4. Collect your environment variables](#4-collect-your-environment-variables)
@@ -16,6 +16,7 @@ Estimated time: ~20 minutes.
 - [7. Create your admin user](#7-create-your-admin-user)
 - [8. Custom domain](#8-custom-domain)
 - [9. Post-deploy checklist](#9-post-deploy-checklist)
+- [10. Tests and CI (if you forked the repo)](#10-tests-and-ci-if-you-forked-the-repo)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -103,7 +104,7 @@ you're not deploying on Vercel at all) and don't need repeating.
 - A [GitHub](https://github.com) account (to fork this repo)
 - A [Supabase](https://supabase.com) account — the free tier is enough
 - A [Vercel](https://vercel.com) account — the free Hobby tier is enough
-- Node.js 20+ if you want to run it locally first
+- Node.js 22+ if you want to run it locally first (matches what CI uses — see `.github/workflows/ci.yml`)
 
 Fork or clone the repo:
 
@@ -133,13 +134,24 @@ The SQL files in `supabase/migrations/` create every table, row-level security p
 
 ### Option A — Supabase SQL Editor (simplest)
 
-For each file in `supabase/migrations/` in numeric order (`001_schema.sql`, then `002_maintenance_blocks.sql`, then any later ones):
+For each file in `supabase/migrations/` in numeric order:
 
 1. Open your project → **SQL Editor** → **New query**.
 2. Paste the entire contents of the file.
 3. Click **Run**. Confirm it reports success before moving to the next file.
 
-`001_schema.sql` is the base schema — every table, RLS policy, trigger, function and storage bucket as of the initial release, consolidated into one file. It ships with **no rows** other than baseline seed data (3 cars, 3 locations, 5 addons, default settings); the homepage hides the reviews section entirely until you publish a testimonial from `/admin/testimonials`. Later-numbered files are additive schema changes since then (`002` adds fleet maintenance blocks).
+| File | Adds |
+|------|------|
+| `001_schema.sql` | The base schema — every table, RLS policy, trigger, function and storage bucket, consolidated into one file. Ships with **no rows** other than baseline seed data (3 cars, 3 locations, 5 addons, default settings); the homepage hides the reviews section entirely until you publish a testimonial from `/admin/testimonials`. |
+| `002_maintenance_blocks.sql` | Fleet maintenance blocks (`maintenance_blocks` table), unioned into availability checks. |
+| `003_licence_documents.sql` | Driver licence capture — `booking_licence_documents` table + private `licence-documents` bucket. |
+| `004_car_home_location.sql` | Per-branch fleet — `cars.home_location_id`. |
+| `005_twilio_settings.sql` | WhatsApp/SMS credential settings rows (Twilio). |
+| `006_ota_settings.sql` | Channel-manager/OTA feed credential settings rows. |
+| `007_ev_specs.sql` | EV spec columns on `cars` (range, charging connector, charging time). |
+| `008_booking_signatures.sql` | E-signature capture — `booking_signatures` table + private `signatures` bucket. |
+
+Run them all, in order — each one builds on the last.
 
 `demo_seed.sql` is **optional and for the public demo only** — it inserts fake cars, photos and bookings on top of the schema. **Skip it** if you are setting up a real business. It is safe to re-run and safe to ignore.
 
@@ -160,7 +172,7 @@ Go to **Table Editor**. You should see the full set of tables including `cars`, 
 
 ## 4. Collect your environment variables
 
-RentInfra needs four variables, plus one optional secret for the scheduled job.
+RentInfra needs four required variables, plus one strongly recommended secret for the two scheduled jobs.
 
 In your Supabase project, go to **Project Settings → API Keys**:
 
@@ -170,7 +182,7 @@ In your Supabase project, go to **Project Settings → API Keys**:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Project Settings → API Keys → **anon / public** | Yes — safe to expose, RLS protects your data |
 | `SUPABASE_SERVICE_ROLE_KEY` | Project Settings → API Keys → **service_role** | **NO — secret** |
 | `NEXT_PUBLIC_SITE_URL` | Your final public URL, e.g. `https://your-domain.com` | Yes |
-| `CRON_SECRET` | Any random string, e.g. `openssl rand -hex 24`. Optional but recommended — it stops anyone from triggering the scheduled job at `/api/cron/expire-holds`. Vercel sends it automatically for real cron runs. | **NO — secret** |
+| `CRON_SECRET` | Any random string, e.g. `openssl rand -hex 24`. Recommended — it stops anyone from triggering the two scheduled jobs (`/api/cron/expire-holds`, `/api/cron/send-emails`, both defined in `vercel.json`) by hitting the URL directly. Vercel sends it automatically for real cron runs. | **NO — secret** |
 
 > ⚠️ **The `service_role` key bypasses all row-level security.** Never commit it, never put it in a `NEXT_PUBLIC_*` variable, and never expose it to the browser. It is used only in server-side code (`src/lib/supabase/server.ts`).
 
@@ -341,8 +353,10 @@ where id = (select id from auth.users where email = 'you@example.com');
 - [ ] `/admin` redirects anonymous visitors to `/auth/login`
 - [ ] `/admin` loads for your promoted admin account
 - [ ] Uploading a car photo in the admin panel succeeds and displays on the public site
-- [ ] The PDF rental contract downloads in both EN and ES
+- [ ] The PDF rental contract downloads in both EN and ES, and shows a captured e-signature if you took one on the booking's detail page
 - [ ] `/sitemap.xml` and `/robots.txt` return 200
+- [ ] If you connected Stripe: a test-mode checkout completes and the booking's payment status updates via webhook
+- [ ] If you forked the repo (not just deployed a clone): a push to your fork triggers `.github/workflows/ci.yml` (build, lint, test, audit) and shows up green under the **Actions** tab
 
 ### Make it yours
 
@@ -353,9 +367,39 @@ Before taking real bookings, replace the placeholder content:
 - **Copy and SEO** — `messages/en.json`, `messages/es.json`, and the `generateMetadata()` exports under `src/app/(public)/**`.
 - **Legal** — `/terms` and `/privacy`, plus the jurisdiction and territory clauses in `src/lib/pdf/RentalContract.tsx`. **Have a lawyer review these for your market.**
 
-### Not included
+### Optional, off until you connect it
 
-RentInfra ships without payment processing or transactional email. Bookings are recorded, but nothing is charged and no email is sent. Wiring up Stripe/PayPal and an SMTP or Resend sender is left to you.
+Bookings work with zero of this configured — they're simply recorded unpaid and no email/message goes out. Everything below is a real, shipped feature, admin-managed from **Settings → Integrations**, not something you need to build:
+
+- **Payments** (Stripe Checkout, full or partial deposit) — see [step 5b](#5b-connect-email-and-payments-optional)
+- **Email** (Resend — booking receipts, confirmations, admin alerts) — see [step 5b](#5b-connect-email-and-payments-optional)
+- **WhatsApp / SMS** (Twilio) — same settings page, independent on/off switches per channel and per notification type
+- **Channel-manager / OTA availability feed** — a bearer-token-authenticated outbound feed at `/api/ota/availability`, for connecting a booking aggregator (publishes availability only, does not import bookings)
+
+See [ROADMAP.md](./ROADMAP.md) for what's genuinely **not built yet** — inbound OTA booking sync, deposit pre-authorization/release, and German/Russian translations are the main gaps.
+
+---
+
+## 10. Tests and CI (if you forked the repo)
+
+Only relevant if you forked on GitHub rather than deploying a one-off clone — this doesn't affect
+Vercel's own deploy in any way, it's a separate signal that runs alongside it.
+
+- `npm test` runs the test suite locally (`npm run test:watch` for watch mode). See CLAUDE.md's
+  Testing section for what's covered.
+- `.github/workflows/ci.yml` runs build, lint, test, and a dependency audit
+  (`npm audit --audit-level=critical`) on every push and pull request. It does **not** gate
+  Vercel's auto-deploy from `main` — Vercel deploys regardless of whether this is green. It's a
+  visible check on the commit/PR, nothing more, unless you turn on GitHub branch protection
+  yourself.
+- `.github/workflows/codeql.yml` runs a static security scan on push/PR to `main` plus weekly;
+  results show up under the repo's **Security → Code scanning** tab.
+- `.github/dependabot.yml` opens weekly PRs for outdated npm and GitHub Actions dependencies.
+  `.github/workflows/dependabot-auto-merge.yml` auto-merges the ones that are patch/minor version
+  bumps once CI passes; major version bumps are left open for you to review by hand.
+
+None of this is required to deploy — it's there so a fork that keeps evolving has a way to catch
+a regression before it ships, not a gate you have to satisfy to get your first deploy live.
 
 ---
 

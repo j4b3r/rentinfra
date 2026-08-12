@@ -115,8 +115,11 @@ deposit disputes are won or lost.
   `BookingActions`), shown alongside the new condition report
 - **Damage markers on a diagram — not built.** The printed contract already has a marked
   diagram; a digital coordinate-overlay UI is separate follow-up work, not bundled here.
-- **Customer signature capture — not built.** Same reasoning; the contract stays the signed
-  paper record for now.
+- ~~Customer signature capture~~ ✅ Done — `SignaturePanel` on the booking detail page captures
+  a signature per (role, stage) via `react-signature-canvas` into a private `signatures`
+  Storage bucket (`008_booking_signatures.sql`), following the same private-bucket/signed-URL
+  pattern as condition photos and licence documents. The contract PDF embeds the captured
+  signature per stage/role, falling back to a blank line to sign by hand when none was taken.
 - **Automatic deposit deduction — not built, and deliberately.** The Stripe Checkout Session
   used for payment runs `mode: 'payment'` with no `customer` / `setup_future_usage`, so there is
   no saved payment method to charge off-session later. A damage claim is a record for staff to
@@ -284,6 +287,21 @@ to `/new` and `/[id]` routes that didn't exist. Both now have full create/edit/d
   already resolve 3DS before `checkout.session.completed` fires, so nothing more is needed for
   payments to keep working; a fraud-ops review workflow for early-warning events is a bigger,
   separate build with no existing admin UI surface to land it in.
+- ~~**EV vehicle support**~~ ✅ Done — `fuel_type` already had an `'electric'` option for cars
+  and motorbikes; this added the fields that were missing to actually show anything for it.
+  `007_ev_specs.sql` adds `ev_range_km`/`ev_charging_connector`/`ev_charging_time_hours` to
+  `cars` (nullable, only meaningful when electric), shown in `CarForm` conditionally and
+  rendered by `specsFor()` alongside the vehicle's other specs. EV stays a `fuel_type` variant,
+  not a new `vehicle_type`/category. **Not built**: a per-rental EV charging fee — better
+  modeled as an `Addon` (already `vehicle_type`-scoped) than a `pricing.ts` special case.
+- ~~**Test suite + CI + security scanning**~~ ✅ Done — Vitest covers pure business logic
+  (pricing, the availability overlap check, vehicle status, per-type vehicle specs) plus smoke
+  tests for three representative API routes via a hand-rolled Supabase mock (no DI seam exists
+  in the route handlers). GitHub Actions runs build/lint/test/`npm audit` on every push and PR,
+  CodeQL does static security analysis, and Dependabot auto-merges patch/minor dependency bumps
+  once CI passes (majors stay open for manual review). See CLAUDE.md's Testing section for full
+  scope and what's deliberately not covered (component/UI tests, E2E, a real DB-backed
+  integration suite).
 
 ---
 
