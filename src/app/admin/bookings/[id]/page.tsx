@@ -13,7 +13,7 @@ const statusColor: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700',
   confirmed: 'bg-blue-100 text-blue-700',
   active: 'bg-emerald-100 text-emerald-700',
-  completed: 'bg-gray-100 text-gray-500',
+  completed: 'bg-gray-100 text-[var(--ink-soft)]',
   cancelled: 'bg-red-100 text-red-600',
 }
 
@@ -21,27 +21,27 @@ const paymentColor: Record<string, string> = {
   unpaid: 'bg-red-100 text-red-600',
   deposit_paid: 'bg-amber-100 text-amber-700',
   paid: 'bg-emerald-100 text-emerald-700',
-  refunded: 'bg-gray-100 text-gray-500',
+  refunded: 'bg-gray-100 text-[var(--ink-soft)]',
   partial_refund: 'bg-orange-100 text-orange-700',
 }
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between py-2.5 border-b border-gray-50 last:border-0">
-      <span className="text-xs text-gray-400 font-medium shrink-0 w-36">{label}</span>
-      <span className="text-sm text-gray-700 text-right">{value || '—'}</span>
+      <span className="text-xs text-[var(--ink-soft)] font-medium shrink-0 w-36">{label}</span>
+      <span className="text-sm text-[var(--ink)] text-right">{value || '—'}</span>
     </div>
   )
 }
 
 function Section({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+    <div className="op-panel p-5">
       <div className="flex items-center gap-2 mb-4">
-        <div className="w-7 h-7 rounded-lg bg-[#0A1F44]/5 flex items-center justify-center">
-          <Icon size={14} className="text-[#0A1F44]" />
+        <div className="w-7 h-7 rounded-lg bg-[var(--bar)]/5 flex items-center justify-center">
+          <Icon size={14} className="text-[var(--ink)]" />
         </div>
-        <h2 className="font-bold text-[#0A1F44] text-sm">{title}</h2>
+        <h2 className="font-bold text-[var(--ink)] text-sm">{title}</h2>
       </div>
       {children}
     </div>
@@ -70,23 +70,23 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
     <div className="space-y-5 max-w-5xl">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href="/admin/bookings" className="text-gray-400 hover:text-gray-600 transition-colors">
+        <Link href="/admin/bookings" className="text-[var(--ink-soft)] hover:text-[var(--ink)] transition-colors">
           <ArrowLeft size={20} />
         </Link>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-extrabold text-[#0A1F44]">{b.reference}</h1>
+            <h1 className="text-2xl font-extrabold text-[var(--ink)]">{b.reference}</h1>
             <a
               href={`/api/admin/bookings/${b.id}/contract?lang=es`}
               target="_blank"
-              className="flex items-center gap-1.5 text-xs border border-gray-200 hover:border-[#0A1F44] text-gray-500 hover:text-[#0A1F44] px-3 py-1.5 rounded-lg transition-all font-semibold"
+              className="flex items-center gap-1.5 text-xs border border-gray-200 hover:border-[var(--bar)] text-[var(--ink-soft)] hover:text-[var(--ink)] px-3 py-1.5 rounded-lg transition-all font-semibold"
             >
               <FileText size={12} /> Contrato ES
             </a>
             <a
               href={`/api/admin/bookings/${b.id}/contract?lang=en`}
               target="_blank"
-              className="flex items-center gap-1.5 text-xs border border-gray-200 hover:border-[#0A1F44] text-gray-500 hover:text-[#0A1F44] px-3 py-1.5 rounded-lg transition-all font-semibold"
+              className="flex items-center gap-1.5 text-xs border border-gray-200 hover:border-[var(--bar)] text-[var(--ink-soft)] hover:text-[var(--ink)] px-3 py-1.5 rounded-lg transition-all font-semibold"
             >
               <FileText size={12} /> Contract EN
             </a>
@@ -97,10 +97,10 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
               {b.payment_status.replace('_', ' ')}
             </span>
             {b.booking_type === 'offline' && (
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">offline</span>
+              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-[var(--ink-soft)]">offline</span>
             )}
           </div>
-          <p className="text-gray-400 text-xs mt-0.5">
+          <p className="text-[var(--ink-soft)] text-xs mt-0.5">
             Created {new Date(b.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}
           </p>
         </div>
@@ -114,11 +114,11 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
           <Section icon={User} title="Guest">
             <Row label="Name" value={b.guest_name} />
             <Row label="Email" value={b.guest_email
-              ? <a href={`mailto:${b.guest_email}`} className="text-[#C9A84C] hover:underline">{b.guest_email}</a>
+              ? <a href={`mailto:${b.guest_email}`} className="text-[var(--pane-signal)] hover:underline">{b.guest_email}</a>
               : null}
             />
             <Row label="Phone" value={b.guest_phone
-              ? <a href={`tel:${b.guest_phone}`} className="text-[#C9A84C] hover:underline">{b.guest_phone}</a>
+              ? <a href={`tel:${b.guest_phone}`} className="text-[var(--pane-signal)] hover:underline">{b.guest_phone}</a>
               : null}
             />
             <Row label="Driver age" value={b.driver_age ? `${b.driver_age} years` : null} />
@@ -163,12 +163,12 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
               }, i: number) => (
                 <div key={i} className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
                   <div>
-                    <p className="text-sm text-gray-700">{a.addon_name_snapshot}</p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-sm text-[var(--ink)]">{a.addon_name_snapshot}</p>
+                    <p className="text-xs text-[var(--ink-soft)]">
                       {formatCurrency(a.price_snapshot)} × {a.quantity}
                     </p>
                   </div>
-                  <span className="text-sm font-semibold text-[#0A1F44]">{formatCurrency(a.subtotal)}</span>
+                  <span className="text-sm font-semibold text-[var(--ink)]">{formatCurrency(a.subtotal)}</span>
                 </div>
               ))}
             </Section>
@@ -186,13 +186,13 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
             {b.subtotal && <Row label="Subtotal" value={formatCurrency(b.subtotal)} />}
             <Row label="Tax" value={formatCurrency(b.tax_amount)} />
             <div className="flex items-center justify-between pt-3 mt-1 border-t border-gray-100">
-              <span className="text-sm font-bold text-[#0A1F44]">Total</span>
-              <span className="text-lg font-extrabold text-[#0A1F44]">
+              <span className="text-sm font-bold text-[var(--ink)]">Total</span>
+              <span className="text-lg font-extrabold text-[var(--ink)]">
                 {b.total_amount ? formatCurrency(b.total_amount) : '—'}
               </span>
             </div>
             {b.deposit_amount > 0 && (
-              <p className="text-xs text-gray-400 mt-1 text-right">
+              <p className="text-xs text-[var(--ink-soft)] mt-1 text-right">
                 Deposit: {formatCurrency(b.deposit_amount)}
                 {b.deposit_paid_at ? ` · paid ${new Date(b.deposit_paid_at).toLocaleDateString('en-GB')}` : ''}
               </p>
@@ -210,8 +210,8 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
 
         {/* Right column — actions */}
         <div className="space-y-5">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <h2 className="font-bold text-[#0A1F44] text-sm mb-4">Actions</h2>
+          <div className="op-panel p-5">
+            <h2 className="font-bold text-[var(--ink)] text-sm mb-4">Actions</h2>
             <BookingActions
               bookingId={b.id}
               initialStatus={b.status}
@@ -236,8 +236,8 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
           {b.car?.requires_license !== false && <LicencePanel bookingId={b.id} />}
 
           {/* Timestamps */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
-            <h2 className="font-bold text-[#0A1F44] text-sm mb-1">Timeline</h2>
+          <div className="op-panel p-5 space-y-3">
+            <h2 className="font-bold text-[var(--ink)] text-sm mb-1">Timeline</h2>
             {[
               { label: 'Created', val: b.created_at },
               { label: 'Confirmed', val: b.confirmed_at },
@@ -245,8 +245,8 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
               { label: 'Updated', val: b.updated_at },
             ].filter(t => t.val).map(t => (
               <div key={t.label} className="flex items-start justify-between">
-                <span className="text-xs text-gray-400">{t.label}</span>
-                <span className="text-xs text-gray-600 text-right">
+                <span className="text-xs text-[var(--ink-soft)]">{t.label}</span>
+                <span className="text-xs text-[var(--ink-soft)] text-right">
                   {new Date(t.val!).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}
                 </span>
               </div>

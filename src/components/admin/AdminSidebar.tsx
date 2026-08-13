@@ -1,10 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Car, Calendar, Users, MapPin,
-  Settings, Languages, Package, ExternalLink, LogOut, Star, BarChart3
+  Settings, Languages, Package, ExternalLink, LogOut, Star, BarChart3,
+  Menu, X,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -26,7 +28,26 @@ interface Props {
   userName: string
 }
 
-export default function AdminSidebar({ userName }: Props) {
+function Wordmark() {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className="grid h-8 w-8 grid-cols-2 grid-rows-2 gap-[2px] bg-[var(--bar-soft)] p-[2px]" aria-hidden="true">
+        <span className="bg-[var(--glass-clear)]" />
+        <span className="bg-[var(--pane-signal)]" />
+        <span className="bg-[var(--glass-clear)]" />
+        <span className="bg-[var(--glass-clear)]" />
+      </span>
+      <div>
+        <p className="text-sm font-bold text-white">
+          RENT<span className="text-[var(--pane-signal)]">INFRA</span>
+        </p>
+        <p className="text-[10px] uppercase tracking-widest text-gray-500">Admin</p>
+      </div>
+    </div>
+  )
+}
+
+function SidebarContents({ userName, onNavigate }: { userName: string; onNavigate?: () => void }) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -39,30 +60,22 @@ export default function AdminSidebar({ userName }: Props) {
   const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 
   return (
-    <aside className="w-64 bg-[#0A1F44] flex flex-col shrink-0 h-screen border-r border-white/5">
-      {/* Logo — TODO: replace with your own logo image */}
-      <div className="px-5 py-5 border-b border-white/8">
-        <div className="flex items-center gap-3">
-          <div>
-            <p className="text-white text-sm font-extrabold tracking-wide">RENT <span className="text-[#C9A84C]">INFRA</span></p>
-            <p className="text-gray-500 text-[10px] uppercase tracking-widest">Admin Panel</p>
-          </div>
-        </div>
-      </div>
-
+    <>
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        <p className="text-gray-600 text-[10px] uppercase tracking-widest font-semibold px-3 mb-2">Menu</p>
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
+        <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-gray-600">Menu</p>
         {navItems.map(({ href, label, icon: Icon }) => {
           const active = href === '/admin' ? pathname === '/admin' : pathname.startsWith(href)
           return (
-            <Link key={href} href={href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
-                active
-                  ? 'bg-[#C9A84C] text-[#0A1F44] font-bold shadow-sm shadow-[#C9A84C]/20'
-                  : 'text-gray-400 hover:bg-white/8 hover:text-white'
-              }`}>
-              <Icon size={16} className={active ? 'text-[#0A1F44]' : ''} />
+            <Link
+              key={href}
+              href={href}
+              onClick={onNavigate}
+              className={`flex items-center gap-3 px-3 py-2.5 text-sm transition-colors ${
+                active ? 'op-nav-active font-semibold' : 'op-nav-inactive'
+              }`}
+            >
+              <Icon size={16} />
               {label}
             </Link>
           )
@@ -70,24 +83,74 @@ export default function AdminSidebar({ userName }: Props) {
       </nav>
 
       {/* Bottom */}
-      <div className="px-3 py-4 border-t border-white/8 space-y-1">
-        <Link href="/" target="_blank"
-          className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs text-gray-500 hover:text-white hover:bg-white/8 transition-all">
+      <div className="space-y-1 border-t-2 border-white/10 px-3 py-4">
+        <Link
+          href="/"
+          target="_blank"
+          className="flex items-center gap-3 px-3 py-2 text-xs text-gray-500 transition-colors hover:bg-white/8 hover:text-white"
+        >
           <ExternalLink size={14} /> View Website
         </Link>
-        <button onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs text-gray-500 hover:text-red-400 hover:bg-red-400/8 transition-all">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 px-3 py-2 text-xs text-gray-500 transition-colors hover:bg-[var(--pane-oxblood)]/20 hover:text-red-300"
+        >
           <LogOut size={14} /> Sign Out
         </button>
 
         {/* User */}
-        <div className="flex items-center gap-3 px-3 pt-3 mt-1 border-t border-white/8">
-          <div className="w-7 h-7 rounded-full bg-[#C9A84C]/20 flex items-center justify-center shrink-0">
-            <span className="text-[#C9A84C] text-xs font-bold">{initials}</span>
+        <div className="mt-1 flex items-center gap-3 border-t-2 border-white/10 px-3 pt-3">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center bg-[var(--pane-signal)]/20">
+            <span className="text-xs font-bold text-[#5b93ff]">{initials}</span>
           </div>
-          <p className="text-xs text-gray-400 truncate">{userName}</p>
+          <p className="truncate text-xs text-gray-400">{userName}</p>
         </div>
       </div>
-    </aside>
+    </>
+  )
+}
+
+export default function AdminSidebar({ userName }: Props) {
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  return (
+    <>
+      {/* Mobile top bar — replaces the fixed-width sidebar below the lg breakpoint */}
+      <div className="op-sidebar flex h-14 shrink-0 items-center justify-between border-b-2 border-black/40 px-4 lg:hidden">
+        <Wordmark />
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="p-2 text-white"
+          aria-label="Open menu"
+          aria-expanded={mobileOpen}
+        >
+          <Menu size={22} />
+        </button>
+      </div>
+
+      {/* Desktop sidebar */}
+      <aside className="op-sidebar hidden h-screen w-60 shrink-0 flex-col border-r-2 border-black/40 lg:flex">
+        <div className="border-b-2 border-white/10 px-5 py-5">
+          <Wordmark />
+        </div>
+        <SidebarContents userName={userName} />
+      </aside>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
+          <aside className="op-sidebar absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col border-r-2 border-black/40">
+            <div className="flex items-center justify-between border-b-2 border-white/10 px-5 py-5">
+              <Wordmark />
+              <button onClick={() => setMobileOpen(false)} className="p-1 text-white" aria-label="Close menu">
+                <X size={20} />
+              </button>
+            </div>
+            <SidebarContents userName={userName} onNavigate={() => setMobileOpen(false)} />
+          </aside>
+        </div>
+      )}
+    </>
   )
 }

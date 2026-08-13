@@ -8,43 +8,43 @@ export default async function AdminLocations() {
   const { data: locations } = await supabase.from('locations').select('*').order('type')
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#0A1F44]">Locations</h1>
+    <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold text-[var(--ink)]">Locations</h1>
         <Link href="/admin/locations/new"
-          className="flex items-center gap-2 bg-[#C9A84C] text-[#0A1F44] px-4 py-2 rounded-lg font-semibold text-sm hover:bg-yellow-400 transition-colors">
+          className="btn-signal flex items-center gap-2 px-4 py-2 text-sm font-bold">
           <Plus size={16} /> Add Location
         </Link>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="op-panel overflow-hidden">
+        <table className="op-table w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
-              <th className="text-left px-4 py-3">Name</th>
-              <th className="text-left px-4 py-3">Type</th>
-              <th className="text-left px-4 py-3">Extra Fee</th>
-              <th className="text-left px-4 py-3">Status</th>
+            <tr className="text-xs uppercase tracking-wide text-[var(--ink-soft)]">
+              <th className="px-4 py-3 text-left">Name</th>
+              <th className="px-4 py-3 text-left">Type</th>
+              <th className="px-4 py-3 text-left">Extra Fee</th>
+              <th className="px-4 py-3 text-left">Status</th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
             {locations?.map((l: { id: string; name_en: string; name_es: string; type: string; extra_fee: number; is_active: boolean }) => (
-              <tr key={l.id} className="border-t border-gray-50 hover:bg-gray-50">
+              <tr key={l.id}>
                 <td className="px-4 py-3">
-                  <p className="font-medium text-[#0A1F44]">{l.name_en}</p>
-                  <p className="text-xs text-gray-400">{l.name_es}</p>
+                  <p className="font-medium text-[var(--ink)]">{l.name_en}</p>
+                  <p className="text-xs text-[var(--ink-soft)]">{l.name_es}</p>
                 </td>
-                <td className="px-4 py-3 capitalize text-gray-600">{l.type.replace('_', ' ')}</td>
-                <td className="px-4 py-3 font-semibold">{l.extra_fee > 0 ? formatCurrency(l.extra_fee) : 'Free'}</td>
+                <td className="px-4 py-3 capitalize text-[var(--ink-soft)]">{l.type.replace('_', ' ')}</td>
+                <td className="px-4 py-3 font-semibold text-[var(--ink)]">{l.extra_fee > 0 ? formatCurrency(l.extra_fee) : 'Free'}</td>
                 <td className="px-4 py-3">
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${l.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  <span className={`rounded-full px-2 py-0.5 text-xs ${l.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                     {l.is_active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
                 <td className="px-4 py-3">
                   <Link href={`/admin/locations/${l.id}`}
-                    className="flex items-center gap-1 text-xs text-[#0A1F44] border border-[#0A1F44] px-2 py-1 rounded hover:bg-[#0A1F44] hover:text-white transition-colors">
+                    className="btn-frame flex w-fit items-center gap-1 px-2 py-1 text-xs">
                     <Edit size={12} /> Edit
                   </Link>
                 </td>

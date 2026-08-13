@@ -57,38 +57,38 @@ export default function RefundPanel({
 
   return (
     <div className="rounded-xl border border-gray-100 bg-white p-4">
-      <h3 className="mb-3 text-sm font-bold text-[#0A1F44]">Refund</h3>
+      <h3 className="mb-3 text-sm font-bold text-[var(--ink)]">Refund</h3>
 
       <dl className="mb-3 space-y-1 text-xs">
         <div className="flex justify-between">
-          <dt className="text-gray-500">Paid</dt>
-          <dd className="font-semibold tabular-nums text-[#0A1F44]">{formatCurrency(amountPaid)}</dd>
+          <dt className="text-[var(--ink-soft)]">Paid</dt>
+          <dd className="font-semibold tabular-nums text-[var(--ink)]">{formatCurrency(amountPaid)}</dd>
         </div>
         {refundedAmount > 0 && (
           <div className="flex justify-between">
-            <dt className="text-gray-500">Already refunded</dt>
+            <dt className="text-[var(--ink-soft)]">Already refunded</dt>
             <dd className="font-semibold tabular-nums text-red-600">
               −{formatCurrency(refundedAmount)}
             </dd>
           </div>
         )}
         <div className="flex justify-between border-t border-gray-100 pt-1">
-          <dt className="text-gray-500">Refundable</dt>
-          <dd className="font-semibold tabular-nums text-[#0A1F44]">
+          <dt className="text-[var(--ink-soft)]">Refundable</dt>
+          <dd className="font-semibold tabular-nums text-[var(--ink)]">
             {formatCurrency(Math.max(0, refundable))}
           </dd>
         </div>
       </dl>
 
       {refundable <= 0 ? (
-        <p className="text-xs text-gray-500">Fully refunded.</p>
+        <p className="text-xs text-[var(--ink-soft)]">Fully refunded.</p>
       ) : done ? (
         <p className="flex items-center gap-1.5 text-xs text-green-700">
           <Check size={13} /> Refund sent. It reaches the customer in 5–10 days.
         </p>
       ) : (
         <>
-          <label className="mb-1 block text-xs font-medium text-gray-600" htmlFor="refund-amount">
+          <label className="mb-1 block text-xs font-medium text-[var(--ink-soft)]" htmlFor="refund-amount">
             Amount to refund
           </label>
           <input
@@ -100,7 +100,7 @@ export default function RefundPanel({
             value={amount}
             onChange={e => setAmount(e.target.value)}
             disabled={confirming || busy}
-            className="mb-2 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm tabular-nums outline-none focus:border-[#0A1F44] focus:ring-2 focus:ring-[#0A1F44]/15 disabled:bg-gray-50"
+            className="mb-2 w-full border-2 border-[var(--bar)] px-3 py-2 text-sm tabular-nums outline-none focus:border-[var(--bar)] focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px] disabled:bg-gray-50"
           />
 
           {!confirming ? (
@@ -130,7 +130,7 @@ export default function RefundPanel({
                   type="button"
                   onClick={() => setConfirming(false)}
                   disabled={busy}
-                  className="flex-1 rounded-lg border border-gray-200 bg-white py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+                  className="flex-1 border-2 border-[var(--bar)] bg-white py-2 text-xs font-semibold text-[var(--ink-soft)] hover:bg-gray-50"
                 >
                   Cancel
                 </button>

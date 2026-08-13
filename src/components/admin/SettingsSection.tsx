@@ -18,7 +18,7 @@ interface Props {
   values: Record<string, string>
 }
 
-const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/40 focus:border-[#C9A84C] transition-colors"
+const inputCls = "w-full border-2 border-[var(--bar)] bg-[var(--glass-clear)] px-3 py-2 text-sm text-[var(--ink)] outline-none transition focus:bg-white focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]"
 
 export default function SettingsSection({ title, description, fields, values: initial }: Props) {
   const [values, setValues] = useState<Record<string, string>>(initial)
@@ -45,34 +45,36 @@ export default function SettingsSection({ title, description, fields, values: in
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div className="op-panel overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-5 border-b border-gray-50">
-        <h2 className="font-bold text-[#0A1F44]">{title}</h2>
-        {description && <p className="text-sm text-gray-400 mt-0.5">{description}</p>}
+      <div className="op-panel-header px-6 py-5">
+        <h2 className="font-bold text-[var(--ink)]">{title}</h2>
+        {description && <p className="mt-0.5 text-sm text-[var(--ink-soft)]">{description}</p>}
       </div>
 
       {/* Fields */}
-      <div className="px-6 py-5 space-y-5">
+      <div className="space-y-5 px-6 py-5">
         {fields.map(f => (
           <div key={f.key}>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">{f.label}</label>
+            <label className="mb-1 block text-xs font-semibold text-[var(--ink-soft)]">{f.label}</label>
 
             {f.type === 'toggle' ? (
-              <label className="flex items-center gap-3 cursor-pointer select-none">
+              <label className="flex cursor-pointer select-none items-center gap-3">
                 <button
                   type="button"
                   onClick={() => set(f.key, values[f.key] === 'true' ? 'false' : 'true')}
-                  className={`relative w-10 h-5.5 rounded-full transition-colors ${
-                    values[f.key] === 'true' ? 'bg-[#C9A84C]' : 'bg-gray-200'
-                  }`}
-                  style={{ height: '22px', width: '40px' }}
+                  className="relative transition-colors"
+                  style={{
+                    height: '22px',
+                    width: '40px',
+                    background: values[f.key] === 'true' ? 'var(--pane-signal)' : '#d1d5db',
+                  }}
                 >
-                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                  <span className={`absolute left-0.5 top-0.5 h-4 w-4 bg-white transition-transform ${
                     values[f.key] === 'true' ? 'translate-x-[18px]' : ''
                   }`} />
                 </button>
-                <span className="text-sm text-gray-600">{values[f.key] === 'true' ? 'Enabled' : 'Disabled'}</span>
+                <span className="text-sm text-[var(--ink-soft)]">{values[f.key] === 'true' ? 'Enabled' : 'Disabled'}</span>
               </label>
             ) : f.type === 'textarea' ? (
               <textarea
@@ -92,20 +94,20 @@ export default function SettingsSection({ title, description, fields, values: in
               />
             )}
 
-            {f.description && <p className="text-xs text-gray-400 mt-1">{f.description}</p>}
+            {f.description && <p className="mt-1 text-xs text-[var(--ink-soft)]">{f.description}</p>}
           </div>
         ))}
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
+      <div className="flex items-center justify-between border-t-2 border-[var(--bar)] bg-[var(--glass-paper)] px-6 py-4">
         {error ? (
           <span className="flex items-center gap-1.5 text-xs text-red-600"><AlertCircle size={13} />{error}</span>
         ) : <span />}
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 bg-[#C9A84C] hover:bg-yellow-400 text-[#0A1F44] px-5 py-2 rounded-xl font-bold text-sm transition-colors disabled:opacity-60 shadow-sm"
+          className="btn-signal flex items-center gap-2 px-5 py-2 text-sm font-bold disabled:opacity-60"
         >
           {saved ? <><Check size={14} /> Saved!</> : saving ? 'Saving…' : <><Save size={14} /> Save Changes</>}
         </button>

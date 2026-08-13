@@ -22,17 +22,17 @@ export default function SettingsNavLink({ href, label, iconName, desc }: Props) 
 
   return (
     <Link href={href}
-      className={`flex items-center gap-3 px-4 py-3.5 border-b border-gray-50 last:border-0 transition-colors group ${
-        active ? 'bg-[#0A1F44]' : 'hover:bg-gray-50'
+      className={`group flex items-center gap-3 border-b border-gray-100 px-4 py-3.5 transition-colors last:border-0 ${
+        active ? 'bg-[var(--pane-signal)]' : 'hover:bg-[var(--glass-paper)]'
       }`}>
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-        active ? 'bg-white/15' : 'bg-gray-100 group-hover:bg-[#C9A84C]/10'
+      <div className={`flex h-8 w-8 shrink-0 items-center justify-center transition-colors ${
+        active ? 'bg-white/15' : 'bg-[var(--glass-seeded)]'
       }`}>
-        <Icon size={15} className={active ? 'text-[#C9A84C]' : 'text-gray-500 group-hover:text-[#C9A84C]'} />
+        <Icon size={15} className={active ? 'text-white' : 'text-[var(--ink-soft)] group-hover:text-[var(--pane-signal)]'} />
       </div>
       <div>
-        <p className={`text-sm font-semibold leading-tight ${active ? 'text-white' : 'text-gray-700'}`}>{label}</p>
-        <p className={`text-[10px] leading-tight mt-0.5 ${active ? 'text-gray-300' : 'text-gray-400'}`}>{desc}</p>
+        <p className={`text-sm font-semibold leading-tight ${active ? 'text-white' : 'text-[var(--ink)]'}`}>{label}</p>
+        <p className={`mt-0.5 text-[10px] leading-tight ${active ? 'text-white/70' : 'text-[var(--ink-soft)]'}`}>{desc}</p>
       </div>
     </Link>
   )

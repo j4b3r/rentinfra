@@ -26,7 +26,7 @@ interface Claim {
 const claimStatusColor: Record<string, string> = {
   open: 'bg-amber-100 text-amber-700',
   resolved: 'bg-emerald-100 text-emerald-700',
-  waived: 'bg-gray-100 text-gray-500',
+  waived: 'bg-gray-100 text-[var(--ink-soft)]',
 }
 
 export default function ConditionReportPanel({ bookingId }: { bookingId: string }) {
@@ -162,17 +162,17 @@ export default function ConditionReportPanel({ bookingId }: { bookingId: string 
   const shownPhotos = photos.filter(p => p.phase === phase)
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div className="op-panel p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-[#0A1F44]">Condition report</h2>
-        <div className="flex rounded-lg border border-gray-200 p-0.5 text-xs font-semibold">
+        <h2 className="text-sm font-bold text-[var(--ink)]">Condition report</h2>
+        <div className="flex border-2 border-[var(--bar)] p-0.5 text-xs font-semibold">
           {(['pickup', 'return'] as const).map(p => (
             <button
               key={p}
               type="button"
               onClick={() => setPhase(p)}
               className={`rounded-md px-3 py-1 capitalize transition ${
-                phase === p ? 'bg-[#0A1F44] text-white' : 'text-gray-500 hover:text-[#0A1F44]'
+                phase === p ? 'bg-[var(--bar)] text-white' : 'text-[var(--ink-soft)] hover:text-[var(--ink)]'
               }`}
             >
               {p}
@@ -195,7 +195,7 @@ export default function ConditionReportPanel({ bookingId }: { bookingId: string 
                 type="button"
                 onClick={() => toggleSelect(photo.id)}
                 className={`group relative aspect-square overflow-hidden rounded-lg border-2 transition ${
-                  selected.has(photo.id) ? 'border-[#C9A84C]' : 'border-transparent'
+                  selected.has(photo.id) ? 'border-[var(--pane-signal)]' : 'border-transparent'
                 }`}
               >
                 {photo.url && (
@@ -211,8 +211,8 @@ export default function ConditionReportPanel({ bookingId }: { bookingId: string 
                   <Trash2 size={12} />
                 </div>
                 {selected.has(photo.id) && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-[#C9A84C]/20">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#C9A84C] text-xs font-bold text-[#0A1F44]">
+                  <div className="absolute inset-0 flex items-center justify-center bg-[var(--pane-signal)]/20">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--pane-signal)] text-xs font-bold text-[var(--ink)]">
                       ✓
                     </div>
                   </div>
@@ -220,7 +220,7 @@ export default function ConditionReportPanel({ bookingId }: { bookingId: string 
               </button>
             ))}
 
-            <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-gray-200 text-gray-400 transition hover:border-[#C9A84C] hover:text-[#C9A84C]">
+            <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-gray-200 text-[var(--ink-soft)] transition hover:border-[var(--pane-signal)] hover:text-[var(--pane-signal)]">
               {uploading ? <Loader2 size={18} className="animate-spin" /> : <Camera size={18} />}
               <span className="text-[10px] font-medium">Add photo</span>
               <input
@@ -237,7 +237,7 @@ export default function ConditionReportPanel({ bookingId }: { bookingId: string 
           </div>
 
           {shownPhotos.length > 0 && (
-            <p className="mb-3 text-[11px] text-gray-400">
+            <p className="mb-3 text-[11px] text-[var(--ink-soft)]">
               Tap a photo to select it, then raise a damage claim citing what&apos;s selected.
             </p>
           )}
@@ -249,15 +249,15 @@ export default function ConditionReportPanel({ bookingId }: { bookingId: string 
             <button
               type="button"
               onClick={() => setClaimOpen(true)}
-              className="mb-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-600 transition hover:border-red-200 hover:text-red-600"
+              className="mb-4 flex w-full items-center justify-center gap-1.5 border-2 border-[var(--bar)] py-2 text-xs font-semibold text-[var(--ink-soft)] transition hover:border-red-200 hover:text-red-600"
             >
               <Plus size={13} /> Raise damage claim
             </button>
           ) : (
-            <div className="mb-4 rounded-lg border border-gray-200 p-3">
+            <div className="mb-4 border-2 border-[var(--bar)] p-3">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-bold text-[#0A1F44]">New damage claim</span>
-                <button type="button" onClick={() => setClaimOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <span className="text-xs font-bold text-[var(--ink)]">New damage claim</span>
+                <button type="button" onClick={() => setClaimOpen(false)} className="text-[var(--ink-soft)] hover:text-[var(--ink)]">
                   <X size={14} />
                 </button>
               </div>
@@ -266,7 +266,7 @@ export default function ConditionReportPanel({ bookingId }: { bookingId: string 
                 onChange={e => setClaimDesc(e.target.value)}
                 placeholder="What's damaged, and how"
                 rows={2}
-                className="mb-2 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#0A1F44] focus:ring-2 focus:ring-[#0A1F44]/15"
+                className="mb-2 w-full border-2 border-[var(--bar)] px-3 py-2 text-sm outline-none focus:border-[var(--bar)] focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]"
               />
               <input
                 type="number"
@@ -275,9 +275,9 @@ export default function ConditionReportPanel({ bookingId }: { bookingId: string 
                 value={claimAmount}
                 onChange={e => setClaimAmount(e.target.value)}
                 placeholder="Amount"
-                className="mb-2 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm tabular-nums outline-none focus:border-[#0A1F44] focus:ring-2 focus:ring-[#0A1F44]/15"
+                className="mb-2 w-full border-2 border-[var(--bar)] px-3 py-2 text-sm tabular-nums outline-none focus:border-[var(--bar)] focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]"
               />
-              <p className="mb-2 text-[11px] text-gray-400">
+              <p className="mb-2 text-[11px] text-[var(--ink-soft)]">
                 {selected.size > 0
                   ? `Citing ${selected.size} selected photo${selected.size !== 1 ? 's' : ''}.`
                   : 'No photos selected — select photos above to cite them as evidence.'}
@@ -290,7 +290,7 @@ export default function ConditionReportPanel({ bookingId }: { bookingId: string 
                 type="button"
                 onClick={submitClaim}
                 disabled={savingClaim}
-                className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#0A1F44] py-2 text-xs font-bold text-white transition hover:bg-[#0A1F44]/90 disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[var(--bar)] py-2 text-xs font-bold text-white transition hover:bg-[var(--bar)]/90 disabled:opacity-60"
               >
                 {savingClaim ? <Loader2 size={13} className="animate-spin" /> : <AlertTriangle size={13} />}
                 Save claim
@@ -304,8 +304,8 @@ export default function ConditionReportPanel({ bookingId }: { bookingId: string 
               {claims.map(claim => (
                 <div key={claim.id} className="rounded-lg border border-gray-100 p-3">
                   <div className="mb-1 flex items-start justify-between gap-2">
-                    <p className="text-xs text-gray-700">{claim.description}</p>
-                    <span className="shrink-0 text-xs font-bold tabular-nums text-[#0A1F44]">
+                    <p className="text-xs text-[var(--ink)]">{claim.description}</p>
+                    <span className="shrink-0 text-xs font-bold tabular-nums text-[var(--ink)]">
                       {formatCurrency(claim.amount)}
                     </span>
                   </div>
@@ -327,7 +327,7 @@ export default function ConditionReportPanel({ bookingId }: { bookingId: string 
                         <button
                           type="button"
                           onClick={() => updateClaimStatus(claim.id, 'waived')}
-                          className="text-gray-400 hover:underline"
+                          className="text-[var(--ink-soft)] hover:underline"
                         >
                           Waive
                         </button>

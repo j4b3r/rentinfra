@@ -17,10 +17,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!profile?.is_admin) redirect('/')
 
   return (
-    <div className="flex h-screen bg-[#F4F6F9]">
+    <div className="op-shell flex h-screen flex-col lg:flex-row">
       <AdminSidebar userName={profile.full_name || user.email || 'Admin'} />
       <main className="flex-1 overflow-auto">
-        <div className="p-7 max-w-7xl mx-auto">
+        <div className="mx-auto max-w-7xl p-4 sm:p-7">
           {children}
         </div>
       </main>

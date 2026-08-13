@@ -49,19 +49,19 @@ export default async function AdminCars() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#0A1F44]">Cars</h1>
-          <p className="text-gray-400 text-sm mt-0.5">{cars?.length || 0} vehicles in fleet</p>
+          <h1 className="text-xl font-bold text-[var(--ink)]">Cars</h1>
+          <p className="mt-0.5 text-sm text-[var(--ink-soft)]">{cars?.length || 0} vehicles in fleet</p>
         </div>
         <Link href="/admin/cars/new"
-          className="flex items-center gap-2 bg-[#C9A84C] hover:bg-yellow-400 text-[#0A1F44] px-4 py-2.5 rounded-xl font-bold text-sm transition-colors shadow-sm">
+          className="btn-signal flex items-center gap-2 px-4 py-2.5 text-sm font-bold">
           <Plus size={15} /> Add Car
         </Link>
       </div>
 
       {/* Cars list */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="op-panel overflow-hidden">
         {cars && cars.length > 0 ? (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-100">
             {cars.map((car: {
               id: string; make: string; model: string; year?: number; category: string;
               transmission: string; seats: number; fuel_type: string;
@@ -78,53 +78,53 @@ export default async function AdminCars() {
               })
 
               return (
-                <div key={car.id} className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50/60 transition-colors group">
+                <div key={car.id} className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-[var(--glass-paper)]">
                   {/* Image */}
-                  <div className="relative w-20 h-14 rounded-xl overflow-hidden shrink-0 bg-gray-100">
+                  <div className="relative h-14 w-20 shrink-0 overflow-hidden bg-[var(--glass-seeded)]">
                     <Image src={img} alt={`${car.make} ${car.model}`} fill className="object-cover" />
                   </div>
 
                   {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <h3 className="font-bold text-[#0A1F44]">{car.make} {car.model}</h3>
-                      {car.year && <span className="text-xs text-gray-400">{car.year}</span>}
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-semibold capitalize ${categoryBadge[car.category] || 'bg-gray-100 text-gray-600'}`}>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-0.5 flex items-center gap-2">
+                      <h3 className="font-bold text-[var(--ink)]">{car.make} {car.model}</h3>
+                      {car.year && <span className="text-xs text-[var(--ink-soft)]">{car.year}</span>}
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${categoryBadge[car.category] || 'bg-gray-100 text-gray-600'}`}>
                         {car.category}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-400">
-                      {car.seats} seats · {car.transmission === 'auto' ? 'Automatic' : 'Manual'} · <span className="capitalize">{car.fuel_type}</span>
+                    <p className="text-xs text-[var(--ink-soft)]">
+                      {car.seats} seats &middot; {car.transmission === 'auto' ? 'Automatic' : 'Manual'} &middot; <span className="capitalize">{car.fuel_type}</span>
                     </p>
                   </div>
 
                   {/* Price */}
-                  <div className="text-right shrink-0 hidden sm:block">
-                    <p className="font-extrabold text-[#0A1F44] text-lg">{price ? formatCurrency(price) : '—'}</p>
-                    <p className="text-xs text-gray-400">/day</p>
+                  <div className="hidden shrink-0 text-right sm:block">
+                    <p className="text-lg font-bold tabular-nums text-[var(--ink)]">{price ? formatCurrency(price) : '—'}</p>
+                    <p className="text-xs text-[var(--ink-soft)]">/day</p>
                   </div>
 
                   {/* Status badges */}
-                  <div className="flex flex-col items-start gap-1.5 shrink-0">
-                    <span className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-semibold ${VEHICLE_STATUS_COLOR[status]}`}>
+                  <div className="flex shrink-0 flex-col items-start gap-1.5">
+                    <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${VEHICLE_STATUS_COLOR[status]}`}>
                       {status === 'maintenance' && <Wrench size={10} />}
                       {VEHICLE_STATUS_LABEL[status]}
                     </span>
                     <div className="flex items-center gap-1.5">
                       {car.is_active
-                        ? <ToggleRight size={18} className="text-emerald-500" />
+                        ? <ToggleRight size={18} className="text-[var(--pane-signal)]" />
                         : <ToggleLeft size={18} className="text-gray-300" />
                       }
-                      <span className={`text-xs font-medium ${car.is_active ? 'text-emerald-600' : 'text-gray-400'}`}>
+                      <span className={`text-xs font-medium ${car.is_active ? 'text-[var(--ink)]' : 'text-[var(--ink-soft)]'}`}>
                         {car.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       {car.is_available
-                        ? <ToggleRight size={18} className="text-blue-500" />
+                        ? <ToggleRight size={18} className="text-[var(--pane-signal)]" />
                         : <ToggleLeft size={18} className="text-gray-300" />
                       }
-                      <span className={`text-xs font-medium ${car.is_available ? 'text-blue-600' : 'text-gray-400'}`}>
+                      <span className={`text-xs font-medium ${car.is_available ? 'text-[var(--ink)]' : 'text-[var(--ink-soft)]'}`}>
                         {car.is_available ? 'Available' : 'Booked'}
                       </span>
                     </div>
@@ -132,7 +132,7 @@ export default async function AdminCars() {
 
                   {/* Edit */}
                   <Link href={`/admin/cars/${car.id}`}
-                    className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-[#0A1F44] border border-gray-200 hover:border-[#0A1F44] px-3 py-1.5 rounded-lg transition-all shrink-0 opacity-0 group-hover:opacity-100">
+                    className="btn-frame flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-xs opacity-0 transition-opacity group-hover:opacity-100">
                     <Pencil size={12} /> Edit
                   </Link>
                 </div>
@@ -140,13 +140,13 @@ export default async function AdminCars() {
             })}
           </div>
         ) : (
-          <div className="text-center py-16">
-            <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <Plus size={20} className="text-gray-400" />
+          <div className="py-16 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center bg-[var(--glass-seeded)]">
+              <Plus size={20} className="text-[var(--ink-soft)]" />
             </div>
-            <p className="text-gray-500 font-medium">No cars yet</p>
-            <Link href="/admin/cars/new" className="mt-2 inline-block text-sm text-[#C9A84C] hover:underline font-semibold">
-              Add your first car →
+            <p className="font-medium text-[var(--ink-soft)]">No cars yet</p>
+            <Link href="/admin/cars/new" className="mt-2 inline-block text-sm font-semibold text-[var(--pane-signal)] hover:underline">
+              Add your first car &rarr;
             </Link>
           </div>
         )}

@@ -90,8 +90,8 @@ export default function TestimonialForm({ testimonial, cars }: TestimonialFormPr
   }
 
   const field =
-    'w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#0A1F44] focus:ring-2 focus:ring-[#0A1F44]/15'
-  const label = 'block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1.5'
+    'w-full border-2 border-[var(--bar)] px-3 py-2 text-sm outline-none focus:border-[var(--bar)] focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]'
+  const label = 'block text-xs font-semibold uppercase tracking-wide text-[var(--ink-soft)] mb-1.5'
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl space-y-5">
@@ -152,7 +152,7 @@ export default function TestimonialForm({ testimonial, cars }: TestimonialFormPr
 
           <div>
             <label htmlFor="author_country" className={label}>
-              Country <span className="font-normal normal-case text-gray-400">(optional)</span>
+              Country <span className="font-normal normal-case text-[var(--ink-soft)]">(optional)</span>
             </label>
             <input
               id="author_country"
@@ -165,7 +165,7 @@ export default function TestimonialForm({ testimonial, cars }: TestimonialFormPr
 
           <div>
             <label htmlFor="author_country_emoji" className={label}>
-              Flag <span className="font-normal normal-case text-gray-400">(optional)</span>
+              Flag <span className="font-normal normal-case text-[var(--ink-soft)]">(optional)</span>
             </label>
             <input
               id="author_country_emoji"
@@ -178,7 +178,7 @@ export default function TestimonialForm({ testimonial, cars }: TestimonialFormPr
 
           <div>
             <label htmlFor="car_id" className={label}>
-              Car rented <span className="font-normal normal-case text-gray-400">(optional)</span>
+              Car rented <span className="font-normal normal-case text-[var(--ink-soft)]">(optional)</span>
             </label>
             <select
               id="car_id"
@@ -214,11 +214,11 @@ export default function TestimonialForm({ testimonial, cars }: TestimonialFormPr
             type="checkbox"
             checked={form.is_published}
             onChange={(e) => set('is_published', e.target.checked)}
-            className="mt-0.5 h-4 w-4 accent-[#0A1F44]"
+            className="mt-0.5 h-4 w-4 accent-[var(--bar)]"
           />
           <span className="text-sm">
-            <span className="font-semibold text-[#0A1F44]">Show on the homepage</span>
-            <span className="mt-0.5 block text-xs text-gray-500">
+            <span className="font-semibold text-[var(--ink)]">Show on the homepage</span>
+            <span className="mt-0.5 block text-xs text-[var(--ink-soft)]">
               Unpublished reviews stay in this list but never appear on the public site.
             </span>
           </span>
@@ -229,7 +229,7 @@ export default function TestimonialForm({ testimonial, cars }: TestimonialFormPr
         <button
           type="submit"
           disabled={saving}
-          className="rounded-lg bg-[#C9A84C] px-5 py-2.5 text-sm font-bold text-[#0A1F44] transition hover:bg-yellow-400 disabled:opacity-60"
+          className="rounded-lg bg-[var(--pane-signal)] px-5 py-2.5 text-sm font-bold text-[var(--ink)] transition hover:bg-[var(--pane-signal-deep)] disabled:opacity-60"
         >
           {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Add review'}
         </button>
@@ -247,7 +247,7 @@ export default function TestimonialForm({ testimonial, cars }: TestimonialFormPr
 
         {isEdit && confirmDelete && (
           <span className="flex items-center gap-2 text-sm">
-            <span className="text-gray-600">Delete this review permanently?</span>
+            <span className="text-[var(--ink-soft)]">Delete this review permanently?</span>
             <button
               type="button"
               onClick={handleDelete}
@@ -259,7 +259,7 @@ export default function TestimonialForm({ testimonial, cars }: TestimonialFormPr
             <button
               type="button"
               onClick={() => setConfirmDelete(false)}
-              className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50"
+              className="border-2 border-[var(--bar)] px-3 py-2 text-xs font-semibold text-[var(--ink-soft)] hover:bg-gray-50"
             >
               Keep
             </button>

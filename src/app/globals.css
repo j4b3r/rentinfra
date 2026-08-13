@@ -193,3 +193,60 @@ h1, h2, h3, h4 {
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--glass-seeded); }
 ::-webkit-scrollbar-thumb { background: var(--bar); }
+
+/* ---------------------------------------------------------------------
+   OPERATE MODE — the same glazing world, restrained for task surfaces.
+   The admin panel inherits bars/panes/signal accent but drops the display
+   face entirely: one family (Space Grotesk) for headings, labels, data,
+   and body alike, at a tighter rem scale. Panes here are content
+   containers with a visible mullion edge, not full-bleed compositions —
+   density and scanability outrank the brand moment.
+--------------------------------------------------------------------- */
+
+.op-shell {
+  background: var(--glass-paper);
+}
+
+.op-sidebar {
+  background: var(--bar);
+}
+
+/* A working surface — content panel with a drawn frame, no display type. */
+.op-panel {
+  background: #ffffff;
+  border: 2px solid var(--bar);
+}
+
+.op-panel-header {
+  border-bottom: 2px solid var(--bar);
+}
+
+.op-table thead tr {
+  background: var(--glass-seeded);
+  border-bottom: 2px solid var(--bar);
+}
+
+.op-table tbody tr {
+  border-bottom: 1px solid #e2e5e3;
+}
+.op-table tbody tr:hover {
+  background: var(--glass-paper);
+}
+
+.op-stat {
+  background: #ffffff;
+  border: 2px solid var(--bar);
+}
+
+/* Nav item — active state is the one lit pane in the sidebar. */
+.op-nav-active {
+  background: var(--pane-signal);
+  color: var(--ink-on-signal);
+}
+.op-nav-inactive {
+  color: #a8b0bc;
+}
+.op-nav-inactive:hover {
+  background: rgba(255,255,255,0.06);
+  color: #ffffff;
+}

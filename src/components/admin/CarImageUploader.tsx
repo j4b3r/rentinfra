@@ -81,7 +81,7 @@ export default function CarImageUploader({ carId, initialImages }: Props) {
         onDrop={handleDrop}
         onDragOver={e => e.preventDefault()}
         onClick={() => inputRef.current?.click()}
-        className="border-2 border-dashed border-gray-200 hover:border-[#C9A84C] rounded-xl p-6 text-center cursor-pointer transition-colors group"
+        className="border-2 border-dashed border-gray-200 hover:border-[var(--pane-signal)] rounded-xl p-6 text-center cursor-pointer transition-colors group"
       >
         <input
           ref={inputRef}
@@ -92,17 +92,17 @@ export default function CarImageUploader({ carId, initialImages }: Props) {
           onChange={e => handleFiles(e.target.files)}
         />
         {uploading ? (
-          <div className="flex items-center justify-center gap-2 text-gray-500">
+          <div className="flex items-center justify-center gap-2 text-[var(--ink-soft)]">
             <Loader2 size={18} className="animate-spin" />
             <span className="text-sm">Uploading…</span>
           </div>
         ) : (
           <>
-            <Upload size={20} className="mx-auto text-gray-300 group-hover:text-[#C9A84C] mb-2 transition-colors" />
-            <p className="text-sm text-gray-500 group-hover:text-gray-700 transition-colors">
+            <Upload size={20} className="mx-auto text-gray-300 group-hover:text-[var(--pane-signal)] mb-2 transition-colors" />
+            <p className="text-sm text-[var(--ink-soft)] group-hover:text-[var(--ink)] transition-colors">
               Click or drag photos here
             </p>
-            <p className="text-xs text-gray-400 mt-1">JPG, PNG, WEBP · Multiple files allowed</p>
+            <p className="text-xs text-[var(--ink-soft)] mt-1">JPG, PNG, WEBP · Multiple files allowed</p>
           </>
         )}
       </div>
@@ -120,7 +120,7 @@ export default function CarImageUploader({ carId, initialImages }: Props) {
 
               {/* Primary badge */}
               {img.is_primary && (
-                <div className="absolute top-1.5 left-1.5 bg-[#C9A84C] text-[#0A1F44] text-[10px] font-bold px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                <div className="absolute top-1.5 left-1.5 bg-[var(--pane-signal)] text-[var(--ink)] text-[10px] font-bold px-1.5 py-0.5 rounded-md flex items-center gap-1">
                   <Star size={9} fill="currentColor" /> Cover
                 </div>
               )}
@@ -132,7 +132,7 @@ export default function CarImageUploader({ carId, initialImages }: Props) {
                     type="button"
                     onClick={() => handleSetPrimary(img.id)}
                     title="Set as cover"
-                    className="text-white hover:text-[#C9A84C] transition-colors"
+                    className="text-white hover:text-[var(--pane-signal)] transition-colors"
                   >
                     <Star size={15} />
                   </button>
@@ -152,7 +152,7 @@ export default function CarImageUploader({ carId, initialImages }: Props) {
       )}
 
       {images.length === 0 && !uploading && (
-        <p className="text-xs text-gray-400 text-center">No photos yet</p>
+        <p className="text-xs text-[var(--ink-soft)] text-center">No photos yet</p>
       )}
     </div>
   )
