@@ -62,89 +62,87 @@ export default function SearchPanel({ locations, minAdvanceHours = 2 }: SearchPa
   )
 
   const fieldClass =
-    'w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-[#0B1220] ' +
-    'outline-none transition focus:border-[#0A1F44] focus:ring-2 focus:ring-[#0A1F44]/15'
+    'w-full border-2 border-[var(--bar)] bg-[var(--glass-clear)] px-3 py-2.5 text-sm text-[var(--ink)] ' +
+    'outline-none transition focus:bg-white focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]'
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border-t-2 border-t-[#C9A84C] bg-white p-5 shadow-[0_20px_50px_-20px_rgba(10,31,68,0.45)] sm:p-6"
+      className="glazing grid grid-cols-1 gap-[3px] sm:grid-cols-2 lg:grid-cols-[1.1fr_1fr_1fr_auto]"
       aria-label="Search available cars"
     >
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1.1fr_1fr_1fr_auto]">
-        <div>
-          <label
-            htmlFor="search-location"
-            className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500"
-          >
-            <MapPin size={13} className="text-[#C9A84C]" />
-            Pick-up location
-          </label>
-          <select
-            id="search-location"
-            value={locationId}
-            onChange={(e) => setLocationId(e.target.value)}
-            className={fieldClass}
-          >
-            {locations.length === 0 && <option value="">Any location</option>}
-            {locations.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name_en}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label
-            htmlFor="search-pickup"
-            className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500"
-          >
-            <CalendarDays size={13} className="text-[#C9A84C]" />
-            Pick-up
-          </label>
-          <input
-            id="search-pickup"
-            type="date"
-            value={pickup}
-            min={toDateInput(earliest)}
-            onChange={(e) => handlePickupChange(e.target.value)}
-            className={fieldClass}
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="search-dropoff"
-            className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500"
-          >
-            <CalendarDays size={13} className="text-[#C9A84C]" />
-            Return
-          </label>
-          <input
-            id="search-dropoff"
-            type="date"
-            value={dropoff}
-            min={pickup}
-            onChange={(e) => setDropoff(e.target.value)}
-            className={fieldClass}
-          />
-        </div>
-
-        <div className="flex items-end">
-          <button
-            type="submit"
-            className="btn-gold flex h-[42px] w-full items-center justify-center gap-2 rounded-lg px-6 text-sm font-bold uppercase tracking-wide text-[#0A1F44] lg:w-auto"
-          >
-            <Search size={16} />
-            Search
-          </button>
-        </div>
+      <div className="pane p-4">
+        <label
+          htmlFor="search-location"
+          className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink-soft)]"
+        >
+          <MapPin size={13} className="text-[var(--pane-signal)]" />
+          Pick-up location
+        </label>
+        <select
+          id="search-location"
+          value={locationId}
+          onChange={(e) => setLocationId(e.target.value)}
+          className={fieldClass}
+        >
+          {locations.length === 0 && <option value="">Any location</option>}
+          {locations.map((l) => (
+            <option key={l.id} value={l.id}>
+              {l.name_en}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <p className="mt-3 text-xs text-gray-500">
-        {days} {days === 1 ? 'day' : 'days'} · Free cancellation up to 24 hours before pick-up
-      </p>
+      <div className="pane p-4">
+        <label
+          htmlFor="search-pickup"
+          className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink-soft)]"
+        >
+          <CalendarDays size={13} className="text-[var(--pane-signal)]" />
+          Pick-up
+        </label>
+        <input
+          id="search-pickup"
+          type="date"
+          value={pickup}
+          min={toDateInput(earliest)}
+          onChange={(e) => handlePickupChange(e.target.value)}
+          className={fieldClass}
+        />
+      </div>
+
+      <div className="pane p-4">
+        <label
+          htmlFor="search-dropoff"
+          className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink-soft)]"
+        >
+          <CalendarDays size={13} className="text-[var(--pane-signal)]" />
+          Return
+        </label>
+        <input
+          id="search-dropoff"
+          type="date"
+          value={dropoff}
+          min={pickup}
+          onChange={(e) => setDropoff(e.target.value)}
+          className={fieldClass}
+        />
+      </div>
+
+      {/* The lit pane — the one accent color, reserved for the primary action */}
+      <div className="pane-lit flex flex-col justify-center p-4">
+        <button
+          type="submit"
+          className="flex h-[42px] w-full items-center justify-center gap-2 bg-[var(--ink-on-signal)] text-sm font-bold uppercase tracking-wide text-[var(--pane-signal)] transition hover:bg-white lg:w-auto lg:px-6"
+        >
+          <Search size={16} />
+          Search
+        </button>
+        <p className="mt-2.5 text-center text-[11px] text-[var(--ink-on-signal)]/80 lg:text-left">
+          {days} {days === 1 ? 'day' : 'days'}
+        </p>
+      </div>
     </form>
   )
 }
