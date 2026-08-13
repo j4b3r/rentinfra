@@ -17,24 +17,49 @@ const steps = [
   },
 ]
 
-/** A genuine four-step sequence, so the numbering carries real information. */
+/** A genuine four-step sequence, so the numbering carries real information.
+ *  The fourth pane is lit — it's the step that ends in a key in your hand. */
 export default function HowItWorks() {
   return (
-    <section className="bg-[#F2F4F7] py-16 sm:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h2 className="font-display text-3xl text-[#0B1220] sm:text-4xl">Booking, start to finish</h2>
-        <p className="mt-1.5 text-sm text-gray-600">Four steps, about two minutes.</p>
+    <section className="glazing py-[3px]">
+      <div className="mx-auto max-w-7xl px-[3px]">
+        <div className="pane pane-seeded p-6 sm:p-8">
+          <h2 className="font-display text-3xl text-[var(--ink)] sm:text-4xl">Booking, start to finish</h2>
+          <p className="mt-1.5 text-sm text-[var(--ink-soft)]">Four steps, about two minutes.</p>
+        </div>
 
-        <ol className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-2xl bg-black/10 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map((step, i) => (
-            <li key={step.title} className="bg-white p-6">
-              <span className="font-display text-3xl text-[#C9A84C] tabular-nums">
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <h3 className="mt-3 text-base font-bold text-[#0B1220]">{step.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-gray-600">{step.body}</p>
-            </li>
-          ))}
+        <ol className="mt-[3px] grid grid-cols-1 gap-[3px] sm:grid-cols-2 lg:grid-cols-4">
+          {steps.map((step, i) => {
+            const isLast = i === steps.length - 1
+            return (
+              <li
+                key={step.title}
+                className={`p-6 ${isLast ? 'pane-lit' : 'pane'}`}
+              >
+                <span
+                  className={`font-display text-3xl tabular-nums ${
+                    isLast ? 'text-[var(--ink-on-signal)]' : 'text-[var(--pane-signal)]'
+                  }`}
+                >
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3
+                  className={`mt-3 text-base font-bold ${
+                    isLast ? 'text-[var(--ink-on-signal)]' : 'text-[var(--ink)]'
+                  }`}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  className={`mt-1.5 text-sm leading-relaxed ${
+                    isLast ? 'text-[var(--ink-on-signal)]/85' : 'text-[var(--ink-soft)]'
+                  }`}
+                >
+                  {step.body}
+                </p>
+              </li>
+            )
+          })}
         </ol>
       </div>
     </section>

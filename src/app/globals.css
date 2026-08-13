@@ -1,124 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap');
+
+/*
+  DIRECTION: Glazed Partition Wall
+  OWN-WORLD: a steel-framed glazier's partition wall — matte black glazing
+  bars at true visual thickness are the only structural ink; clear and
+  seeded-white glass panes are the calm resting ground; one accent color
+  (signal blue) floods the pane that matters right now — the searched car,
+  the selected step, the open availability. Unavailable panes frost to
+  translucent. No gradients, no soft drop shadows standing in for material —
+  depth comes from the bars sitting proud of the glass and mullion shadow.
+  Availability itself is the interface.
+*/
 
 :root {
-  --navy: #0A1F44;
-  --navy-light: #0d2a5c;
-  --gold: #C9A84C;
-  --gold-light: #e0bf70;
-  --background: #F8F9FA;
-  --foreground: #1A1A2E;
-}
+  /* Glazing bar — the only line ink in the system */
+  --bar: #0b0d10;
+  --bar-soft: #23272d;
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: 'Inter', Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
+  /* Glass grounds */
+  --glass-clear: #f7f8f7;
+  --glass-seeded: #eef1ef;
+  --glass-paper: #f4f6f5;
 
-h1, h2, h3 {
-  font-family: 'Inter', Arial, sans-serif;
-}
+  /* Accent glass — reserved for what matters now, never decorative */
+  --pane-signal: #2f6fed;
+  --pane-signal-deep: #1d4fc4;
+  --pane-amber: #d98a1f;
+  --pane-oxblood: #7a2430;
+  --pane-frost: #c8d6e0;
 
-.font-display {
-  font-family: 'Playfair Display', Georgia, serif;
+  /* Text */
+  --ink: #0b0d10;
+  --ink-soft: #4a5058;
+  --ink-on-signal: #f7f8f7;
+
+  --background: var(--glass-clear);
+  --foreground: var(--ink);
 }
 
 * {
   box-sizing: border-box;
 }
 
-/* Animations */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Space Grotesk', 'Segoe UI', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Space Grotesk', Arial, sans-serif;
+}
+
+/* The display voice — heavy, expanded, industrial stencil-adjacent grotesque.
+   Used at scale for headlines only; never for UI labels or body copy. */
+.font-display {
+  font-family: 'Archivo Expanded', 'Space Grotesk', Arial, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------
+   GLAZING SYSTEM
+   The grid IS the navigation and layout grammar. Bars are drawn at true
+   thickness with background-color, never border, so they sit proud of
+   the glass and read as structure rather than a rule.
+--------------------------------------------------------------------- */
+
+.glazing {
+  background: var(--bar);
+}
+
+.pane {
+  background: var(--glass-clear);
+  position: relative;
+}
+
+.pane-seeded {
+  background: var(--glass-seeded);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 20% 30%, rgba(11,13,16,0.03) 0, transparent 45%),
+    radial-gradient(circle at 70% 70%, rgba(11,13,16,0.025) 0, transparent 40%),
+    radial-gradient(circle at 45% 85%, rgba(11,13,16,0.02) 0, transparent 35%);
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+}
+
+/* Lit pane — the searched car, the active step, the thing that matters now.
+   Flooded with the one reserved accent, never used decoratively elsewhere. */
+.pane-lit {
+  background: var(--pane-signal);
+  color: var(--ink-on-signal);
+}
+
+/* Frosted pane — unavailable, disabled, past. Translucent, not grayed out. */
+.pane-frost {
+  background: var(--pane-frost);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(255,255,255,0.35) 0px,
+    rgba(255,255,255,0.35) 2px,
+    transparent 2px,
+    transparent 6px
+  );
+}
+
+/* ---------------------------------------------------------------------
+   MOTION — one authored moment: glass brightening, never sliding.
+--------------------------------------------------------------------- */
+@keyframes paneLight {
+  from { filter: brightness(0.94); }
+  to   { filter: brightness(1); }
+}
+.animate-pane-light {
+  animation: paneLight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
+  from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.animate-fade-up { animation: fadeInUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+.delay-100 { animation-delay: 0.08s; }
+.delay-200 { animation-delay: 0.16s; }
+.delay-300 { animation-delay: 0.24s; }
+.delay-400 { animation-delay: 0.32s; }
+
+/* ---------------------------------------------------------------------
+   CONTROLS
+--------------------------------------------------------------------- */
+
+/* Primary button — a lit pane you press. */
+.btn-signal {
+  background: var(--pane-signal);
+  color: var(--ink-on-signal);
+  transition: background-color 0.2s ease, transform 0.15s ease;
 }
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+.btn-signal:hover {
+  background: var(--pane-signal-deep);
 }
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-8px); }
-}
-@keyframes pulse-gold {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.4); }
-  50%       { box-shadow: 0 0 0 10px rgba(201,168,76,0); }
+.btn-signal:active {
+  transform: scale(0.98);
 }
 
-.animate-fade-up    { animation: fadeInUp 0.6s ease forwards; }
-.animate-fade-in    { animation: fadeIn 0.5s ease forwards; }
-.animate-float      { animation: float 3s ease-in-out infinite; }
-.animate-pulse-gold { animation: pulse-gold 2s infinite; }
-
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
-.delay-400 { animation-delay: 0.4s; }
-
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #C9A84C 0%, #e0bf70 50%, #C9A84C 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Secondary button — clear glass in a black frame. */
+.btn-frame {
+  background: var(--glass-clear);
+  color: var(--ink);
+  border: 2px solid var(--bar);
+  transition: background-color 0.2s ease;
+}
+.btn-frame:hover {
+  background: var(--bar);
+  color: var(--glass-clear);
 }
 
-/* Gold shimmer button */
-.btn-gold {
-  background: linear-gradient(135deg, #C9A84C, #e0bf70, #C9A84C);
-  background-size: 200%;
-  transition: background-position 0.4s, transform 0.2s, box-shadow 0.2s;
-}
-.btn-gold:hover {
-  background-position: right center;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(201,168,76,0.4);
+::selection {
+  background: var(--pane-signal);
+  color: var(--ink-on-signal);
 }
 
-/* Glass card */
-.glass {
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.12);
-}
-
-/* Section divider wave */
-.wave-divider {
-  width: 100%;
-  overflow: hidden;
-  line-height: 0;
-}
-
-/* Card hover lift */
-.card-lift {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-.card-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(10,31,68,0.12);
-}
-
-/* Phone input */
+/* Phone input (account/register forms) — kept functional, restyled to the bar grammar. */
 .phone-input {
   display: flex;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  overflow: hidden;
+  border: 2px solid var(--bar);
 }
 .phone-input:focus-within {
-  border-color: #0A1F44;
-  box-shadow: 0 0 0 2px rgba(10,31,68,0.15);
+  outline: 2px solid var(--pane-signal);
+  outline-offset: 1px;
 }
 .PhoneInputCountry {
   padding: 0 0.75rem;
-  background: #f9fafb;
-  border-right: 1px solid #e5e7eb;
+  background: var(--glass-seeded);
+  border-right: 2px solid var(--bar);
   display: flex;
   align-items: center;
 }
@@ -128,10 +186,10 @@ h1, h2, h3 {
   font-size: 0.875rem;
   border: none;
   outline: none;
-  background: white;
+  background: var(--glass-clear);
+  font-family: 'Space Grotesk', sans-serif;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #f1f1f1; }
-::-webkit-scrollbar-thumb { background: #C9A84C; border-radius: 3px; }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--glass-seeded); }
+::-webkit-scrollbar-thumb { background: var(--bar); }

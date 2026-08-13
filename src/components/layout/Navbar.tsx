@@ -38,49 +38,64 @@ export default function Navbar({ user, isAdmin, settings = {} }: NavbarProps) {
   ]
 
   return (
-    <nav className={`sticky top-0 z-50 transition-all duration-300 ${
-      scrolled ? 'bg-[#0A1F44] shadow-xl shadow-black/20' : 'bg-[#0A1F44]'
-    }`}>
-      {/* Top info bar */}
-      <div className="hidden lg:block border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5 flex justify-between items-center">
-          <p className="text-gray-400 text-xs">{companyName}</p>
-          <div className="flex items-center gap-4 text-xs text-gray-400">
-            <a href={whatsapp} target="_blank" rel="noopener noreferrer"
-              className="hover:text-[#C9A84C] transition-colors">WhatsApp: {phone}</a>
-            <span>·</span>
-            <span>Mon–Sat {officeHoursOpen}–{officeHoursClose}</span>
+    <nav
+      className={`sticky top-0 z-50 bg-[var(--bar)] transition-shadow duration-300 ${
+        scrolled ? 'shadow-[0_4px_0_0_var(--bar)]' : ''
+      }`}
+    >
+      {/* Top info bar — a thin lit pane, not a gradient strip */}
+      <div className="hidden border-b-2 border-black/40 bg-[var(--pane-signal)] lg:block">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-xs text-[var(--ink-on-signal)] sm:px-6 lg:px-8">
+          <p className="font-medium">{companyName}</p>
+          <div className="flex items-center gap-4">
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="hover:underline">
+              WhatsApp: {phone}
+            </a>
+            <span aria-hidden="true">/</span>
+            <span className="tabular-nums">
+              Mon&ndash;Sat {officeHoursOpen}&ndash;{officeHoursClose}
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo — TODO: replace with your own logo image */}
-          <Link href="/" className="flex items-center gap-3 shrink-0">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          {/* Wordmark — set inside its own pane, never across the bar */}
+          <Link href="/" className="flex shrink-0 items-center gap-2.5">
+            <span className="grid h-9 w-9 grid-cols-2 grid-rows-2 gap-[2px] bg-[var(--bar)] p-[2px]" aria-hidden="true">
+              <span className="bg-[var(--glass-clear)]" />
+              <span className="bg-[var(--pane-signal)]" />
+              <span className="bg-[var(--glass-clear)]" />
+              <span className="bg-[var(--glass-clear)]" />
+            </span>
             <div className="hidden sm:block">
-              <div className="flex items-baseline gap-1">
-                <span className="text-white font-extrabold text-lg tracking-wide">RENT</span>
-                <span className="text-[#C9A84C] font-extrabold text-lg tracking-wide">INFRA</span>
+              <div className="flex items-baseline gap-1 font-display text-lg leading-none text-[var(--glass-clear)]">
+                <span>RENT</span>
+                <span className="text-[var(--pane-signal)]">INFRA</span>
               </div>
-              <p className="text-gray-400 text-[10px] -mt-0.5 tracking-widest uppercase">Affordable Car Rental</p>
             </div>
           </Link>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-1">
-            {links.map(link => (
-              <Link key={link.href} href={link.href}
-                className="text-gray-300 hover:text-white hover:bg-white/8 px-3 py-2 rounded-lg transition-all text-sm font-medium">
+          {/* Desktop nav — each link a pane you enter, not a pill */}
+          <div className="hidden md:flex md:items-stretch md:self-stretch">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="flex items-center border-l border-white/10 px-4 text-sm font-medium text-gray-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+              >
                 {link.label}
               </Link>
             ))}
           </div>
 
           {/* Right side */}
-          <div className="hidden md:flex items-center gap-3">
-            <a href={`tel:${phone}`}
-              className="flex items-center gap-1.5 text-[#C9A84C] text-sm font-medium hover:text-white transition-colors">
+          <div className="hidden items-center gap-4 md:flex">
+            <a
+              href={`tel:${phone}`}
+              className="flex items-center gap-1.5 text-sm font-medium text-[#5b93ff] transition-colors hover:text-white"
+            >
               <Phone size={14} />
               {phone}
             </a>
@@ -89,24 +104,29 @@ export default function Navbar({ user, isAdmin, settings = {} }: NavbarProps) {
             {user ? (
               <div className="flex items-center gap-2">
                 {isAdmin && (
-                  <Link href="/admin"
-                    className="text-xs bg-[#C9A84C] text-[#0A1F44] px-3 py-1.5 rounded-lg font-bold hover:bg-yellow-400 transition-colors">
+                  <Link
+                    href="/admin"
+                    className="btn-signal px-3 py-1.5 text-xs font-bold uppercase tracking-wide"
+                  >
                     Admin
                   </Link>
                 )}
-                <Link href="/account"
-                  className="flex items-center gap-1 text-gray-300 hover:text-white text-sm transition-colors">
+                <Link
+                  href="/account"
+                  className="flex items-center gap-1 text-sm text-gray-300 transition-colors hover:text-white"
+                >
                   {t('myAccount')} <ChevronDown size={13} />
                 </Link>
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Link href="/auth/login"
-                  className="text-gray-300 hover:text-white text-sm px-3 py-1.5 transition-colors">
+                <Link
+                  href="/auth/login"
+                  className="px-3 py-1.5 text-sm text-gray-300 transition-colors hover:text-white"
+                >
                   {t('login')}
                 </Link>
-                <Link href="/auth/register"
-                  className="btn-gold text-[#0A1F44] px-4 py-1.5 rounded-lg text-sm font-bold">
+                <Link href="/auth/register" className="btn-signal px-4 py-1.5 text-sm font-bold">
                   {t('register')}
                 </Link>
               </div>
@@ -114,8 +134,12 @@ export default function Navbar({ user, isAdmin, settings = {} }: NavbarProps) {
           </div>
 
           {/* Mobile menu button */}
-          <button onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden text-white p-2 rounded-lg hover:bg-white/10 transition-colors">
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="rounded p-2 text-white transition-colors hover:bg-white/10 md:hidden"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+          >
             {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
@@ -123,42 +147,55 @@ export default function Navbar({ user, isAdmin, settings = {} }: NavbarProps) {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-white/10 bg-[#071530] px-4 py-4 space-y-1">
-          {links.map(link => (
-            <Link key={link.href} href={link.href}
+        <div className="space-y-0 border-t border-white/10 bg-[#050608] md:hidden">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="block text-gray-300 hover:text-white hover:bg-white/8 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors">
+              className="block border-b border-white/5 px-4 py-3 text-sm font-medium text-gray-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+            >
               {link.label}
             </Link>
           ))}
-          <Link href="/my-booking"
+          <Link
+            href="/my-booking"
             onClick={() => setMobileOpen(false)}
-            className="block text-gray-300 hover:text-white hover:bg-white/8 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors">
+            className="block border-b border-white/5 px-4 py-3 text-sm font-medium text-gray-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+          >
             {t('myBooking')}
           </Link>
           {user && (
-            <Link href="/account"
+            <Link
+              href="/account"
               onClick={() => setMobileOpen(false)}
-              className="block text-gray-300 hover:text-white hover:bg-white/8 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors">
+              className="block border-b border-white/5 px-4 py-3 text-sm font-medium text-gray-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+            >
               {t('myAccount')}
             </Link>
           )}
 
-          <div className="pt-3 border-t border-white/10 space-y-2">
+          <div className="space-y-3 p-4">
             <div className="flex items-center justify-between">
-              <a href={`tel:${phone}`} className="flex items-center gap-2 text-[#C9A84C] text-sm font-medium">
+              <a href={`tel:${phone}`} className="flex items-center gap-2 text-sm font-medium text-[#5b93ff]">
                 <Phone size={14} /> {phone}
               </a>
               <LanguageSwitcher />
             </div>
             {!user && (
               <div className="flex gap-2 pt-1">
-                <Link href="/auth/login" onClick={() => setMobileOpen(false)}
-                  className="flex-1 text-center text-gray-300 border border-white/20 rounded-lg py-2.5 text-sm hover:bg-white/10 transition-colors">
+                <Link
+                  href="/auth/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="btn-frame flex-1 border-white/20 py-2.5 text-center text-sm text-gray-200 hover:bg-white/10 hover:text-white"
+                >
                   {t('login')}
                 </Link>
-                <Link href="/auth/register" onClick={() => setMobileOpen(false)}
-                  className="flex-1 text-center btn-gold text-[#0A1F44] rounded-lg py-2.5 text-sm font-bold">
+                <Link
+                  href="/auth/register"
+                  onClick={() => setMobileOpen(false)}
+                  className="btn-signal flex-1 py-2.5 text-center text-sm font-bold"
+                >
                   {t('register')}
                 </Link>
               </div>

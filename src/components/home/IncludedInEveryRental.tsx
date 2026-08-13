@@ -8,6 +8,10 @@ interface IncludedInEveryRentalProps {
  * The terms that decide whether someone books — insurance, mileage,
  * cancellation, support — stated plainly instead of as adjectives.
  * Figures read from the settings table where one exists.
+ *
+ * The lead term (insurance) gets the lit pane and a wider span — the one
+ * thing in this list that most changes whether someone trusts the booking —
+ * so the section reads as a graded elevation, not four identical tiles.
  */
 export default function IncludedInEveryRental({ settings = {} }: IncludedInEveryRentalProps) {
   const openTime = settings.office_hours_open || '08:00'
@@ -18,6 +22,7 @@ export default function IncludedInEveryRental({ settings = {} }: IncludedInEvery
       icon: ShieldCheck,
       title: 'Insurance included',
       body: 'Third-party cover and collision damage waiver come as standard. No cover is sold at the counter.',
+      lead: true,
     },
     {
       icon: Gauge,
@@ -37,26 +42,36 @@ export default function IncludedInEveryRental({ settings = {} }: IncludedInEvery
   ]
 
   return (
-    <section className="bg-white py-16 sm:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h2 className="font-display text-3xl text-[#0B1220] sm:text-4xl">
-          What every rental includes
-        </h2>
-        <p className="mt-1.5 max-w-xl text-sm text-gray-600">
-          No optional extras disguised as requirements. These apply to every car in the fleet.
-        </p>
-
-        <dl className="mt-10 grid grid-cols-1 gap-x-8 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
-          {items.map(({ icon: Icon, title, body }) => (
-            <div key={title} className="border-t-2 border-[#C9A84C]/70 pt-5">
-              <dt className="flex items-center gap-2.5 text-base font-bold text-[#0B1220]">
-                <Icon size={18} className="text-[#0A1F44]" strokeWidth={2} />
-                {title}
-              </dt>
-              <dd className="mt-2 text-sm leading-relaxed text-gray-600">{body}</dd>
-            </div>
-          ))}
-        </dl>
+    <section className="glazing py-[3px]">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-[3px] px-[3px] sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        {items.map(({ icon: Icon, title, body, lead }) => (
+          <div
+            key={title}
+            className={`p-6 transition duration-500 sm:p-7 ${
+              lead ? 'pane-lit lg:row-span-1' : 'pane hover:animate-pane-light'
+            }`}
+          >
+            <Icon
+              size={lead ? 26 : 20}
+              className={lead ? 'text-[var(--ink-on-signal)]' : 'text-[var(--pane-signal)]'}
+              strokeWidth={2}
+            />
+            <h3
+              className={`mt-3 font-bold ${
+                lead ? 'text-xl text-[var(--ink-on-signal)]' : 'text-base text-[var(--ink)]'
+              }`}
+            >
+              {title}
+            </h3>
+            <p
+              className={`mt-2 text-sm leading-relaxed ${
+                lead ? 'max-w-sm text-[var(--ink-on-signal)]/85' : 'text-[var(--ink-soft)]'
+              }`}
+            >
+              {body}
+            </p>
+          </div>
+        ))}
       </div>
     </section>
   )
