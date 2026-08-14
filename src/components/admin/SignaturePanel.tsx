@@ -80,9 +80,9 @@ export default function SignaturePanel({ bookingId }: { bookingId: string }) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div className="op-panel p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-[#0A1F44]">Signatures</h2>
+        <h2 className="text-sm font-bold text-[var(--ink)]">Signatures</h2>
       </div>
 
       {loading ? (
@@ -96,7 +96,7 @@ export default function SignaturePanel({ bookingId }: { bookingId: string }) {
           <div className="space-y-3">
             {STAGES.map(stage => (
               <div key={stage.value}>
-                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink-soft)]">
                   {stage.label}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
@@ -120,7 +120,7 @@ export default function SignaturePanel({ bookingId }: { bookingId: string }) {
                           <button
                             type="button"
                             onClick={() => setSigning({ role: role.value, stage: stage.value })}
-                            className="flex aspect-[2/1] w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-gray-200 text-gray-400 transition hover:border-[#C9A84C] hover:text-[#C9A84C]"
+                            className="flex aspect-[2/1] w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-gray-200 text-[var(--ink-soft)] transition hover:border-[var(--pane-signal)] hover:text-[var(--pane-signal)]"
                           >
                             <PenLine size={16} />
                             <span className="text-[10px] font-medium">{role.label}</span>
@@ -134,7 +134,7 @@ export default function SignaturePanel({ bookingId }: { bookingId: string }) {
             ))}
           </div>
 
-          <p className="mt-3 text-[11px] text-gray-400">
+          <p className="mt-3 text-[11px] text-[var(--ink-soft)]">
             Signing here embeds the signature in the PDF contract for that stage. Any stage/role
             left unsigned still shows a blank line to sign by hand on the printout.
           </p>
@@ -145,17 +145,17 @@ export default function SignaturePanel({ bookingId }: { bookingId: string }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-4 shadow-lg">
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-sm font-bold text-[#0A1F44]">
+              <p className="text-sm font-bold text-[var(--ink)]">
                 {ROLES.find(r => r.value === signing.role)?.label} signature — {STAGES.find(s => s.value === signing.stage)?.label}
               </p>
-              <button type="button" onClick={() => setSigning(null)} className="text-gray-400 hover:text-gray-600">
+              <button type="button" onClick={() => setSigning(null)} className="text-[var(--ink-soft)] hover:text-[var(--ink)]">
                 <X size={16} />
               </button>
             </div>
             <div className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
               <SignatureCanvas
                 ref={padRef}
-                penColor="#0A1F44"
+                penColor="#0b0d10"
                 canvasProps={{ className: 'w-full', height: 180 }}
               />
             </div>
@@ -163,7 +163,7 @@ export default function SignaturePanel({ bookingId }: { bookingId: string }) {
               <button
                 type="button"
                 onClick={() => padRef.current?.clear()}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-600 transition hover:bg-gray-50"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 py-2 text-xs font-semibold text-[var(--ink-soft)] transition hover:bg-gray-50"
               >
                 <RotateCcw size={13} /> Clear
               </button>
@@ -171,7 +171,7 @@ export default function SignaturePanel({ bookingId }: { bookingId: string }) {
                 type="button"
                 onClick={save}
                 disabled={saving}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#0A1F44] py-2 text-xs font-bold text-white transition hover:bg-[#0A1F44]/90 disabled:opacity-40"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--bar)] py-2 text-xs font-bold text-white transition hover:bg-[var(--bar)]/90 disabled:opacity-40"
               >
                 {saving && <Loader2 size={13} className="animate-spin" />}
                 {saving ? 'Saving...' : 'Save signature'}

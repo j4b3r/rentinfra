@@ -11,7 +11,7 @@ const statusColor: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700',
   confirmed: 'bg-blue-100 text-blue-700',
   active: 'bg-emerald-100 text-emerald-700',
-  completed: 'bg-gray-100 text-gray-500',
+  completed: 'bg-gray-100 text-[var(--ink-soft)]',
   cancelled: 'bg-red-100 text-red-600',
 }
 
@@ -74,13 +74,13 @@ export default function BookingActions({ bookingId, initialStatus, initialPaymen
     router.refresh()
   }
 
-  const selectCls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/40 focus:border-[#C9A84C]"
+  const selectCls = "w-full border-2 border-[var(--bar)] px-3 py-2 text-sm focus:outline-none focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px] focus:border-[var(--pane-signal)]"
 
   return (
     <div className="space-y-4">
       {/* Status */}
       <div>
-        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Booking Status</label>
+        <label className="block text-xs font-semibold text-[var(--ink-soft)] mb-1.5">Booking Status</label>
         <select className={selectCls} value={status} onChange={e => setStatus(e.target.value)}>
           {STATUSES.map(s => (
             <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
@@ -93,7 +93,7 @@ export default function BookingActions({ bookingId, initialStatus, initialPaymen
 
       {/* Payment status */}
       <div>
-        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Payment Status</label>
+        <label className="block text-xs font-semibold text-[var(--ink-soft)] mb-1.5">Payment Status</label>
         <select className={selectCls} value={paymentStatus} onChange={e => setPaymentStatus(e.target.value)}>
           {PAYMENT_STATUSES.map(s => (
             <option key={s} value={s}>{s.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}</option>
@@ -104,11 +104,11 @@ export default function BookingActions({ bookingId, initialStatus, initialPaymen
       {/* KM */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1.5">KM at Pickup</label>
+          <label className="block text-xs font-semibold text-[var(--ink-soft)] mb-1.5">KM at Pickup</label>
           <input type="number" className={selectCls} value={kmPickup} onChange={e => setKmPickup(e.target.value)} placeholder="e.g. 12500" />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1.5">KM at Return</label>
+          <label className="block text-xs font-semibold text-[var(--ink-soft)] mb-1.5">KM at Return</label>
           <input type="number" className={selectCls} value={kmReturn} onChange={e => setKmReturn(e.target.value)} placeholder="e.g. 13200" />
         </div>
       </div>
@@ -116,7 +116,7 @@ export default function BookingActions({ bookingId, initialStatus, initialPaymen
       {/* Fuel */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1.5">Fuel at Pickup</label>
+          <label className="block text-xs font-semibold text-[var(--ink-soft)] mb-1.5">Fuel at Pickup</label>
           <select className={selectCls} value={fuelPickup} onChange={e => setFuelPickup(e.target.value)}>
             <option value="full">Full</option>
             <option value="three_quarters">¾</option>
@@ -126,7 +126,7 @@ export default function BookingActions({ bookingId, initialStatus, initialPaymen
           </select>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1.5">Fuel at Return</label>
+          <label className="block text-xs font-semibold text-[var(--ink-soft)] mb-1.5">Fuel at Return</label>
           <select className={selectCls} value={fuelReturn} onChange={e => setFuelReturn(e.target.value)}>
             <option value="">—</option>
             <option value="full">Full</option>
@@ -140,7 +140,7 @@ export default function BookingActions({ bookingId, initialStatus, initialPaymen
 
       {/* Deposit payment method */}
       <div>
-        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Deposit Method</label>
+        <label className="block text-xs font-semibold text-[var(--ink-soft)] mb-1.5">Deposit Method</label>
         <select className={selectCls} value={paymentMethodDeposit} onChange={e => setPaymentMethodDeposit(e.target.value)}>
           <option value="">— select —</option>
           <option value="cash">Cash</option>
@@ -151,7 +151,7 @@ export default function BookingActions({ bookingId, initialStatus, initialPaymen
 
       {/* Internal notes */}
       <div>
-        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Internal Notes</label>
+        <label className="block text-xs font-semibold text-[var(--ink-soft)] mb-1.5">Internal Notes</label>
         <textarea
           className={`${selectCls} resize-none`}
           rows={4}
@@ -166,7 +166,7 @@ export default function BookingActions({ bookingId, initialStatus, initialPaymen
       <button
         onClick={handleSave}
         disabled={saving}
-        className="w-full flex items-center justify-center gap-2 bg-[#C9A84C] hover:bg-yellow-400 text-[#0A1F44] px-4 py-2.5 rounded-xl font-bold text-sm transition-colors disabled:opacity-60 shadow-sm"
+        className="w-full flex items-center justify-center gap-2 bg-[var(--pane-signal)] hover:bg-[var(--pane-signal-deep)] text-[var(--ink)] px-4 py-2.5 rounded-xl font-bold text-sm transition-colors disabled:opacity-60 shadow-sm"
       >
         {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
         {saving ? 'Saving…' : saved ? 'Saved!' : 'Save Changes'}

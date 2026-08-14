@@ -98,7 +98,7 @@ export default function IntegrationsForm({ groups, values: initial, configured }
   }
 
   const inputCls =
-    'w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-mono outline-none transition focus:border-[#C9A84C] focus:ring-2 focus:ring-[#C9A84C]/40'
+    'w-full border-2 border-[var(--bar)] px-3 py-2 text-sm font-mono outline-none transition focus:border-[var(--pane-signal)] focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]'
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -108,14 +108,14 @@ export default function IntegrationsForm({ groups, values: initial, configured }
           <section key={group.provider} className="rounded-xl border border-gray-100 bg-white p-6">
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-lg font-bold text-[#0A1F44]">{group.title}</h2>
-                <p className="mt-1 text-sm text-gray-500">{group.blurb}</p>
+                <h2 className="text-lg font-bold text-[var(--ink)]">{group.title}</h2>
+                <p className="mt-1 text-sm text-[var(--ink-soft)]">{group.blurb}</p>
               </div>
               <a
                 href={group.docsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 text-xs font-semibold text-[#C9A84C] hover:underline"
+                className="shrink-0 text-xs font-semibold text-[var(--pane-signal)] hover:underline"
               >
                 {group.docsLabel || 'Get keys →'}
               </a>
@@ -124,7 +124,7 @@ export default function IntegrationsForm({ groups, values: initial, configured }
             <div className="space-y-4">
               {group.fields.map(f => (
                 <div key={f.key}>
-                  <label htmlFor={f.key} className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor={f.key} className="mb-1 block text-sm font-medium text-[var(--ink)]">
                     {f.label}
                     {f.secret && configured[f.key] && (
                       <span className="ml-2 text-xs font-normal text-green-600">
@@ -139,9 +139,9 @@ export default function IntegrationsForm({ groups, values: initial, configured }
                         type="checkbox"
                         checked={values[f.key] === 'true'}
                         onChange={e => set(f.key, e.target.checked ? 'true' : 'false')}
-                        className="h-4 w-4 accent-[#0A1F44]"
+                        className="h-4 w-4 accent-[var(--bar)]"
                       />
-                      <span className="text-sm text-gray-600">{f.description}</span>
+                      <span className="text-sm text-[var(--ink-soft)]">{f.description}</span>
                     </label>
                   ) : (
                     <>
@@ -160,7 +160,7 @@ export default function IntegrationsForm({ groups, values: initial, configured }
                         className={inputCls}
                       />
                       {f.description && (
-                        <p className="mt-1 text-xs text-gray-500">{f.description}</p>
+                        <p className="mt-1 text-xs text-[var(--ink-soft)]">{f.description}</p>
                       )}
                     </>
                   )}
@@ -173,7 +173,7 @@ export default function IntegrationsForm({ groups, values: initial, configured }
                 type="button"
                 onClick={() => handleTest(group.provider)}
                 disabled={testing === group.provider}
-                className="flex items-center gap-2 rounded-lg border border-[#0A1F44] px-4 py-2 text-sm font-semibold text-[#0A1F44] transition hover:bg-[#0A1F44] hover:text-white disabled:opacity-60"
+                className="flex items-center gap-2 rounded-lg border border-[var(--bar)] px-4 py-2 text-sm font-semibold text-[var(--ink)] transition hover:bg-[var(--bar)] hover:text-white disabled:opacity-60"
               >
                 {testing === group.provider ? (
                   <>
@@ -210,7 +210,7 @@ export default function IntegrationsForm({ groups, values: initial, configured }
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 rounded-lg bg-[#C9A84C] px-5 py-2.5 text-sm font-bold text-[#0A1F44] transition hover:bg-yellow-400 disabled:opacity-60"
+          className="flex items-center gap-2 rounded-lg bg-[var(--pane-signal)] px-5 py-2.5 text-sm font-bold text-[var(--ink)] transition hover:bg-[var(--pane-signal-deep)] disabled:opacity-60"
         >
           <Save size={15} />
           {saving ? 'Saving…' : 'Save integrations'}

@@ -19,9 +19,9 @@ interface Addon {
   vehicle_type: string | null
 }
 
-const labelCls = 'block text-sm font-medium text-gray-600 mb-1'
+const labelCls = 'block text-sm font-medium text-[var(--ink-soft)] mb-1'
 const inputCls =
-  'w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0A1F44] focus:ring-2 focus:ring-[#0A1F44]/15'
+  'w-full border-2 border-[var(--bar)] px-3 py-2 text-sm outline-none focus:border-[var(--bar)] focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]'
 
 export default function AddonForm({ addon }: { addon?: Addon }) {
   const router = useRouter()
@@ -94,13 +94,13 @@ export default function AddonForm({ addon }: { addon?: Addon }) {
   return (
     <div className="max-w-2xl">
       <div className="mb-6 flex items-center gap-3">
-        <Link href="/admin/addons" className="text-gray-400 hover:text-gray-600 transition-colors">
+        <Link href="/admin/addons" className="text-[var(--ink-soft)] hover:text-[var(--ink)] transition-colors">
           <ArrowLeft size={20} />
         </Link>
-        <h1 className="text-2xl font-bold text-[#0A1F44]">{isEdit ? 'Edit Addon' : 'Add Addon'}</h1>
+        <h1 className="text-2xl font-bold text-[var(--ink)]">{isEdit ? 'Edit Addon' : 'Add Addon'}</h1>
       </div>
 
-      <div className="space-y-5 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="op-panel space-y-5 p-6">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className={labelCls}>Name (English) *</label>
@@ -152,15 +152,15 @@ export default function AddonForm({ addon }: { addon?: Addon }) {
             <option value="motorbike">Motorbike only</option>
             <option value="bicycle">Bicycle only</option>
           </select>
-          <p className="mt-1 text-xs text-gray-400">A child seat is meaningless on a bicycle — leave blank to show everywhere.</p>
+          <p className="mt-1 text-xs text-[var(--ink-soft)]">A child seat is meaningless on a bicycle — leave blank to show everywhere.</p>
         </div>
 
         <div className="flex items-center gap-6 pt-1">
-          <label className="flex items-center gap-2 text-sm text-gray-600">
+          <label className="flex items-center gap-2 text-sm text-[var(--ink-soft)]">
             <input type="checkbox" checked={isGlobal} onChange={e => setIsGlobal(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
             Applies to all cars
           </label>
-          <label className="flex items-center gap-2 text-sm text-gray-600">
+          <label className="flex items-center gap-2 text-sm text-[var(--ink-soft)]">
             <input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
             Active (bookable on the site)
           </label>
@@ -190,7 +190,7 @@ export default function AddonForm({ addon }: { addon?: Addon }) {
             type="button"
             onClick={save}
             disabled={saving || !nameEn || !nameEs || !price}
-            className="flex items-center gap-1.5 rounded-lg bg-[#0A1F44] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#0A1F44]/90 disabled:opacity-40"
+            className="flex items-center gap-1.5 rounded-lg bg-[var(--bar)] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[var(--bar)]/90 disabled:opacity-40"
           >
             {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
             Save

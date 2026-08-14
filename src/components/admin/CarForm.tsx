@@ -196,18 +196,18 @@ export default function CarForm({ car, locations = [] }: CarFormProps) {
     }
   }
 
-  const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/40 focus:border-[#C9A84C]"
+  const inputCls = "w-full border-2 border-[var(--bar)] px-3 py-2 text-sm focus:outline-none focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px] focus:border-[var(--pane-signal)]"
   const selectCls = inputCls
-  const labelCls = "block text-xs font-semibold text-gray-600 mb-1"
+  const labelCls = "block text-xs font-semibold text-[var(--ink-soft)] mb-1"
 
   return (
     <form onSubmit={handleSubmit} className="max-w-3xl">
       <div className="flex items-center gap-3 mb-6">
         <button type="button" onClick={() => router.push('/admin/cars')}
-          className="text-gray-400 hover:text-gray-600 transition-colors">
+          className="text-[var(--ink-soft)] hover:text-[var(--ink)] transition-colors">
           <ArrowLeft size={20} />
         </button>
-        <h1 className="text-2xl font-bold text-[#0A1F44]">{isEdit ? `Edit ${car!.make} ${car!.model}` : 'Add New Car'}</h1>
+        <h1 className="text-2xl font-bold text-[var(--ink)]">{isEdit ? `Edit ${car!.make} ${car!.model}` : 'Add New Car'}</h1>
       </div>
 
       {error && (
@@ -217,8 +217,8 @@ export default function CarForm({ car, locations = [] }: CarFormProps) {
       )}
 
       {/* Basic Info */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
-        <h2 className="font-bold text-[#0A1F44] mb-4">Basic Information</h2>
+      <div className="op-panel p-6 mb-4">
+        <h2 className="font-bold text-[var(--ink)] mb-4">Basic Information</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className={labelCls}>Make *</label>
@@ -328,7 +328,7 @@ export default function CarForm({ car, locations = [] }: CarFormProps) {
                 <option key={l.id} value={l.id}>{l.name_en}</option>
               ))}
             </select>
-            <p className="mt-1 text-xs text-gray-400">Leave as &quot;Any location&quot; unless this car is tied to a specific branch.</p>
+            <p className="mt-1 text-xs text-[var(--ink-soft)]">Leave as &quot;Any location&quot; unless this car is tied to a specific branch.</p>
           </div>
           <div>
             <label className={labelCls}>Seats</label>
@@ -363,16 +363,16 @@ export default function CarForm({ car, locations = [] }: CarFormProps) {
           ].map(({ label, val, set }) => (
             <label key={label} className="flex items-center gap-2 cursor-pointer select-none">
               <input type="checkbox" checked={val} onChange={e => set(e.target.checked)}
-                className="w-4 h-4 accent-[#C9A84C]" />
-              <span className="text-sm text-gray-700">{label}</span>
+                className="w-4 h-4 accent-[var(--pane-signal)]" />
+              <span className="text-sm text-[var(--ink)]">{label}</span>
             </label>
           ))}
         </div>
       </div>
 
       {/* Description */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
-        <h2 className="font-bold text-[#0A1F44] mb-4">Description</h2>
+      <div className="op-panel p-6 mb-4">
+        <h2 className="font-bold text-[var(--ink)] mb-4">Description</h2>
         <div className="grid grid-cols-1 gap-4">
           <div>
             <label className={labelCls}>English</label>
@@ -389,8 +389,8 @@ export default function CarForm({ car, locations = [] }: CarFormProps) {
 
       {/* Photos — only available after car is created */}
       {isEdit && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
-          <h2 className="font-bold text-[#0A1F44] mb-4">Photos</h2>
+        <div className="op-panel p-6 mb-4">
+          <h2 className="font-bold text-[var(--ink)] mb-4">Photos</h2>
           <CarImageUploader
             carId={car!.id}
             initialImages={car!.car_images?.map(img => ({
@@ -404,7 +404,7 @@ export default function CarForm({ car, locations = [] }: CarFormProps) {
 
       {!isEdit && (
         <div className="bg-gray-50 rounded-2xl border border-dashed border-gray-200 p-5 mb-4 text-center">
-          <p className="text-sm text-gray-400">Save the car first, then you can add photos.</p>
+          <p className="text-sm text-[var(--ink-soft)]">Save the car first, then you can add photos.</p>
         </div>
       )}
 
@@ -416,8 +416,8 @@ export default function CarForm({ car, locations = [] }: CarFormProps) {
       )}
 
       {/* Pricing */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
-        <h2 className="font-bold text-[#0A1F44] mb-4">Pricing</h2>
+      <div className="op-panel p-6 mb-4">
+        <h2 className="font-bold text-[var(--ink)] mb-4">Pricing</h2>
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label className={labelCls}>Price List Name</label>
@@ -433,15 +433,15 @@ export default function CarForm({ car, locations = [] }: CarFormProps) {
         {/* Discount tiers */}
         <div className="border-t border-gray-100 pt-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-700">Discount Tiers</h3>
+            <h3 className="text-sm font-semibold text-[var(--ink)]">Discount Tiers</h3>
             <button type="button" onClick={addDiscount}
-              className="flex items-center gap-1 text-xs text-[#C9A84C] hover:text-yellow-600 font-semibold">
+              className="flex items-center gap-1 text-xs text-[var(--pane-signal)] hover:text-yellow-600 font-semibold">
               <Plus size={13} /> Add tier
             </button>
           </div>
 
           {discounts.length === 0 && (
-            <p className="text-xs text-gray-400 italic">No discounts. Add a tier for multi-day bookings.</p>
+            <p className="text-xs text-[var(--ink-soft)] italic">No discounts. Add a tier for multi-day bookings.</p>
           )}
 
           <div className="space-y-3">
@@ -494,18 +494,18 @@ export default function CarForm({ car, locations = [] }: CarFormProps) {
       </div>
 
       {/* Status */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
-        <h2 className="font-bold text-[#0A1F44] mb-4">Status</h2>
+      <div className="op-panel p-6 mb-6">
+        <h2 className="font-bold text-[var(--ink)] mb-4">Status</h2>
         <div className="flex gap-6">
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)}
-              className="w-4 h-4 accent-[#C9A84C]" />
-            <span className="text-sm text-gray-700">Active <span className="text-gray-400">(visible on site)</span></span>
+              className="w-4 h-4 accent-[var(--pane-signal)]" />
+            <span className="text-sm text-[var(--ink)]">Active <span className="text-[var(--ink-soft)]">(visible on site)</span></span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input type="checkbox" checked={isAvailable} onChange={e => setIsAvailable(e.target.checked)}
-              className="w-4 h-4 accent-[#C9A84C]" />
-            <span className="text-sm text-gray-700">Available <span className="text-gray-400">(can be booked)</span></span>
+              className="w-4 h-4 accent-[var(--pane-signal)]" />
+            <span className="text-sm text-[var(--ink)]">Available <span className="text-[var(--ink-soft)]">(can be booked)</span></span>
           </label>
         </div>
       </div>
@@ -523,11 +523,11 @@ export default function CarForm({ car, locations = [] }: CarFormProps) {
         </div>
         <div className="flex items-center gap-3">
           <button type="button" onClick={() => router.push('/admin/cars')}
-            className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 transition-colors">
+            className="text-sm text-[var(--ink-soft)] hover:text-[var(--ink)] px-4 py-2 transition-colors">
             Cancel
           </button>
           <button type="submit" disabled={saving}
-            className="flex items-center gap-2 bg-[#C9A84C] hover:bg-yellow-400 text-[#0A1F44] px-6 py-2.5 rounded-xl font-bold text-sm transition-colors disabled:opacity-60 shadow-sm">
+            className="flex items-center gap-2 bg-[var(--pane-signal)] hover:bg-[var(--pane-signal-deep)] text-[var(--ink)] px-6 py-2.5 rounded-xl font-bold text-sm transition-colors disabled:opacity-60 shadow-sm">
             <Save size={15} />
             {saving ? 'Saving…' : isEdit ? 'Save Changes' : 'Add Car'}
           </button>

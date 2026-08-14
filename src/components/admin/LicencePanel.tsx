@@ -123,9 +123,9 @@ export default function LicencePanel({ bookingId }: { bookingId: string }) {
   const isRejected = Boolean(booking?.licence_rejection_reason)
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div className="op-panel p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-[#0A1F44]">Driver licence</h2>
+        <h2 className="text-sm font-bold text-[var(--ink)]">Driver licence</h2>
         {isVerified && (
           <span className="flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
             <ShieldCheck size={12} /> Verified
@@ -145,8 +145,8 @@ export default function LicencePanel({ bookingId }: { bookingId: string }) {
       ) : (
         <>
           {booking?.guest_license && (
-            <p className="mb-3 text-xs text-gray-500">
-              Licence number on file: <span className="font-semibold text-[#0A1F44]">{booking.guest_license}</span>
+            <p className="mb-3 text-xs text-[var(--ink-soft)]">
+              Licence number on file: <span className="font-semibold text-[var(--ink)]">{booking.guest_license}</span>
             </p>
           )}
 
@@ -199,7 +199,7 @@ export default function LicencePanel({ bookingId }: { bookingId: string }) {
           )}
 
           {!front || !back ? (
-            <p className="mt-2 text-[11px] text-gray-400">Upload both sides before verifying.</p>
+            <p className="mt-2 text-[11px] text-[var(--ink-soft)]">Upload both sides before verifying.</p>
           ) : null}
 
           {rejecting && (
@@ -229,7 +229,7 @@ export default function LicencePanel({ bookingId }: { bookingId: string }) {
           )}
 
           {isVerified && (
-            <p className="text-[11px] text-gray-400">Uploading a new photo will reset this and require re-verifying.</p>
+            <p className="text-[11px] text-[var(--ink-soft)]">Uploading a new photo will reset this and require re-verifying.</p>
           )}
         </>
       )}
@@ -254,7 +254,7 @@ function PhotoSlot({
 }) {
   return (
     <div>
-      <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400">{label}</p>
+      <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink-soft)]">{label}</p>
       {photo?.url ? (
         <div className="group relative aspect-[3/2] overflow-hidden rounded-lg border border-gray-100">
           <Image src={photo.url} alt={`Licence ${label.toLowerCase()}`} fill className="object-cover" unoptimized />
@@ -267,7 +267,7 @@ function PhotoSlot({
           </button>
         </div>
       ) : (
-        <label className="flex aspect-[3/2] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-gray-200 text-gray-400 transition hover:border-[#C9A84C] hover:text-[#C9A84C]">
+        <label className="flex aspect-[3/2] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-gray-200 text-[var(--ink-soft)] transition hover:border-[var(--pane-signal)] hover:text-[var(--pane-signal)]">
           {uploading ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
           <span className="text-[10px] font-medium">Add photo</span>
           <input

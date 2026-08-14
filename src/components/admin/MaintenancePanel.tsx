@@ -79,14 +79,14 @@ export default function MaintenancePanel({ carId }: { carId: string }) {
   const past = blocks.filter(b => b.end_date <= now)
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+    <div className="op-panel p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-bold text-[#0A1F44]">Maintenance</h2>
+        <h2 className="font-bold text-[var(--ink)]">Maintenance</h2>
         {!adding && (
           <button
             type="button"
             onClick={() => setAdding(true)}
-            className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 transition hover:border-[#0A1F44] hover:text-[#0A1F44]"
+            className="flex items-center gap-1.5 border-2 border-[var(--bar)] px-3 py-1.5 text-xs font-semibold text-[var(--ink-soft)] transition hover:border-[var(--bar)] hover:text-[var(--ink)]"
           >
             <Plus size={13} /> Schedule block
           </button>
@@ -96,37 +96,37 @@ export default function MaintenancePanel({ carId }: { carId: string }) {
       {adding && (
         <div className="mb-4 rounded-xl border border-gray-200 p-4">
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-xs font-bold text-[#0A1F44]">New maintenance block</span>
-            <button type="button" onClick={() => setAdding(false)} className="text-gray-400 hover:text-gray-600">
+            <span className="text-xs font-bold text-[var(--ink)]">New maintenance block</span>
+            <button type="button" onClick={() => setAdding(false)} className="text-[var(--ink-soft)] hover:text-[var(--ink)]">
               <X size={14} />
             </button>
           </div>
           <div className="mb-3 grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-600">From</label>
+              <label className="mb-1 block text-xs font-medium text-[var(--ink-soft)]">From</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={e => setStartDate(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#0A1F44] focus:ring-2 focus:ring-[#0A1F44]/15"
+                className="w-full border-2 border-[var(--bar)] px-3 py-2 text-sm outline-none focus:border-[var(--bar)] focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-600">Until</label>
+              <label className="mb-1 block text-xs font-medium text-[var(--ink-soft)]">Until</label>
               <input
                 type="date"
                 value={endDate}
                 onChange={e => setEndDate(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#0A1F44] focus:ring-2 focus:ring-[#0A1F44]/15"
+                className="w-full border-2 border-[var(--bar)] px-3 py-2 text-sm outline-none focus:border-[var(--bar)] focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]"
               />
             </div>
           </div>
           <div className="mb-3">
-            <label className="mb-1 block text-xs font-medium text-gray-600">Reason</label>
+            <label className="mb-1 block text-xs font-medium text-[var(--ink-soft)]">Reason</label>
             <select
               value={reason}
               onChange={e => setReason(e.target.value)}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#0A1F44] focus:ring-2 focus:ring-[#0A1F44]/15"
+              className="w-full border-2 border-[var(--bar)] px-3 py-2 text-sm outline-none focus:border-[var(--bar)] focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]"
             >
               {Object.entries(REASON_LABEL).map(([value, label]) => (
                 <option key={value} value={value}>
@@ -136,12 +136,12 @@ export default function MaintenancePanel({ carId }: { carId: string }) {
             </select>
           </div>
           <div className="mb-3">
-            <label className="mb-1 block text-xs font-medium text-gray-600">Notes (optional)</label>
+            <label className="mb-1 block text-xs font-medium text-[var(--ink-soft)]">Notes (optional)</label>
             <textarea
               value={notes}
               onChange={e => setNotes(e.target.value)}
               rows={2}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#0A1F44] focus:ring-2 focus:ring-[#0A1F44]/15"
+              className="w-full border-2 border-[var(--bar)] px-3 py-2 text-sm outline-none focus:border-[var(--bar)] focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]"
             />
           </div>
           {error && <p className="mb-2 text-xs text-red-600">{error}</p>}
@@ -149,7 +149,7 @@ export default function MaintenancePanel({ carId }: { carId: string }) {
             type="button"
             onClick={submit}
             disabled={saving}
-            className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#0A1F44] py-2 text-xs font-bold text-white transition hover:bg-[#0A1F44]/90 disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[var(--bar)] py-2 text-xs font-bold text-white transition hover:bg-[var(--bar)]/90 disabled:opacity-60"
           >
             {saving ? <Loader2 size={13} className="animate-spin" /> : <Wrench size={13} />}
             Save block — the car will show unavailable for these dates
@@ -162,7 +162,7 @@ export default function MaintenancePanel({ carId }: { carId: string }) {
           <Loader2 size={18} className="animate-spin text-gray-300" />
         </div>
       ) : blocks.length === 0 ? (
-        <p className="text-sm text-gray-400">No maintenance scheduled.</p>
+        <p className="text-sm text-[var(--ink-soft)]">No maintenance scheduled.</p>
       ) : (
         <div className="space-y-4">
           {active.length > 0 && <BlockGroup title="Active now" blocks={active} onRemove={remove} />}
@@ -187,7 +187,7 @@ function BlockGroup({
 }) {
   return (
     <div>
-      <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-gray-400">{title}</p>
+      <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink-soft)]">{title}</p>
       <div className="space-y-1.5">
         {blocks.map(b => (
           <div
@@ -195,10 +195,10 @@ function BlockGroup({
             className={`flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2 ${muted ? 'opacity-60' : ''}`}
           >
             <div>
-              <p className="text-sm font-medium text-[#0A1F44]">
+              <p className="text-sm font-medium text-[var(--ink)]">
                 {REASON_LABEL[b.reason] || b.reason} · {formatDate(b.start_date)} → {formatDate(b.end_date)}
               </p>
-              {b.notes && <p className="text-xs text-gray-400">{b.notes}</p>}
+              {b.notes && <p className="text-xs text-[var(--ink-soft)]">{b.notes}</p>}
             </div>
             <button
               type="button"

@@ -63,13 +63,11 @@ function StatCard({
   sub?: string
 }) {
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-[#0A1F44]/5">
-        <Icon size={18} className="text-[#0A1F44]" />
-      </div>
-      <p className="text-2xl font-extrabold text-[#0A1F44]">{value}</p>
-      <p className="mt-0.5 text-xs font-medium text-gray-400">{label}</p>
-      {sub && <p className="mt-1 text-[11px] text-gray-400">{sub}</p>}
+    <div className="op-stat p-5">
+      <Icon size={18} className="text-[var(--pane-signal)]" />
+      <p className="mt-3 text-2xl font-bold tabular-nums text-[var(--ink)]">{value}</p>
+      <p className="mt-0.5 text-xs font-medium text-[var(--ink-soft)]">{label}</p>
+      {sub && <p className="mt-1 text-[11px] text-[var(--ink-soft)]">{sub}</p>}
     </div>
   )
 }
@@ -120,16 +118,16 @@ export default async function ReportsPage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#0A1F44]">Reports</h1>
-          <p className="mt-0.5 text-sm text-gray-400">Business performance, computed from bookings — no separate reporting store.</p>
+          <h1 className="text-xl font-bold text-[var(--ink)]">Reports</h1>
+          <p className="mt-0.5 text-sm text-[var(--ink-soft)]">Business performance, computed from bookings — no separate reporting store.</p>
         </div>
-        <div className="flex rounded-xl border border-gray-200 bg-white p-1 text-xs font-semibold">
+        <div className="op-panel flex p-1 text-xs font-semibold">
           {(Object.keys(PERIOD_LABEL) as Period[]).map(p => (
             <Link
               key={p}
               href={`/admin/reports?period=${p}`}
-              className={`rounded-lg px-3 py-1.5 transition ${
-                p === period ? 'bg-[#0A1F44] text-white' : 'text-gray-500 hover:text-[#0A1F44]'
+              className={`px-3 py-1.5 transition-colors ${
+                p === period ? 'bg-[var(--bar)] text-white' : 'text-[var(--ink-soft)] hover:text-[var(--ink)]'
               }`}
             >
               {PERIOD_LABEL[p]}
@@ -161,25 +159,25 @@ export default async function ReportsPage({
       </div>
 
       {/* Revenue by month */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-sm font-bold text-[#0A1F44]">Revenue by month</h2>
+      <div className="op-panel p-5">
+        <h2 className="mb-4 text-sm font-bold text-[var(--ink)]">Revenue by month</h2>
         {byMonth.length === 0 ? (
-          <p className="text-sm text-gray-400">No bookings in this period.</p>
+          <p className="text-sm text-[var(--ink-soft)]">No bookings in this period.</p>
         ) : (
           <div className="space-y-2">
             {byMonth.map(m => (
               <div key={m.month} className="flex items-center gap-3">
-                <span className="w-16 shrink-0 text-xs text-gray-500">{m.month}</span>
-                <div className="h-6 flex-1 overflow-hidden rounded-md bg-gray-50">
+                <span className="w-16 shrink-0 text-xs text-[var(--ink-soft)]">{m.month}</span>
+                <div className="h-6 flex-1 overflow-hidden bg-[var(--glass-paper)]">
                   <div
-                    className="h-full rounded-md bg-[#C9A84C]"
+                    className="h-full bg-[var(--pane-signal)]"
                     style={{ width: `${Math.max(2, (m.revenue / maxMonthRevenue) * 100)}%` }}
                   />
                 </div>
-                <span className="w-24 shrink-0 text-right text-xs font-semibold tabular-nums text-[#0A1F44]">
+                <span className="w-24 shrink-0 text-right text-xs font-semibold tabular-nums text-[var(--ink)]">
                   {formatCurrency(m.revenue)}
                 </span>
-                <span className="w-16 shrink-0 text-right text-[11px] text-gray-400">{m.bookings} bkgs</span>
+                <span className="w-16 shrink-0 text-right text-[11px] text-[var(--ink-soft)]">{m.bookings} bkgs</span>
               </div>
             ))}
           </div>
@@ -187,26 +185,26 @@ export default async function ReportsPage({
       </div>
 
       {/* Utilization by category */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-        <h2 className="mb-1 text-sm font-bold text-[#0A1F44]">Utilization by category</h2>
-        <p className="mb-4 text-xs text-gray-400">Cars only — motorbikes and bicycles can rent hourly, which doesn&apos;t compare to a days-based rate.</p>
+      <div className="op-panel p-5">
+        <h2 className="mb-1 text-sm font-bold text-[var(--ink)]">Utilization by category</h2>
+        <p className="mb-4 text-xs text-[var(--ink-soft)]">Cars only — motorbikes and bicycles can rent hourly, which doesn&apos;t compare to a days-based rate.</p>
         {byCategory.length === 0 ? (
-          <p className="text-sm text-gray-400">No cars in the fleet.</p>
+          <p className="text-sm text-[var(--ink-soft)]">No cars in the fleet.</p>
         ) : (
           <div className="space-y-2">
             {byCategory.map(c => (
               <div key={c.category} className="flex items-center gap-3">
-                <span className="w-20 shrink-0 text-xs capitalize text-gray-500">{c.category}</span>
-                <div className="h-6 flex-1 overflow-hidden rounded-md bg-gray-50">
+                <span className="w-20 shrink-0 text-xs capitalize text-[var(--ink-soft)]">{c.category}</span>
+                <div className="h-6 flex-1 overflow-hidden bg-[var(--glass-paper)]">
                   <div
-                    className="h-full rounded-md bg-[#0A1F44]"
+                    className="h-full bg-[var(--bar)]"
                     style={{ width: `${Math.max(2, c.rate * 100)}%` }}
                   />
                 </div>
-                <span className="w-12 shrink-0 text-right text-xs font-semibold tabular-nums text-[#0A1F44]">
+                <span className="w-12 shrink-0 text-right text-xs font-semibold tabular-nums text-[var(--ink)]">
                   {(c.rate * 100).toFixed(0)}%
                 </span>
-                <span className="w-24 shrink-0 text-right text-[11px] text-gray-400">
+                <span className="w-24 shrink-0 text-right text-[11px] text-[var(--ink-soft)]">
                   {c.rentedDays}/{c.availableDays}d
                 </span>
               </div>

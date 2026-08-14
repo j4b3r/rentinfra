@@ -58,32 +58,32 @@ export default function SettingsForm({ settings }: Props) {
   return (
     <div className="space-y-6">
       {SETTING_GROUPS.map(group => (
-        <div key={group.title} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="font-bold text-[#0A1F44] mb-4">{group.title}</h2>
+        <div key={group.title} className="op-panel p-6">
+          <h2 className="font-bold text-[var(--ink)] mb-4">{group.title}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {group.keys.map(key => {
               const setting = settings.find(s => s.key === key)
               if (!setting) return null
               return (
                 <div key={key}>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{getLabel(key)}</label>
+                  <label className="block text-sm font-medium text-[var(--ink)] mb-1">{getLabel(key)}</label>
                   {key === 'company_address' ? (
                     <textarea
                       value={values[key] || ''}
                       onChange={e => setValues(v => ({ ...v, [key]: e.target.value }))}
                       rows={3}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0A1F44]"
+                      className="w-full border-2 border-[var(--bar)] px-3 py-2 text-sm focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]"
                     />
                   ) : (
                     <input
                       type={setting.type === 'number' ? 'number' : 'text'}
                       value={values[key] || ''}
                       onChange={e => setValues(v => ({ ...v, [key]: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0A1F44]"
+                      className="w-full border-2 border-[var(--bar)] px-3 py-2 text-sm focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]"
                     />
                   )}
                   {getDescription(setting) && (
-                    <p className="text-xs text-gray-400 mt-1">{getDescription(setting)}</p>
+                    <p className="text-xs text-[var(--ink-soft)] mt-1">{getDescription(setting)}</p>
                   )}
                 </div>
               )
@@ -95,7 +95,7 @@ export default function SettingsForm({ settings }: Props) {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="bg-[#C9A84C] text-[#0A1F44] px-8 py-3 rounded-lg font-bold hover:bg-yellow-400 transition-colors disabled:opacity-60"
+        className="bg-[var(--pane-signal)] text-[var(--ink)] px-8 py-3 rounded-lg font-bold hover:bg-[var(--pane-signal-deep)] transition-colors disabled:opacity-60"
       >
         {saving ? 'Saving...' : saved ? '✓ Saved!' : 'Save Settings'}
       </button>

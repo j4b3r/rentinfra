@@ -178,8 +178,8 @@ export default async function IntegrationsSettings() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#0A1F44]">Integrations</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-xl font-bold text-[var(--ink)]">Integrations</h1>
+        <p className="mt-1 text-sm text-[var(--ink-soft)]">
           Connect the outside services RentInfra uses. Keys are stored encrypted, are never sent to
           the public site, and cannot be read back once saved.
         </p>

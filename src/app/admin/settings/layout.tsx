@@ -14,20 +14,20 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-extrabold text-[#0A1F44]">Settings</h1>
-        <p className="text-gray-400 text-sm mt-0.5">Manage your business configuration</p>
+        <h1 className="text-xl font-bold text-[var(--ink)]">Settings</h1>
+        <p className="mt-0.5 text-sm text-[var(--ink-soft)]">Manage your business configuration</p>
       </div>
 
-      <div className="flex gap-5 items-start">
+      <div className="flex items-start gap-5">
         {/* Sidebar */}
-        <nav className="w-52 shrink-0 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <nav className="op-panel w-52 shrink-0 overflow-hidden">
           {settingsNav.map(item => (
             <SettingsNavLink key={item.href} {...item} />
           ))}
         </nav>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           {children}
         </div>
       </div>

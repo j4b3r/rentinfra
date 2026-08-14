@@ -19,14 +19,14 @@ interface Props {
 
 interface SelectedAddon { addon: Addon; quantity: number }
 
-const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/40 focus:border-[#C9A84C]"
-const labelCls = "block text-xs font-semibold text-gray-600 mb-1"
+const inputCls = "w-full border-2 border-[var(--bar)] px-3 py-2 text-sm focus:outline-none focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px] focus:border-[var(--pane-signal)]"
+const labelCls = "block text-xs font-semibold text-[var(--ink-soft)] mb-1"
 const selectCls = inputCls
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
-      <h2 className="font-bold text-[#0A1F44] mb-4 text-sm uppercase tracking-wide">{title}</h2>
+    <div className="op-panel p-6 mb-4">
+      <h2 className="font-bold text-[var(--ink)] mb-4 text-sm uppercase tracking-wide">{title}</h2>
       {children}
     </div>
   )
@@ -159,24 +159,24 @@ export default function OfflineBookingForm({ cars, locations, addons, settings }
         <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <Save size={28} className="text-emerald-600" />
         </div>
-        <h2 className="text-2xl font-bold text-[#0A1F44] mb-1">Booking Created</h2>
-        <p className="text-gray-400 mb-6">{createdRef}</p>
+        <h2 className="text-2xl font-bold text-[var(--ink)] mb-1">Booking Created</h2>
+        <p className="text-[var(--ink-soft)] mb-6">{createdRef}</p>
         <div className="flex gap-3 justify-center flex-wrap">
           <a href={`/api/admin/bookings/${createdId}/contract?lang=es`} target="_blank"
-            className="flex items-center gap-2 border border-gray-200 hover:border-[#0A1F44] text-gray-600 hover:text-[#0A1F44] px-4 py-2 rounded-xl text-sm font-semibold transition-all">
+            className="flex items-center gap-2 border border-gray-200 hover:border-[var(--bar)] text-[var(--ink-soft)] hover:text-[var(--ink)] px-4 py-2 rounded-xl text-sm font-semibold transition-all">
             <FileText size={14} /> Contrato ES
           </a>
           <a href={`/api/admin/bookings/${createdId}/contract?lang=en`} target="_blank"
-            className="flex items-center gap-2 border border-gray-200 hover:border-[#0A1F44] text-gray-600 hover:text-[#0A1F44] px-4 py-2 rounded-xl text-sm font-semibold transition-all">
+            className="flex items-center gap-2 border border-gray-200 hover:border-[var(--bar)] text-[var(--ink-soft)] hover:text-[var(--ink)] px-4 py-2 rounded-xl text-sm font-semibold transition-all">
             <FileText size={14} /> Contract EN
           </a>
           <button onClick={() => router.push(`/admin/bookings/${createdId}`)}
-            className="bg-[#C9A84C] hover:bg-yellow-400 text-[#0A1F44] px-5 py-2 rounded-xl text-sm font-bold transition-colors">
+            className="bg-[var(--pane-signal)] hover:bg-[var(--pane-signal-deep)] text-[var(--ink)] px-5 py-2 rounded-xl text-sm font-bold transition-colors">
             View Booking →
           </button>
         </div>
         <button onClick={() => router.push('/admin/bookings')}
-          className="mt-4 text-sm text-gray-400 hover:text-gray-600 underline">
+          className="mt-4 text-sm text-[var(--ink-soft)] hover:text-[var(--ink)] underline">
           Back to bookings list
         </button>
       </div>
@@ -188,10 +188,10 @@ export default function OfflineBookingForm({ cars, locations, addons, settings }
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <button type="button" onClick={() => router.push('/admin/bookings')}
-          className="text-gray-400 hover:text-gray-600 transition-colors">
+          className="text-[var(--ink-soft)] hover:text-[var(--ink)] transition-colors">
           <ArrowLeft size={20} />
         </button>
-        <h1 className="text-2xl font-bold text-[#0A1F44]">New Offline Booking</h1>
+        <h1 className="text-2xl font-bold text-[var(--ink)]">New Offline Booking</h1>
       </div>
 
       {error && (
@@ -252,7 +252,7 @@ export default function OfflineBookingForm({ cars, locations, addons, settings }
                 </select>
               </div>
               <div className="col-span-2">
-                <label className={labelCls}>Hotel Name <span className="font-normal text-gray-400">(if delivery)</span></label>
+                <label className={labelCls}>Hotel Name <span className="font-normal text-[var(--ink-soft)]">(if delivery)</span></label>
                 <input className={inputCls} value={hotelName} onChange={e => setHotelName(e.target.value)} placeholder="Hotel name" />
               </div>
             </div>
@@ -303,18 +303,18 @@ export default function OfflineBookingForm({ cars, locations, addons, settings }
                 {addons.map(addon => {
                   const sel = selectedAddons.find(a => a.addon.id === addon.id)
                   return (
-                    <div key={addon.id} className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${sel ? 'border-[#C9A84C] bg-amber-50/40' : 'border-gray-100 hover:border-gray-200'}`}>
+                    <div key={addon.id} className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${sel ? 'border-[var(--pane-signal)] bg-amber-50/40' : 'border-gray-100 hover:border-gray-200'}`}>
                       <label className="flex items-center gap-3 cursor-pointer flex-1">
-                        <input type="checkbox" checked={!!sel} onChange={() => toggleAddon(addon)} className="accent-[#C9A84C] w-4 h-4" />
+                        <input type="checkbox" checked={!!sel} onChange={() => toggleAddon(addon)} className="accent-[var(--pane-signal)] w-4 h-4" />
                         <div>
-                          <p className="text-sm font-medium text-gray-700">{addon.name_en}</p>
-                          <p className="text-xs text-gray-400">€{addon.price} {addon.pricing_type === 'per_day' ? '/day' : 'flat'}</p>
+                          <p className="text-sm font-medium text-[var(--ink)]">{addon.name_en}</p>
+                          <p className="text-xs text-[var(--ink-soft)]">€{addon.price} {addon.pricing_type === 'per_day' ? '/day' : 'flat'}</p>
                         </div>
                       </label>
                       {sel && (
                         <input type="number" min={1} max={10} value={sel.quantity}
                           onChange={e => setAddonQty(addon.id, parseInt(e.target.value) || 1)}
-                          className="w-16 border border-gray-200 rounded-lg px-2 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#C9A84C]/40" />
+                          className="w-16 border-2 border-[var(--bar)] px-2 py-1 text-sm text-center focus:outline-none focus:outline-2 focus:outline-[var(--pane-signal)] focus:outline-offset-[-2px]" />
                       )}
                     </div>
                   )
@@ -353,13 +353,13 @@ export default function OfflineBookingForm({ cars, locations, addons, settings }
         <div className="space-y-4">
 
           {/* Price summary */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <h2 className="font-bold text-[#0A1F44] text-sm uppercase tracking-wide mb-4">Price Summary</h2>
-            {!selectedCar && <p className="text-xs text-gray-400">Select a car to see pricing</p>}
+          <div className="op-panel p-5">
+            <h2 className="font-bold text-[var(--ink)] text-sm uppercase tracking-wide mb-4">Price Summary</h2>
+            {!selectedCar && <p className="text-xs text-[var(--ink-soft)]">Select a car to see pricing</p>}
             {selectedCar && !pricing && <p className="text-xs text-amber-600">Check dates</p>}
             {pricing && (
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between text-xs text-gray-500">
+                <div className="flex justify-between text-xs text-[var(--ink-soft)]">
                   <span>Daily rate × {totalDays}d</span>
                   <span>€{pricing.dailyRate.toFixed(2)}</span>
                 </div>
@@ -370,12 +370,12 @@ export default function OfflineBookingForm({ cars, locations, addons, settings }
                   </div>
                 )}
                 {pricing.addonsTotal > 0 && (
-                  <div className="flex justify-between text-xs text-gray-500">
+                  <div className="flex justify-between text-xs text-[var(--ink-soft)]">
                     <span>Extras</span><span>€{pricing.addonsTotal.toFixed(2)}</span>
                   </div>
                 )}
                 {pricing.locationFee > 0 && (
-                  <div className="flex justify-between text-xs text-gray-500">
+                  <div className="flex justify-between text-xs text-[var(--ink-soft)]">
                     <span>Location fee</span><span>€{pricing.locationFee.toFixed(2)}</span>
                   </div>
                 )}
@@ -384,10 +384,10 @@ export default function OfflineBookingForm({ cars, locations, addons, settings }
                     <span>Young driver</span><span>€{pricing.youngDriverFee.toFixed(2)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-xs text-gray-500">
+                <div className="flex justify-between text-xs text-[var(--ink-soft)]">
                   <span>Tax</span><span>€{pricing.taxAmount.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between font-bold text-[#0A1F44] pt-2 border-t border-gray-100 text-base">
+                <div className="flex justify-between font-bold text-[var(--ink)] pt-2 border-t border-gray-100 text-base">
                   <span>Total</span><span>€{pricing.total.toFixed(2)}</span>
                 </div>
               </div>
@@ -395,8 +395,8 @@ export default function OfflineBookingForm({ cars, locations, addons, settings }
           </div>
 
           {/* Status + payment */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
-            <h2 className="font-bold text-[#0A1F44] text-sm uppercase tracking-wide">Status</h2>
+          <div className="op-panel p-5 space-y-4">
+            <h2 className="font-bold text-[var(--ink)] text-sm uppercase tracking-wide">Status</h2>
             <div>
               <label className={labelCls}>Booking Status</label>
               <select className={selectCls} value={bookingStatus} onChange={e => setBookingStatus(e.target.value)}>
@@ -435,7 +435,7 @@ export default function OfflineBookingForm({ cars, locations, addons, settings }
 
           {/* Submit */}
           <button type="submit" disabled={saving}
-            className="w-full flex items-center justify-center gap-2 bg-[#C9A84C] hover:bg-yellow-400 text-[#0A1F44] px-4 py-3 rounded-xl font-bold text-sm transition-colors disabled:opacity-60 shadow-sm">
+            className="w-full flex items-center justify-center gap-2 bg-[var(--pane-signal)] hover:bg-[var(--pane-signal-deep)] text-[var(--ink)] px-4 py-3 rounded-xl font-bold text-sm transition-colors disabled:opacity-60 shadow-sm">
             {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
             {saving ? 'Creating…' : 'Create Booking'}
           </button>

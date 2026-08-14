@@ -15,11 +15,11 @@ export default async function NewTestimonial() {
     <div>
       <Link
         href="/admin/testimonials"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#0A1F44]"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-[var(--ink-soft)] hover:text-[var(--ink)]"
       >
         <ArrowLeft size={14} /> Back to testimonials
       </Link>
-      <h1 className="mb-6 text-2xl font-bold text-[#0A1F44]">Add review</h1>
+      <h1 className="mb-6 text-2xl font-bold text-[var(--ink)]">Add review</h1>
       <TestimonialForm cars={cars || []} />
     </div>
   )
