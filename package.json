@@ -25,7 +25,7 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-toast": "^1.2.15",
     "@react-pdf/renderer": "^4.6.1",
-    "@supabase/ssr": "^0.12.4",
+    "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.104.1",
     "@vercel/analytics": "^2.0.1",
     "@vercel/functions": "^3.9.5",
