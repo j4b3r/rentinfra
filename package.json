@@ -39,7 +39,7 @@
     "pg": "^8.23.0",
     "qrcode": "^1.5.4",
     "react": "19.3.0",
-    "react-dom": "19.2.8",
+    "react-dom": "19.3.0",
     "react-phone-number-input": "^3.4.18",
     "react-signature-canvas": "^1.1.0-alpha.2",
     "stripe": "^22.6.1",
