@@ -33,7 +33,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "libphonenumber-js": "^1.13.16",
-    "lucide-react": "^1.73.0",
+    "lucide-react": "^1.77.0",
     "next": "16.4.6",
     "next-intl": "^4.15.3",
     "pg": "^8.23.1",
